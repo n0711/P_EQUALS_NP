@@ -1,0 +1,90 @@
+# PELAOS graph-search workspace
+
+Working implementation and research notes for Charalampos Nadiotis / PELAOS Tech.
+Started 30 October 2026. These are implementations of established algorithms, not a claim of a new algorithm or a proof of P = NP.
+
+## Paper and licence
+
+Read the [compiled paper](paper/graph-search.pdf) or its [XeLaTeX source](paper/graph-search.tex). Author: Charalampos Nadiotis, PELAOS Tech. The manuscript and its source are licensed under the ROS3-derived [Civilian-Use Licence (No Military Use), Version 1.0](MANUSCRIPT_LICENCE.md), also printed in the paper's appendix. This manuscript licence does not grant a new software licence.
+
+Repository: [n0711/P_EQUALS_NP](https://github.com/n0711/P_EQUALS_NP).
+
+## Run locally
+
+Node.js 20 or newer; no downloaded packages required. From this directory:
+
+```powershell
+node --test
+node demo.mjs
+node collect-matrices.mjs
+```
+
+`demo.mjs` writes deterministic operation counts to `results.json`.
+`collect-matrices.mjs` creates the local `matrices/` collection and its index.
+No files are uploaded or published by these scripts.
+
+## Implementation
+
+| Method | Implementation choices | Guarantee |
+| --- | --- | --- |
+| BFS | Array queue with a head index; mark on insertion; parent pointers | Shortest path on unit-cost graphs |
+| DFS | Explicit stack of traversal frames; visited tracking; parent pointers | Reachability and a path; not necessarily shortest |
+| Bidirectional BFS | Expand the smaller frontier by whole layers; reverse edges for the goal-side search | Shortest path on unit-cost directed or undirected graphs |
+| A* | Binary min-heap; cache heuristic values; skip obsolete entries; reopen improved vertices | Minimum-cost path if the heuristic is admissible |
+| Dijkstra | A* with h = 0 | Minimum-cost path with nonnegative costs |
+
+These are practical improvements over naive implementations. BFS and DFS already have optimal worst-case linear traversal bounds for explicit adjacency-list graphs. We do not claim to improve their general asymptotic bounds.
+
+```javascript
+import { Graph, astar, bfs, dfs, bidirectionalBfs } from './search.mjs';
+
+// Vertices are integers 0 through vertexCount - 1. Edges: [from, to, cost].
+const weighted = new Graph(3, [[0, 1, 2], [1, 2, 3], [0, 2, 10]]);
+console.log(astar(weighted, 0, 2)); // path [0, 1, 2], cost 5
+
+const unit = new Graph(4, [[0, 1], [1, 2], [2, 3], [0, 3]], { directed: false });
+console.log(bfs(unit, 0, 3).path); // [0, 3]
+console.log(dfs(unit, 0, 3).path); // [0, 1, 2, 3], adjacency order matters
+console.log(bidirectionalBfs(unit, 0, 3).path); // [0, 3]
+```
+
+For A*, pass `heuristic(vertex, goal)` as the fourth argument. It must be a deterministic nonnegative lower bound on remaining cost and be zero at the goal. Admissibility is a caller obligation: runtime validation checks values, not the mathematical lower-bound property. A test demonstrates how an overestimate can return a suboptimal path. Inconsistent admissible heuristics are supported by reopening vertices.
+
+Costs and heuristic values must be nonnegative safe integers. Arithmetic that leaves JavaScript's exact integer range throws an error. This version does not support negative weights, arbitrary precision, fractional weights, infinite graphs, or dynamic changes to a graph. The graph's adjacency lists are immutable after construction. Unreachable results have `path: null`, `found: false`, `cost: Infinity` in memory; JSON data uses `null` for unreachable distances.
+
+## Complexity and measurement
+
+Let V and E be the vertex and adjacency-entry counts, including both directions for undirected edges. Graph construction, validation, and reverse adjacency require O(V + E) time and storage. Each search initializes arrays of length V.
+
+- BFS, DFS, and bidirectional BFS: O(V + E) worst-case time; O(V) auxiliary storage in addition to the graph. BFS's queue retains processed entries until the search returns, still O(V).
+- A* with a consistent heuristic, including Dijkstra: O(V + (E + 1) log(E + 2)) time and O(V + E) auxiliary storage with this lazy-duplicate heap, assuming O(1) heuristic evaluations. Each vertex expands at most once. If heuristic evaluation is more expensive, add the total cost of computing it.
+- A* with an inconsistent admissible heuristic: reopening preserves correctness but the preceding expansion bound no longer applies. Count repeated expansions and heuristic computation in any complexity claim.
+
+These are ordinary RAM-model operation bounds with representable integers, not a bit-complexity analysis for unbounded integers.
+
+Metrics count processing of the goal as an expansion, even though its outgoing edges are not scanned. `examinedEdges` counts actual adjacency scans. `discovered` counts first discovery per search direction, so bidirectional BFS can count a vertex twice. `peakFrontier` measures stored work entries: pending queue entries for BFS, active frames for DFS, heap entries including stale entries for A*, and retained current/next layer entries for bidirectional BFS. It is not total memory or a directly interchangeable measure across algorithms.
+
+## Reproducible observations
+
+The demo uses unit-cost, four-neighbor, undirected grids. A* uses Manhattan distance, a consistent heuristic under these conditions. Equal A* priorities prefer larger g, then insertion order.
+
+| Scenario | Method | Path cost | Expanded |
+| --- | --- | ---: | ---: |
+| Open 40 x 40 | BFS | 78 | 1600 |
+| Open 40 x 40 | DFS | 1560 | 1561 |
+| Open 40 x 40 | Bidirectional BFS | 78 | 1560 |
+| Open 40 x 40 | A*, Manhattan | 78 | 79 |
+| Alternating wall gaps | BFS | 300 | 1366 |
+| Alternating wall gaps | DFS | 872 | 1361 |
+| Alternating wall gaps | Bidirectional BFS | 300 | 1359 |
+| Alternating wall gaps | A*, Manhattan | 300 | 1239 |
+
+The open-grid result depends strongly on the heuristic and tie breaking. The wall example demonstrates a weaker gain and a larger A* frontier. Fewer expansions are not a wall-clock speedup claim; preprocessing and heuristic costs matter. Neither scenario establishes a worst-case improvement for SAT.
+
+## Validation and research
+
+`search.test.mjs` checks all 4,096 directed simple graphs on four vertices, each with all 16 start/goal pairs. BFS, bidirectional BFS, and A* distances are compared to independent Bellman-Ford relaxation; DFS reachability and returned paths are checked. Another 100 seeded weighted graphs exercise zero costs and admissible heuristics. Additional cases cover reopening, stale heap entries, invalid inputs, parallel edges, overflow, and a 30,000-vertex DFS chain.
+
+Read [RESEARCH_NOTES.md](RESEARCH_NOTES.md) for correctness arguments and the SAT connection, and [MATRICES.md](MATRICES.md) for matrix definitions and formats.
+
+Primary A* reference: Peter E. Hart, Nils J. Nilsson, Bertram Raphael (1968), [A Formal Basis for the Heuristic Determination of Minimum Cost Paths](https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf). The original paper treats positive-cost graphs; this finite-graph implementation also supports zero-cost edges with strict cost improvements.
