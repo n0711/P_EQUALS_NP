@@ -1,0 +1,226 @@
+{
+  "provenance": "Locally generated illustrative graphs. Not an external benchmark dataset.",
+  "conventions": "See ../MATRICES.md. Rows/columns use vertex IDs; incidence columns use edge-list order. null/INF denotes no finite distance or absent edge.",
+  "examples": [
+    {
+      "id": "directed_diamond",
+      "vertexCount": 4,
+      "edgeCount": 4,
+      "directed": true,
+      "dimensions": {
+        "adjacency": [
+          4,
+          4
+        ],
+        "edge_multiplicity": [
+          4,
+          4
+        ],
+        "weight_sum": [
+          4,
+          4
+        ],
+        "min_edge_cost": [
+          4,
+          4
+        ],
+        "incidence": [
+          4,
+          4
+        ],
+        "weighted_degree": [
+          4,
+          4
+        ],
+        "laplacian": [
+          4,
+          4
+        ],
+        "reachability": [
+          4,
+          4
+        ],
+        "shortest_paths": [
+          4,
+          4
+        ]
+      }
+    },
+    {
+      "id": "astar_reopening",
+      "vertexCount": 4,
+      "edgeCount": 4,
+      "directed": true,
+      "dimensions": {
+        "adjacency": [
+          4,
+          4
+        ],
+        "edge_multiplicity": [
+          4,
+          4
+        ],
+        "weight_sum": [
+          4,
+          4
+        ],
+        "min_edge_cost": [
+          4,
+          4
+        ],
+        "incidence": [
+          4,
+          4
+        ],
+        "weighted_degree": [
+          4,
+          4
+        ],
+        "laplacian": [
+          4,
+          4
+        ],
+        "reachability": [
+          4,
+          4
+        ],
+        "shortest_paths": [
+          4,
+          4
+        ]
+      }
+    },
+    {
+      "id": "weighted_disconnected",
+      "vertexCount": 6,
+      "edgeCount": 5,
+      "directed": false,
+      "dimensions": {
+        "adjacency": [
+          6,
+          6
+        ],
+        "edge_multiplicity": [
+          6,
+          6
+        ],
+        "weight_sum": [
+          6,
+          6
+        ],
+        "min_edge_cost": [
+          6,
+          6
+        ],
+        "incidence": [
+          6,
+          5
+        ],
+        "weighted_degree": [
+          6,
+          6
+        ],
+        "laplacian": [
+          6,
+          6
+        ],
+        "reachability": [
+          6,
+          6
+        ],
+        "shortest_paths": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "id": "cycle_five",
+      "vertexCount": 5,
+      "edgeCount": 5,
+      "directed": false,
+      "dimensions": {
+        "adjacency": [
+          5,
+          5
+        ],
+        "edge_multiplicity": [
+          5,
+          5
+        ],
+        "weight_sum": [
+          5,
+          5
+        ],
+        "min_edge_cost": [
+          5,
+          5
+        ],
+        "incidence": [
+          5,
+          5
+        ],
+        "weighted_degree": [
+          5,
+          5
+        ],
+        "laplacian": [
+          5,
+          5
+        ],
+        "reachability": [
+          5,
+          5
+        ],
+        "shortest_paths": [
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "id": "grid_four_by_four",
+      "vertexCount": 16,
+      "edgeCount": 24,
+      "directed": false,
+      "dimensions": {
+        "adjacency": [
+          16,
+          16
+        ],
+        "edge_multiplicity": [
+          16,
+          16
+        ],
+        "weight_sum": [
+          16,
+          16
+        ],
+        "min_edge_cost": [
+          16,
+          16
+        ],
+        "incidence": [
+          16,
+          24
+        ],
+        "weighted_degree": [
+          16,
+          16
+        ],
+        "laplacian": [
+          16,
+          16
+        ],
+        "reachability": [
+          16,
+          16
+        ],
+        "shortest_paths": [
+          16,
+          16
+        ]
+      }
+    }
+  ]
+}

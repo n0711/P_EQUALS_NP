@@ -1,0 +1,9 @@
+{
+  "name": "pelaos-graph-search",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Graph-search research workspace for Charalampos Nadiotis",
+  "scripts": { "test": "node --test", "demo": "node demo.mjs", "matrices": "node collect-matrices.mjs" },
+  "engines": { "node": ">=20" }
+}

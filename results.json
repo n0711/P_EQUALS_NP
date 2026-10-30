@@ -1,0 +1,115 @@
+{
+  "description": "Deterministic operation counts, not wall-clock speed claims. Graph construction excluded.",
+  "rows": [
+    {
+      "scenario": "open 40x40 grid",
+      "algorithm": "BFS",
+      "cost": 78,
+      "expanded": 1600,
+      "examinedEdges": 6238,
+      "discovered": 1600,
+      "peakFrontier": 40,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "open 40x40 grid",
+      "algorithm": "DFS",
+      "cost": 1560,
+      "expanded": 1561,
+      "examinedEdges": 3879,
+      "discovered": 1561,
+      "peakFrontier": 1561,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "open 40x40 grid",
+      "algorithm": "bidirectional BFS",
+      "cost": 78,
+      "expanded": 1560,
+      "examinedEdges": 6084,
+      "discovered": 1640,
+      "peakFrontier": 119,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "open 40x40 grid",
+      "algorithm": "A* h=0 (Dijkstra)",
+      "cost": 78,
+      "expanded": 1600,
+      "examinedEdges": 6238,
+      "discovered": 1600,
+      "peakFrontier": 40,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "open 40x40 grid",
+      "algorithm": "A* Manhattan",
+      "cost": 78,
+      "expanded": 79,
+      "examinedEdges": 232,
+      "discovered": 155,
+      "peakFrontier": 77,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "alternating wall gaps",
+      "algorithm": "BFS",
+      "cost": 300,
+      "expanded": 1366,
+      "examinedEdges": 4834,
+      "discovered": 1366,
+      "peakFrontier": 7,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "alternating wall gaps",
+      "algorithm": "DFS",
+      "cost": 872,
+      "expanded": 1361,
+      "examinedEdges": 3785,
+      "discovered": 1361,
+      "peakFrontier": 873,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "alternating wall gaps",
+      "algorithm": "bidirectional BFS",
+      "cost": 300,
+      "expanded": 1359,
+      "examinedEdges": 4813,
+      "discovered": 1370,
+      "peakFrontier": 18,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "alternating wall gaps",
+      "algorithm": "A* h=0 (Dijkstra)",
+      "cost": 300,
+      "expanded": 1366,
+      "examinedEdges": 4834,
+      "discovered": 1366,
+      "peakFrontier": 7,
+      "reopened": 0,
+      "stalePops": 0
+    },
+    {
+      "scenario": "alternating wall gaps",
+      "algorithm": "A* Manhattan",
+      "cost": 300,
+      "expanded": 1239,
+      "examinedEdges": 4381,
+      "discovered": 1287,
+      "peakFrontier": 164,
+      "reopened": 0,
+      "stalePops": 448
+    }
+  ]
+}
