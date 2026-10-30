@@ -6,6 +6,8 @@ Charalampos Nadiotis, PELAOS Tech, Cyprus. 30 October 2026.
 
 Source: [graph-search.tex](graph-search.tex). Compiled paper: [graph-search.pdf](graph-search.pdf).
 
+The source is authoritative. Rebuild the PDF after changing the source so that the published document matches it.
+
 From this directory, compile with XeLaTeX twice:
 
 ```powershell
