@@ -1,0 +1,28 @@
+name: SAT and graph-search verification
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python-sat:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Verify SAT baseline against independent oracles
+        run: python -m unittest -v test_sat.py
+  node-search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify graph-search implementations
+        run: node --test
