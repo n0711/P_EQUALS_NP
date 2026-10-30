@@ -5,7 +5,7 @@ Started 30 October 2026. This repository implements established algorithms and d
 
 ## Paper and licence
 
-Read the [compiled paper](paper/graph-search.pdf) or its [XeLaTeX source](paper/graph-search.tex). Author: Charalampos Nadiotis, PELAOS Tech. The source is authoritative; rebuild the PDF after source changes. The manuscript and its source are licensed under the ROS3-derived [Civilian-Use Licence (No Military Use), Version 1.0](MANUSCRIPT_LICENCE.md), also printed in the paper's appendix. This manuscript licence does not grant a new software licence.
+Read the [compiled paper](paper/graph-search.pdf) or its [XeLaTeX source](paper/graph-search.tex). The source is authoritative; rebuild the PDF after source changes. Author: Charalampos Nadiotis, PELAOS Tech. The manuscript and its source are licensed under the ROS3-derived [Civilian-Use Licence (No Military Use), Version 1.0](MANUSCRIPT_LICENCE.md), also printed in the paper's appendix. This manuscript licence does not grant a new software licence.
 
 Repository: [n0711/P_EQUALS_NP](https://github.com/n0711/P_EQUALS_NP).
 
