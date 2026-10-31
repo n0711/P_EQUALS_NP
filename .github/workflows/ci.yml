@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Verify SAT baseline against independent oracles
-        run: python -m unittest -v test_sat.py
+      - name: Verify SAT against independent truth tables
+        run: python -m unittest discover -v -p 'test*.py'
   node-search:
     runs-on: ubuntu-latest
     steps:
