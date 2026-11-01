@@ -1,0 +1,287 @@
+﻿{
+  "seed": 20261031,
+  "variables": 100,
+  "clauses": 430,
+  "results": [
+    {
+      "instance": 0,
+      "satisfiable": true,
+      "first": {
+        "calls": 6329,
+        "branches": 6349,
+        "unit_steps": 59639
+      },
+      "occurrence": {
+        "calls": 89,
+        "branches": 88,
+        "unit_steps": 1059
+      }
+    },
+    {
+      "instance": 1,
+      "satisfiable": false,
+      "first": {
+        "calls": 4994,
+        "branches": 4998,
+        "unit_steps": 50105
+      },
+      "occurrence": {
+        "calls": 1568,
+        "branches": 1568,
+        "unit_steps": 16750
+      }
+    },
+    {
+      "instance": 2,
+      "satisfiable": false,
+      "first": {
+        "calls": 3934,
+        "branches": 4034,
+        "unit_steps": 34890
+      },
+      "occurrence": {
+        "calls": 802,
+        "branches": 814,
+        "unit_steps": 7487
+      }
+    },
+    {
+      "instance": 3,
+      "satisfiable": false,
+      "first": {
+        "calls": 6283,
+        "branches": 6390,
+        "unit_steps": 58668
+      },
+      "occurrence": {
+        "calls": 3433,
+        "branches": 3440,
+        "unit_steps": 32548
+      }
+    },
+    {
+      "instance": 4,
+      "satisfiable": true,
+      "first": {
+        "calls": 1363,
+        "branches": 1382,
+        "unit_steps": 14116
+      },
+      "occurrence": {
+        "calls": 332,
+        "branches": 332,
+        "unit_steps": 3617
+      }
+    },
+    {
+      "instance": 5,
+      "satisfiable": false,
+      "first": {
+        "calls": 4398,
+        "branches": 4402,
+        "unit_steps": 44796
+      },
+      "occurrence": {
+        "calls": 2102,
+        "branches": 2108,
+        "unit_steps": 23968
+      }
+    },
+    {
+      "instance": 6,
+      "satisfiable": true,
+      "first": {
+        "calls": 2242,
+        "branches": 2274,
+        "unit_steps": 22169
+      },
+      "occurrence": {
+        "calls": 2089,
+        "branches": 2103,
+        "unit_steps": 24456
+      }
+    },
+    {
+      "instance": 7,
+      "satisfiable": true,
+      "first": {
+        "calls": 2802,
+        "branches": 2802,
+        "unit_steps": 29864
+      },
+      "occurrence": {
+        "calls": 75,
+        "branches": 74,
+        "unit_steps": 765
+      }
+    },
+    {
+      "instance": 8,
+      "satisfiable": false,
+      "first": {
+        "calls": 7033,
+        "branches": 7054,
+        "unit_steps": 70942
+      },
+      "occurrence": {
+        "calls": 2330,
+        "branches": 2336,
+        "unit_steps": 27101
+      }
+    },
+    {
+      "instance": 9,
+      "satisfiable": true,
+      "first": {
+        "calls": 6601,
+        "branches": 6620,
+        "unit_steps": 66100
+      },
+      "occurrence": {
+        "calls": 1033,
+        "branches": 1032,
+        "unit_steps": 11535
+      }
+    },
+    {
+      "instance": 10,
+      "satisfiable": false,
+      "first": {
+        "calls": 5939,
+        "branches": 5968,
+        "unit_steps": 58153
+      },
+      "occurrence": {
+        "calls": 881,
+        "branches": 886,
+        "unit_steps": 9182
+      }
+    },
+    {
+      "instance": 11,
+      "satisfiable": false,
+      "first": {
+        "calls": 3020,
+        "branches": 3036,
+        "unit_steps": 28869
+      },
+      "occurrence": {
+        "calls": 884,
+        "branches": 884,
+        "unit_steps": 9427
+      }
+    },
+    {
+      "instance": 12,
+      "satisfiable": false,
+      "first": {
+        "calls": 4587,
+        "branches": 4624,
+        "unit_steps": 47481
+      },
+      "occurrence": {
+        "calls": 1308,
+        "branches": 1326,
+        "unit_steps": 13567
+      }
+    },
+    {
+      "instance": 13,
+      "satisfiable": false,
+      "first": {
+        "calls": 2148,
+        "branches": 2150,
+        "unit_steps": 23444
+      },
+      "occurrence": {
+        "calls": 1068,
+        "branches": 1096,
+        "unit_steps": 11063
+      }
+    },
+    {
+      "instance": 14,
+      "satisfiable": false,
+      "first": {
+        "calls": 8578,
+        "branches": 8638,
+        "unit_steps": 79020
+      },
+      "occurrence": {
+        "calls": 2109,
+        "branches": 2118,
+        "unit_steps": 19832
+      }
+    },
+    {
+      "instance": 15,
+      "satisfiable": false,
+      "first": {
+        "calls": 8992,
+        "branches": 8992,
+        "unit_steps": 94074
+      },
+      "occurrence": {
+        "calls": 3509,
+        "branches": 3536,
+        "unit_steps": 36891
+      }
+    },
+    {
+      "instance": 16,
+      "satisfiable": true,
+      "first": {
+        "calls": 2828,
+        "branches": 2880,
+        "unit_steps": 25058
+      },
+      "occurrence": {
+        "calls": 334,
+        "branches": 339,
+        "unit_steps": 3285
+      }
+    },
+    {
+      "instance": 17,
+      "satisfiable": true,
+      "first": {
+        "calls": 3147,
+        "branches": 3259,
+        "unit_steps": 26591
+      },
+      "occurrence": {
+        "calls": 147,
+        "branches": 146,
+        "unit_steps": 1540
+      }
+    },
+    {
+      "instance": 18,
+      "satisfiable": false,
+      "first": {
+        "calls": 3026,
+        "branches": 3066,
+        "unit_steps": 27050
+      },
+      "occurrence": {
+        "calls": 463,
+        "branches": 462,
+        "unit_steps": 4761
+      }
+    },
+    {
+      "instance": 19,
+      "satisfiable": false,
+      "first": {
+        "calls": 6112,
+        "branches": 6176,
+        "unit_steps": 57901
+      },
+      "occurrence": {
+        "calls": 901,
+        "branches": 924,
+        "unit_steps": 9171
+      }
+    }
+  ]
+}

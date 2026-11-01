@@ -1,0 +1,287 @@
+﻿{
+  "seed": 20261031,
+  "variables": 40,
+  "clauses": 172,
+  "results": [
+    {
+      "instance": 0,
+      "satisfiable": true,
+      "first": {
+        "calls": 81,
+        "branches": 81,
+        "unit_steps": 396
+      },
+      "occurrence": {
+        "calls": 21,
+        "branches": 21,
+        "unit_steps": 116
+      }
+    },
+    {
+      "instance": 1,
+      "satisfiable": true,
+      "first": {
+        "calls": 37,
+        "branches": 37,
+        "unit_steps": 125
+      },
+      "occurrence": {
+        "calls": 18,
+        "branches": 17,
+        "unit_steps": 128
+      }
+    },
+    {
+      "instance": 2,
+      "satisfiable": false,
+      "first": {
+        "calls": 130,
+        "branches": 130,
+        "unit_steps": 681
+      },
+      "occurrence": {
+        "calls": 55,
+        "branches": 54,
+        "unit_steps": 249
+      }
+    },
+    {
+      "instance": 3,
+      "satisfiable": true,
+      "first": {
+        "calls": 78,
+        "branches": 80,
+        "unit_steps": 410
+      },
+      "occurrence": {
+        "calls": 38,
+        "branches": 39,
+        "unit_steps": 227
+      }
+    },
+    {
+      "instance": 4,
+      "satisfiable": false,
+      "first": {
+        "calls": 78,
+        "branches": 80,
+        "unit_steps": 359
+      },
+      "occurrence": {
+        "calls": 68,
+        "branches": 68,
+        "unit_steps": 390
+      }
+    },
+    {
+      "instance": 5,
+      "satisfiable": false,
+      "first": {
+        "calls": 86,
+        "branches": 86,
+        "unit_steps": 495
+      },
+      "occurrence": {
+        "calls": 54,
+        "branches": 54,
+        "unit_steps": 257
+      }
+    },
+    {
+      "instance": 6,
+      "satisfiable": false,
+      "first": {
+        "calls": 125,
+        "branches": 126,
+        "unit_steps": 669
+      },
+      "occurrence": {
+        "calls": 50,
+        "branches": 52,
+        "unit_steps": 249
+      }
+    },
+    {
+      "instance": 7,
+      "satisfiable": true,
+      "first": {
+        "calls": 13,
+        "branches": 12,
+        "unit_steps": 48
+      },
+      "occurrence": {
+        "calls": 32,
+        "branches": 31,
+        "unit_steps": 222
+      }
+    },
+    {
+      "instance": 8,
+      "satisfiable": false,
+      "first": {
+        "calls": 263,
+        "branches": 262,
+        "unit_steps": 1173
+      },
+      "occurrence": {
+        "calls": 47,
+        "branches": 46,
+        "unit_steps": 273
+      }
+    },
+    {
+      "instance": 9,
+      "satisfiable": false,
+      "first": {
+        "calls": 59,
+        "branches": 58,
+        "unit_steps": 448
+      },
+      "occurrence": {
+        "calls": 67,
+        "branches": 66,
+        "unit_steps": 504
+      }
+    },
+    {
+      "instance": 10,
+      "satisfiable": false,
+      "first": {
+        "calls": 134,
+        "branches": 138,
+        "unit_steps": 631
+      },
+      "occurrence": {
+        "calls": 20,
+        "branches": 22,
+        "unit_steps": 111
+      }
+    },
+    {
+      "instance": 11,
+      "satisfiable": false,
+      "first": {
+        "calls": 77,
+        "branches": 76,
+        "unit_steps": 478
+      },
+      "occurrence": {
+        "calls": 75,
+        "branches": 74,
+        "unit_steps": 374
+      }
+    },
+    {
+      "instance": 12,
+      "satisfiable": true,
+      "first": {
+        "calls": 13,
+        "branches": 12,
+        "unit_steps": 34
+      },
+      "occurrence": {
+        "calls": 12,
+        "branches": 11,
+        "unit_steps": 43
+      }
+    },
+    {
+      "instance": 13,
+      "satisfiable": false,
+      "first": {
+        "calls": 107,
+        "branches": 106,
+        "unit_steps": 632
+      },
+      "occurrence": {
+        "calls": 71,
+        "branches": 74,
+        "unit_steps": 476
+      }
+    },
+    {
+      "instance": 14,
+      "satisfiable": true,
+      "first": {
+        "calls": 45,
+        "branches": 44,
+        "unit_steps": 249
+      },
+      "occurrence": {
+        "calls": 37,
+        "branches": 36,
+        "unit_steps": 190
+      }
+    },
+    {
+      "instance": 15,
+      "satisfiable": false,
+      "first": {
+        "calls": 224,
+        "branches": 224,
+        "unit_steps": 1021
+      },
+      "occurrence": {
+        "calls": 42,
+        "branches": 42,
+        "unit_steps": 210
+      }
+    },
+    {
+      "instance": 16,
+      "satisfiable": true,
+      "first": {
+        "calls": 41,
+        "branches": 40,
+        "unit_steps": 225
+      },
+      "occurrence": {
+        "calls": 27,
+        "branches": 26,
+        "unit_steps": 153
+      }
+    },
+    {
+      "instance": 17,
+      "satisfiable": false,
+      "first": {
+        "calls": 97,
+        "branches": 96,
+        "unit_steps": 512
+      },
+      "occurrence": {
+        "calls": 79,
+        "branches": 78,
+        "unit_steps": 478
+      }
+    },
+    {
+      "instance": 18,
+      "satisfiable": true,
+      "first": {
+        "calls": 187,
+        "branches": 186,
+        "unit_steps": 1029
+      },
+      "occurrence": {
+        "calls": 31,
+        "branches": 31,
+        "unit_steps": 122
+      }
+    },
+    {
+      "instance": 19,
+      "satisfiable": false,
+      "first": {
+        "calls": 47,
+        "branches": 50,
+        "unit_steps": 217
+      },
+      "occurrence": {
+        "calls": 42,
+        "branches": 42,
+        "unit_steps": 256
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+name: SAT cross-language verification
+on:
+  push:
+    branches: [main, "research/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  exact-sat-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Build C17 with warnings
+        run: gcc -std=c17 -O2 -Wall -Wextra -Wpedantic -Werror -o c_research/sat_solver c_research/sat.c
+      - name: Python SAT reference and heuristic tests
+        run: python -m unittest -v test_sat.py test_sat_benchmark.py
+      - name: C SAT exhaustive oracle cross-checks
+        run: python c_research/test_and_analyze.py c_research/sat_solver
+      - name: C DIMACS edge-case regression checks
+        run: python c_research/test_edge_cases.py c_research/sat_solver
+      - name: Upload C benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c-sat-research-evidence
+          path: c_research/c_sat_results.json
+          if-no-files-found: ignore
