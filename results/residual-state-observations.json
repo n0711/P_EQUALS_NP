@@ -1,0 +1,43 @@
+{
+  "status": "previously observed, not rerun during this commit",
+  "environment": "Python 3.13.5, Linux x86-64",
+  "method": "Python set insertion of integer subset identifiers; tracemalloc peak; single run",
+  "rows": [
+    {
+      "k": 4,
+      "unique": 16,
+      "elapsed_seconds": 0.00001,
+      "peak_mib": 0.001
+    },
+    {
+      "k": 8,
+      "unique": 256,
+      "elapsed_seconds": 0.000011,
+      "peak_mib": 0.01
+    },
+    {
+      "k": 12,
+      "unique": 4096,
+      "elapsed_seconds": 0.00146,
+      "peak_mib": 0.242
+    },
+    {
+      "k": 16,
+      "unique": 65536,
+      "elapsed_seconds": 0.022973,
+      "peak_mib": 3.992
+    },
+    {
+      "k": 18,
+      "unique": 262144,
+      "elapsed_seconds": 0.186792,
+      "peak_mib": 16.792
+    },
+    {
+      "k": 20,
+      "unique": 1048576,
+      "elapsed_seconds": 0.689529,
+      "peak_mib": 67.192
+    }
+  ]
+}
