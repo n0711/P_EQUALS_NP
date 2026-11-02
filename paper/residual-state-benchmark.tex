@@ -1,0 +1,60 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,hyperref}
+\newtheorem{proposition}{Proposition}
+\title{Residual Boolean Functions Under a Fixed Variable Order:\\An Exact Counting Result and Enumeration Measurements}
+\author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
+\date{2 November 2026\\Technical research note}
+\begin{document}
+\maketitle
+\begin{abstract}
+We examine the number of distinct residual Boolean functions arising from a simple family of conjunctive normal form formulas under a fixed variable order. We prove that assigning the first group of variables yields exactly $2^k$ pairwise distinct residual functions. With conventional binary-encoded variable indices, this number is superpolynomial in the formula encoding length. We report a small Python benchmark enumerating integer subset identifiers corresponding bijectively to these residuals. This is a restricted state-enumeration observation, not a lower bound for SAT and not a proof of $\mathsf{P}=\mathsf{NP}$ or $\mathsf{P}\ne\mathsf{NP}$.
+\end{abstract}
+\section{Problem and construction}
+For $k\geq 0$, define
+\[
+ F_k(x_1,\ldots,x_k,y_1,\ldots,y_k)
+ =\bigwedge_{i=1}^{k}(x_i\lor y_i).
+\]
+Consider the fixed assignment order $x_1,\ldots,x_k$ before any $y_i$. For an assignment to all $x$ variables, let $S=\{i:x_i=\mathrm{false}\}$. Substitution produces the residual
+\[
+ R_S(y_1,\ldots,y_k)=\bigwedge_{i\in S}y_i,
+\]
+with the empty conjunction interpreted as true.
+\begin{proposition}
+The $2^k$ assignments to the $x$ variables induce exactly $2^k$ distinct residual Boolean functions of the $y$ variables.
+\end{proposition}
+\begin{proof}
+Every assignment corresponds to exactly one subset $S\subseteq\{1,\ldots,k\}$. For distinct $S,T$, choose $j$ in their symmetric difference; without loss of generality $j\in S\setminus T$. Set $y_j=\mathrm{false}$ and all other $y_i=\mathrm{true}$. Then $R_S$ evaluates to false and $R_T$ to true. Thus the functions are pairwise distinct, and their number is exactly the number of subsets, $2^k$.
+\end{proof}
+\section{Encoding-size consequence}
+For a conventional explicit CNF encoding using binary variable identifiers and clause delimiters, the bit length $N$ of $F_k$ is $\Theta(k\log(k+1))$. Therefore the number of residual functions is
+\[
+ 2^k=2^{\Theta(N/\log N)},
+\]
+which grows faster than every fixed polynomial in $N$. Any procedure that explicitly retains one distinct representative for every residual function at this particular layer has a superpolynomial state-count requirement. This conclusion does not apply to all variable orders, symbolic encodings, early stopping, or arbitrary SAT algorithms.
+\section{Measurement protocol}
+A Python 3.13.5 benchmark on Linux x86-64 enumerated integer masks $0,\ldots,2^k-1$, inserted them into a Python set, and recorded elapsed wall-clock time and peak \texttt{tracemalloc} memory. Each mask is a unique exact identifier for one subset $S$, and hence for one residual function by the proposition. The experiment did \emph{not} construct residual CNF expressions, compare truth tables, execute a SAT solver, or measure all process memory. Results are one run, not repeated-trial statistics.
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+$k$ & identifiers & elapsed (s) & peak (MiB)\\
+\midrule
+4 & 16 & 0.000010 & 0.001\\
+8 & 256 & 0.000011 & 0.010\\
+12 & 4096 & 0.001460 & 0.242\\
+16 & 65536 & 0.022973 & 3.992\\
+18 & 262144 & 0.186792 & 16.792\\
+20 & 1048576 & 0.689529 & 67.192\\
+\bottomrule
+\end{tabular}
+\end{center}
+Counts agree with the theorem at every measured size. Time and memory are implementation- and machine-dependent, and the small sample does not justify extrapolating a precise empirical growth law.
+\section{Implications and limitations}
+The family is trivially satisfiable, for example by setting every $x_i$ to true. Consequently, this construction provides no lower bound on the time required to decide its satisfiability, much less on arbitrary SAT. It instead refutes the proposed general polynomial bound based \emph{only} on exact merging of all fixed-order residual functions. Establishing $\mathsf{P}=\mathsf{NP}$ would require a deterministic, sound and complete algorithm for arbitrary SAT with a proved polynomial worst-case total bit complexity, including representation, state transitions, and decision costs. No such result is established here.
+\section{Reproducibility}
+The accompanying repository contains a standalone Python enumeration benchmark, a test of the exact counts, and a JSON record of the previously observed values. Run \texttt{python residual\_state\_benchmark.py} to obtain fresh measurements; machine-dependent timings are not expected to match the table. Build this note with \texttt{xelatex paper/residual-state-benchmark.tex}.
+\section*{Research status}
+This note is a restricted mathematical and experimental result, not a solution to the P versus NP Millennium Prize Problem.
+\end{document}
