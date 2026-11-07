@@ -202,6 +202,16 @@ also completed and archived its raw JSON under artifact ID
 13586040475. These observations concern finite validation only,
 and do not establish runtime improvement or a general bound.
 
+M6 validation was executed on 7 November 2026 in GitHub Actions
+run 42403877621. All 48 Python unittest methods passed, including
+11 new M6 tests with 810 seeded small-formula exhaustive-oracle
+comparisons and 210 signed variable-renaming comparisons. The
+bounded same-primal-graph benchmark was archived as artifact ID
+13586087780, and the other SAT and graph-search checks passed.
+Completion of the benchmark workflow does not imply that
+time-limited individual solver calls always completed, nor
+that one solver is asymptotically faster than another.
+
 Each solver run has either a completed SAT/UNSAT result,
 an explicit call-limit status, or a timeout. The latter outcomes
 are not UNSAT answers. Results should report seeds, input size,
