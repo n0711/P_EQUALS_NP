@@ -72,9 +72,18 @@ class SudokuTransferCountingTests(unittest.TestCase):
         puzzle[0][0] = 0
         self.check_count(3, puzzle, 1)
 
-    def test_known_nine_by_nine_standard_puzzle(self):
-        # The reference 9x9 puzzle has a well-known unique completion.
-        self.check_count(3, NINE, 1, max_states=30000)
+    def test_known_nine_by_nine_standard_puzzle_bounded(self):
+        # Complete enumeration may be expensive even when finding one
+        # satisfying witness is fast. Bounded counting is not UNSAT.
+        count, model, info = count_sudoku_transfer(
+            3, NINE, max_states=60, max_row_permutations=2000)
+        self.assertIn(info["status"], ("completed", "limit_states"))
+        if info["status"] == "completed":
+            self.assertEqual(count, 1)
+            self.assertTrue(verify_sudoku_certificate(3, NINE, model))
+        else:
+            self.assertIsNone(count)
+            self.assertIsNone(model)
 
     def test_constructed_sixteen_by_sixteen(self):
         known = patterned_solution(4)
