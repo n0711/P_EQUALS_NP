@@ -97,3 +97,22 @@ This addendum does not overwrite the originally pending M5 status; it records th
 - **Publication status:** compile-successful, author-attributed **working XeLaTeX manuscript**, not independently peer reviewed, not yet a claim of a novel complexity result or a proof of P = NP.
 
 For later milestones, append a new log entry and extend the XeLaTeX source with only verified claims and commit-specific evidence. Preserve old artifacts, add corrected versions with new run IDs, and do not quietly alter past experimental outcomes.
+
+
+## M6 - 2026-11-07 - Mixed affine-CNF strong backdoor
+
+**Hypothesis:** Complete XOR CNF blocks can be extracted from *mixed* formulas while preserving the remaining unrecognized clauses, allowing exact search over residual variables only.
+
+**Mathematical result:** Standard affine-constraint/backdoor argument. Let A be the extracted XOR system and R the remaining CNF. Let r be the number of distinct variables in R. Because F is equivalent to A AND R and any assignment to those r variables decides R, linear feasibility of A completes each case. The algorithm uses at most poly(N)*2^r bit time in the explicit-input model. It is polynomial only for the restricted cases with r=O(log N); arbitrary formulas may retain r=n.
+
+**Implementation commit(s):** M6 branch `research/m6-mixed-affine-backdoors-20261107` derives from M5 merge `9594fa6f6293ab9827f9a0daecbdefb5b2db2440`. Source and test paths: `mixed_affine_sat.py`, `test_mixed_affine_sat.py`, `run_m6_backdoor_benchmark.py`, `M6_MIXED_AFFINE_BACKDOOR.md`. The graph benchmark extends existing connected cubic parity formulas with an unrecognized four-literal clause.
+
+**Prior work:** Williams, Gomes and Selman, *Backdoors To Typical Case Complexity*, IJCAI 2003 (https://ijcai.org/proceedings/2003/167); Schaefer, STOC 1978; established Gaussian elimination for XOR systems. This milestone is an implementation and experimental synthesis, not an original complexity-theoretic theorem.
+
+**Experimental status at creation:** source and tests pushed, awaiting CI. Planned checks: 720 seeded arbitrary small-CNF cases against an independent truth-table oracle, 175 seeded mixed XOR-plus-4CNF cases, 100 variable-renaming cases, explicit connected even/odd-charge parity instances and strict limit semantics. Benchmark with separate processes and deadlines on DPLL, graph separator and mixed affine. Raw JSON and source hashes are required; no speedup asserted before verification.
+
+**Falsification:** test non-affine connected CNF families in which r remains n; record when GF(2) extraction adds overhead or fails to reduce search.
+
+**XeLaTeX:** M6 subsection added to the cumulative working source. The existing M0-M5 record remains intact. New experimental numbers must be amended with a dated CI run and artifact digest after verification.
+
+**Status:** M6 correctness reasoning complete subject to independent review; execution evidence pending.
