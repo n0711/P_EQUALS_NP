@@ -313,12 +313,20 @@ phase projections to exact graph conflicts. The
 dedicated research note is
 \texttt{SUDOKU\_RIOTUNER\_PHASE\_M7.md}.
 
-At the time of this draft, M7 experimental results
-require independent GitHub Actions verification.
-A test file is not a passed test. The milestone
-ledger records concrete run and artifact identifiers
-once CI has been checked. Nothing in this section
-proves $\mathsf{P}=\mathsf{NP}$.
+On 7 November 2026, SAT research GitHub Actions
+run 42415413946 completed successfully: 68 Python
+unittest methods passed, including 20 new M7
+tests. Those M7 cases include 540 independently
+oracle-checked $4\times4$ clue sets and 240 seeded
+complete $4\times4$ assignments used to compare
+Fourier and integer edge counts. The graph-conflict
+experiment completed and was archived as GitHub
+artifact 13590907805. These are finite checks,
+not a polynomial-time guarantee or evidence that
+weighted Fourier windows yield an exact verifier.
+The milestone ledger records the source and artifact
+provenance. Nothing in this section proves
+$\mathsf{P}=\mathsf{NP}$.
 
 \section{Evidence, limitations and manuscript updates}
 The cumulative research log is
