@@ -33,6 +33,7 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M5 | 2026-11-07 | Affine recognizer + GF(2) / graph-adversary benchmark infrastructure | Exact equivalence for recognized complete XOR clause blocks, standard Gaussian elimination; connected odd-charge Tseitin contradiction | \`structural_hybrid_sat.py\`, \`graph_research_instances.py\`, \`test_structural_hybrid_sat.py\`, \`run_structural_benchmark.py\`; **CI on M5 head pending verification** | Section: algebraic shortcut, evaluation plan |
 | M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
 | M7 | 2026-11-07 | Nondeterministic generalized Sudoku graph coloring and RioTuner-inspired Fourier integral | NP certificate verification, exact one-hot CNF encoding, Fourier character orthogonality, nonuniform-window leakage | sudoku_graph_np.py, sudoku_graph_to_sat.py, sudoku_phase_integrals.py, tests; CI initially pending | Section: Sudoku and Fourier phase constraints |
+| M8 | 2026-11-07 | Exact generalized Sudoku counting by row-transfer masks | Exact count recurrence, q! first-row symmetry, exponential loose bound | sudoku_transfer_count.py, test_sudoku_transfer_count.py, run_sudoku_transfer_benchmark.py; 81 CI tests passed, run 42418159452, artifact 13592321531 | Section: transfer counting and symmetry |
 
 ## M5 hypothesis and mathematical scope
 
@@ -212,3 +213,35 @@ A tested 4x4 puzzle was solved in **2 recursive nodes** by the deterministic gra
 - **Build:** [XeLaTeX milestone run 42415890343](https://github.com/n0711/P_EQUALS_NP/actions/runs/42415890343) passed. It built paper/structural-sat-milestones.tex twice and uploaded **structural-sat-milestone-paper**, artifact ID **13591880379**.
 - The exact PDF archived in that artifact is **6 A4 pages**. Its metadata names Charalampos Nadiotis as author and it was visually rendered and inspected; the theorem, Fourier integral, Yato-Seta citation and experiment results are legible.
 - **Research interpretation:** a correct NP certificate verifier, a polynomial Sudoku-to-CNF encoding and a numerical Fourier integral equality diagnostic all stand independently of the unproved conjecture P=NP. No deterministic polynomial-time solver for every generalized Sudoku instance is established.
+
+
+## M8 - Sudoku graph transfer counting, 7 November 2026
+
+**Publication provenance:** The researcher reports that the M7 Sudoku and RioTuner-inspired integral working manuscript has been posted on ResearchGate. Its URL/DOI and any editorial review have not been independently checked. M8 is a separate follow-up, with its own falsifiable results.
+
+**Question:** Can the exact M7 Fourier Sudoku partition function be evaluated by grouping graph-color assignments that have the same future-relevant boundary masks, rather than by enumerating all complete colorings separately?
+
+**Construction:** For q=b^2 colors, every full Sudoku row must be a permutation of [q]. State after r rows contains q column masks (q bits each) and b masks (q bits each) for the current box-row band. Accepted row permutations add their digits to the masks. Box masks reset between bands. Cache the count of accepted suffixes keyed by (r, columns, active boxes).
+
+**Exactness theorem:** Each valid completed coloring has exactly one sequence of row permutations. Each accepted sequence yields q distinct digits in every row, column and b-by-b box, and respects all givens. Every unit has q cells and q colors, so these conditions are sufficient. Summing 1 over all completed transfer paths therefore counts exactly the valid completions. This is a mathematically sound reordering of the finite M7 Fourier partition function, not a polynomial-time evaluation theorem.
+
+**Blank-board symmetry theorem:** On a puzzle with NO givens, global color permutations form an S_q action that is free on complete grids. Every orbit contains precisely one completion with first row (1,2,...,q). Consequently Z_blank=q! times Z_canonical. A clue-bearing board cannot be normalized by this unrestricted operation.
+
+**Complexity:** There are at most q*2^(q^2+bq) transfer states because q column masks and b active box masks each contain q bits. Each state may inspect q! row permutations and requires polynomial transition and arbitrary-precision arithmetic. A loose worst-case bit-operation upper bound is poly(q)*q!*2^(q^2+bq), exponential as generalized board dimension grows; this is NOT a proof of P=NP and not an exponential lower bound for all solvers.
+
+**Implementation:** sudoku_transfer_count.py (exact arbitrary-precision count, model reconstruction and explicit resource budgets), test_sudoku_transfer_count.py (independent oracle and symmetry checks), run_sudoku_transfer_benchmark.py (JSON CI evidence). Count 0 is UNSAT only with status completed; the limit_states and limit_row_permutations statuses are UNKNOWN.
+
+**Verified CI:** GitHub Actions SAT research run 42418159452 (https://github.com/n0711/P_EQUALS_NP/actions/runs/42418159452), Python job 128540623940, succeeded with 81 unittest methods in 1.046 s, including 13 new M8 methods. Cases include all 288 known completed 4x4 grids, 240 seeded clue subsets, 160 random adversarial 4x4 clue patterns, 9x9 and 16x16 examples, independent model validation, digit relabeling and resource limit semantics.
+
+**Artifact:** m8-sudoku-transfer-results, ID 13592321531, downloaded and inspected. Exact measurements:
+- Empty 4x4 without symmetry: count 288, 85 transfer states, 240 accepted transitions, 2040 row trials.
+- Empty 4x4 with first-row symmetry: count 288, 15 states, 26 accepted transitions, 337 row trials. Canonical count 12 multiplied by 24.
+- Four-blank 4x4: count 1, 4 states. Solved and one-blank 9x9: count 1 each, 9 states. Fully solved constructed 16x16: count 1, 16 states.
+- Standard 9x9 under 60-state budget: 41,262 row trials, then limit_states; exact count UNKNOWN, not UNSAT. The previous graph finder recovered one witness in one node.
+- Empty 9x9 under max 5000 row permutations: limit_row_permutations before state search (9! = 362880); exact count UNKNOWN.
+
+**Interpretation:** A provably correct, special-case symmetry optimization reduces this finite search from 85 to 15 memoized states. Generalized Sudoku counting still has exponential possible boundary states. No uniform polynomial-time bound has been established.
+
+**Next falsifiable gate:** Seek exact quotienting of frontier states for arbitrary clue patterns, and measure failures on puzzles whose boundary signatures remain distinct. The proof obligation must include complete bit complexity, not only the number of sample search nodes.
+
+**Paper integration:** Add section M8 to paper/structural-sat-milestones.tex; the compiled paper requires a new successful XeLaTeX workflow and immutable artifact ID.
