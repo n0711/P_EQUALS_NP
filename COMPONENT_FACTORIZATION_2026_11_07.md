@@ -36,7 +36,7 @@ Corollary: A single UNSAT component establishes global UNSAT. Combining one vali
 
 ## Theorem 2 - bounded-component time
 
-Let N be the input bit length and b=max_i |V_i| (b=0 if there are no components). Union-find incidence decomposition, normalization and compact variable remapping have polynomial total cost in N on the explicit input representation.
+Let N be the complete explicit representation size, counting n variable slots as well as all encoded clauses, and let b=max_i |V_i| (b=0 if there are no components). In particular, n <= N. This convention matters because the implementation returns a length-n assignment, including values for unused variables. With an alternative succinct encoding where n is binary and may be exponentially larger than its representation, the complexity statement is in n plus input length, not in that succinct bit length alone. Union-find incidence decomposition, normalization and compact variable remapping cost polynomial time in N.
 
 If each F_i is decided by a correct exponential-time DPLL solver, total worst-case bit time is bounded by
 
