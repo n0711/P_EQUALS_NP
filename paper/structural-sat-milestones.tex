@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{7 November 2026\\Working manuscript, milestone M6}
+\date{7 November 2026\\Working manuscript, milestone M7}
 \begin{document}
 \maketitle
 
@@ -189,6 +189,136 @@ the polarity-aware hybrid on these graph-identical inputs.
 Any \texttt{timeout} or \texttt{limit\_calls} result is
 \emph{undecided}, not UNSAT. Run and artifact IDs for each
 validated result are appended in the milestone ledger.
+
+
+\section{M7: Generalized Sudoku and RioTuner-inspired Fourier integrals}
+
+\subsection{Nondeterministic graph-coloring formulation}
+Let $b\ge1$ denote the box width and $q=b^2$. A generalized Sudoku
+board has $q$ rows, $q$ columns, $q^2$ cells, and labels $1,\ldots,q$.
+Create a vertex per cell; connect two vertices if and only if their
+cells share a row, column, or $b\times b$ box. An assignment
+$c:V\rightarrow[q]$ respects a Sudoku puzzle precisely when it
+is a proper graph coloring and preserves every prescribed given digit.
+
+\begin{theorem}[Polynomial witness verification]
+Generalized Sudoku belongs to $\mathsf{NP}$.
+\end{theorem}
+\begin{proof}
+A certificate contains one color per cell, a total of $q^2$
+integers each represented in $O(\log q)$ bits. A deterministic
+verifier confirms the digits lie in $[q]$, checks prescribed
+givens, and compares assigned colors across every graph edge.
+Each vertex has $O(q)$ neighbors, so $|E|=O(q^3)$, and
+verification is polynomial in the explicit board size.
+A nondeterministic machine guesses this certificate.
+The argument does not show a deterministic polynomial-time
+method for discovering a certificate.
+\end{proof}
+
+The reference implementation
+\texttt{sudoku\_graph\_np.py} constructs the graph, checks
+certificates, and solves examples via deterministic
+constraint propagation and backtracking. It is exact when
+completed, but its worst case may be exponential.
+An explicit node budget yields an \emph{undecided} status
+rather than an unsatisfiability certificate.
+
+\subsection{A Fourier integral as a color-conflict indicator}
+The author's separate RioTuner engine (repository
+\texttt{n0711/riotuner}, \texttt{engine/src/partials.rs})
+uses weighted complex phase demodulation to estimate
+audio frequency. Here we transfer only its Fourier
+projection principle, not the audio code or its
+pitch-estimation guarantees.
+
+\begin{theorem}[Fourier--Kronecker projection]
+For colors $a,b\in\{1,\ldots,q\}$, define
+\begin{equation}
+\delta_q(a,b)=\frac{1}{2\pi}\int_0^{2\pi}
+ e^{i(a-b)t}\,dt =
+ \frac1q\sum_{k=0}^{q-1}
+ e^{2\pi i k(a-b)/q}.
+\end{equation}
+Then $\delta_q(a,b)=1$ if $a=b$ and is zero otherwise.
+For any complete coloring $c$, the energy
+\begin{equation}
+E(c)=\sum_{\{u,v\}\in E}\delta_q(c(u),c(v))
+\end{equation}
+equals the integer number of same-color graph edges.
+\end{theorem}
+\begin{proof}
+If $a=b$, every integrand and discrete summand equals one.
+Otherwise $d=a-b$ is a nonzero integer with $|d|<q$.
+Integrating the nonconstant integer-frequency exponential
+over the circle gives zero. In the discrete sum,
+$\omega=e^{2\pi i d/q}$ is a nontrivial $q$th root
+of unity, hence
+$\sum_{k=0}^{q-1}\omega^k=(1-\omega^q)/(1-\omega)=0$.
+Summing edge indicators gives the collision count.
+\end{proof}
+
+For a \emph{complete} coloring, zero energy together
+with preserved givens is exactly a Sudoku solution.
+For a partial assignment, zero conflicts among assigned
+cells cannot decide whether a full solution exists.
+Evaluating the displayed discrete phase sum directly
+requires $O(q|E|)$ numerical operations, whereas direct
+exact integer comparisons require $O(|E|)$. The
+integral notation therefore does \emph{not} improve
+the complexity of certificate checking.
+
+\paragraph{Audio window transfer obstruction.}
+RioTuner uses a nonuniform four-term Blackman--Harris
+analysis window. Replacing the uniform coefficients
+in the finite Fourier sum by these weights generally
+destroys exact character orthogonality. The resulting
+nonzero leakage can appear even for valid Sudoku
+colorings. Consequently, weighted phase diagnostics
+and floating-point cancellation are not valid SAT
+or Sudoku decision certificates.
+
+\subsection{Polynomial encoding and counting obstruction}
+The module \texttt{sudoku\_graph\_to\_sat.py}
+encodes one Boolean variable for each cell-color pair,
+for a total of $q^3$ variables. Clauses enforce
+exactly one color per cell, unequal colors along graph
+edges, and the original givens. The encoding has
+$O(q^4)$ explicit size and preserves solutions:
+Sudoku reduces to CNF-SAT in polynomial time.
+
+Let $D$ be the given-cell set and $g_v$ its required
+color. The number of valid completions is
+\begin{equation}
+Z=\sum_{c\in[q]^V}
+\left[\prod_{\{u,v\}\in E}
+ (1-\delta_q(c(u),c(v)))\right]
+\left[\prod_{v\in D}\delta_q(c(v),g_v)\right].
+\end{equation}
+There are $q^{q^2}$ candidate complete colorings.
+Replacing the indicators by Fourier integrals does
+not itself provide a polynomial procedure to evaluate
+this partition function.
+
+\subsection{Experiment and reproducibility}
+The source files are \texttt{sudoku\_graph\_np.py},
+\texttt{sudoku\_graph\_to\_sat.py},
+\texttt{sudoku\_phase\_integrals.py}, and
+\texttt{run\_sudoku\_phase\_experiment.py}.
+Tests independently enumerate all valid $4\times4$
+Sudoku boards, compare generated puzzles against an
+oracle, exercise a practical $9\times9$ example and
+a synthetic $16\times16$ board, and compare Fourier
+phase projections to exact graph conflicts. The
+dedicated research note is
+\texttt{SUDOKU\_RIOTUNER\_PHASE\_M7.md}.
+
+At the time of this draft, M7 experimental results
+require independent GitHub Actions verification.
+A test file is not a passed test. The milestone
+ledger records concrete run and artifact identifiers
+once CI has been checked. Nothing in this section
+proves $\mathsf{P}=\mathsf{NP}$.
 
 \section{Evidence, limitations and manuscript updates}
 The cumulative research log is
