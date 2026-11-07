@@ -171,3 +171,16 @@ The subsequent research gate remains unrestricted, non-affine connected SAT form
 - **Next falsification:** Compare signed-phase integration, exact graph-edge checking and candidate ordering on general Sudoku as size b grows, including adversarial solutions and unsatisfiable puzzles. Count *total* integral evaluation cost, graph construction and all backtracking states. A probabilistic or nondeterministic certificate is not a deterministic polynomial worst-case proof.
 
 Technical research note: SUDOKU_RIOTUNER_PHASE_M7.md. Working XeLaTeX draft: paper/structural-sat-milestones.tex. Branch: research/m7-sudoku-graph-np-20261107, PR #7.
+
+
+## M7 verified CI and experimental evidence - 2026-11-07 21:20 UTC
+
+- **PR:** [#7](https://github.com/n0711/P_EQUALS_NP/pull/7), M7 branch research/m7-sudoku-graph-np-20261107. The M7 code head tested was commit 0df1ae8a254e85629df4d7e4075627cc2a529862.
+- [SAT research run 42415413946](https://github.com/n0711/P_EQUALS_NP/actions/runs/42415413946): **completed/success**. GitHub job 128532292855 ran **68 Python unittest methods in 1.128 seconds**, all passed. Exactly 20 methods are new M7 tests: 11 in test_sudoku_graph_np.py and 9 in test_sudoku_phase_integrals.py. The other 48 prior tests remain passing.
+- **Independent checker evidence:** an independent 4x4 oracle enumerates 288 completed grids. The tests compare 240 seeded clue subsets and 300 seeded random clue grids to the oracle (540 total 4x4 puzzle evaluations). They also test the conventional 9x9 example, constructed 16x16 validation, conflicting givens, a resource-budget undecided status and CNF witness round-tripping.
+- **Phase/integral evidence:** tests check 1-,2-,4-,9-,16-color character orthogonality on every color pair; 240 seeded complete 4x4 random assignments compare complex projection with exact graph edge-clash counts. Nonuniform Blackman-Harris projection exhibits nonzero leakage on a correct full Sudoku. Numerical phase results are **not** used as exact solver decisions.
+- **Reproducible experiment:** the M7 JSON-producing program completed successfully in the CI run and uploaded artifact **m7-sudoku-phase-results**, ID **13590907805**. It measures solved, conflicted and partially filled 9x9 boards; a 4x4 graph-search example; and the Fourier-vs-direct candidate edge scores. Explicit Fourier evaluation is O(q|E|), vs O(|E|) for exact integer comparisons, so no speedup claim is made.
+- The corresponding SAT cross-language, SAT and graph-search (three jobs) and XeLaTeX workflows on the tested code head also completed successfully. The *M7-updated* XeLaTeX manuscript will have a separate build run after the paper is pushed; do not conflate it with the older manuscript build.
+- **Scope/novelty:** The analytic equality and Sudoku-to-SAT encoding are established mathematics. The experiment is an implementation of the Fourier phase idea, inspired by RioTuner's signal processing. This does not produce a polynomial-time solver for generalized Sudoku or prove P=NP.
+
+No independent expert or peer review is claimed; maintain a separate dated addendum if any M7 result requires correction.
