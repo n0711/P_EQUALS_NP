@@ -85,3 +85,15 @@ python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py tes
 - **Paper update:** M5 can now cite the observed regression statuses, still without claiming an unrestricted theorem or a peer-reviewed scientific result.
 
 This addendum does not overwrite the originally pending M5 status; it records the subsequent evidence with an immutable workflow ID.
+
+
+## M5 XeLaTeX manuscript build evidence - 2026-11-07 18:36 UTC
+
+- **Source:** \`paper/structural-sat-milestones.tex\` at PR #5, author Charalampos Nadiotis.
+- **Workflow:** [XeLaTeX milestone manuscript, run 42402089931](https://github.com/n0711/P_EQUALS_NP/actions/runs/42402089931).
+- **Result:** successful XeLaTeX compilation, twice, followed by PDF existence check and successful artifact upload.
+- **Artifact:** \`structural-sat-milestone-paper\`, ID 13585444810, generated from head commit \`9ae829680c22f7fd2aa4f6bd5e250f4e403f4e50\`. GitHub workflow artifacts have limited retention.
+- **Build correction preserved:** initial run 42401955056 failed because the build environment lacked the \`pzdr\` font metric. Workflow dependency \`texlive-fonts-recommended\` was added, and rerun 42402089931 succeeded. The original failure is not reclassified as a pass.
+- **Publication status:** compile-successful, author-attributed **working XeLaTeX manuscript**, not independently peer reviewed, not yet a claim of a novel complexity result or a proof of P = NP.
+
+For later milestones, append a new log entry and extend the XeLaTeX source with only verified claims and commit-specific evidence. Preserve old artifacts, add corrected versions with new run IDs, and do not quietly alter past experimental outcomes.
