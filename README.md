@@ -125,3 +125,17 @@ Reproduce with:
 - `cd paper && xelatex structural-sat-milestones.tex && xelatex structural-sat-milestones.tex`
 
 **Verification and novelty boundary:** This is a reproducible implementation of established affine SAT / AND-OR graph methods, not an unconditional polynomial-time SAT solver. Update the ledger and manuscript only with explicitly verified outcomes.
+
+
+## M6: Mixed XOR/CNF exact backdoor search (7 November 2026)
+
+[M6_MIXED_AFFINE_BACKDOOR.md](M6_MIXED_AFFINE_BACKDOOR.md) formalizes a useful restricted SAT class beyond entirely affine formulas: recognize complete small XOR clause blocks, retain other CNF clauses exactly, branch on the variables in those remaining clauses, and finish with GF(2) elimination. The [mixed_affine_sat.py](mixed_affine_sat.py) implementation and [independent finite oracle tests](test_mixed_affine_sat.py) preserve SAT/UNSAT and undecided limit distinctions. [run_m6_backdoor_benchmark.py](run_m6_backdoor_benchmark.py) runs reproducible isolated comparisons against DPLL and graph-separator baselines.
+
+Let r denote the number of variables remaining in unrecognized clauses. The standard affine-backdoor argument yields a worst-case time bound poly(N)*2^r in explicit input size N, which is polynomial only on the restricted class with r=O(log N). This is a known backdoor-search technique, **not** a proof that P = NP.
+
+Reproduce:
+- Run Python unit tests using `python -m unittest -v test_mixed_affine_sat.py`.
+- Run a bounded comparison using `python run_m6_backdoor_benchmark.py --quick --max-calls 2500 --timeout-seconds 3 > m6-results.json`.
+- Rebuild the continuous A4 XeLaTeX paper using `cd paper && xelatex structural-sat-milestones.tex && xelatex structural-sat-milestones.tex`.
+
+See [RESEARCH_MILESTONES.md](RESEARCH_MILESTONES.md) for immutable validation evidence and recorded failures. Results must be verified before publication claims.
