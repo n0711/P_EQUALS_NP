@@ -203,3 +203,12 @@ For one blank 9x9 cell, only 790 of the 810 edges had both endpoints assigned. A
 A tested 4x4 puzzle was solved in **2 recursive nodes** by the deterministic graph backtracker (one finite example, not a worst-case bound). Candidate Fourier scores matched the integer peer counts within numerical error. For the first cell of a one-blank solved grid, digit 1 had an approximate phase clash score 4.79e-15 (exact 0); other digits had exact clashes 2 or 3.
 
 **Interpretation:** The phase integral is mathematically equivalent to the equality predicate; RioTuner's nonuniform audio window is not. No measured speedup or polynomial solver is claimed. The experiment's raw JSON, workflow ID and source commit remain preserved in the M7 PR.
+
+
+## M7 manuscript compile and primary-source verification - 2026-11-07 21:27 UTC
+
+- **Primary NP-completeness literature:** Takayuki Yato and Takahiro Seta, *Complexity and Completeness of Finding Another Solution and Its Application to Puzzles*, IEICE Transactions on Fundamentals, E86-A(5), pp. 1052-1060, May 2003, https://globals.ieice.org/en_transactions/fundamentals/10.1587/e86-a_5_1052/_p. This established generalized Number Place hardness result is cited separately from our proof of membership in NP. It is prior art, not a theorem discovered by M7.
+- **Working paper source head:** ce5bcf3d0f66f7c81aa65d7d34814a2dad1a7a6e, which contains the Sudoku/RioTuner mathematical argument, finite regression evidence, experimental values and literature citation.
+- **Build:** [XeLaTeX milestone run 42415890343](https://github.com/n0711/P_EQUALS_NP/actions/runs/42415890343) passed. It built paper/structural-sat-milestones.tex twice and uploaded **structural-sat-milestone-paper**, artifact ID **13591880379**.
+- The exact PDF archived in that artifact is **6 A4 pages**. Its metadata names Charalampos Nadiotis as author and it was visually rendered and inspected; the theorem, Fourier integral, Yato-Seta citation and experiment results are legible.
+- **Research interpretation:** a correct NP certificate verifier, a polynomial Sudoku-to-CNF encoding and a numerical Fourier integral equality diagnostic all stand independently of the unproved conjecture P=NP. No deterministic polynomial-time solver for every generalized Sudoku instance is established.
