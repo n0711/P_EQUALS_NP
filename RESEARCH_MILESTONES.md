@@ -254,3 +254,14 @@ A tested 4x4 puzzle was solved in **2 recursive nodes** by the deterministic gra
 **Verification of additional test:** [SAT research workflow run 42418569685](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418569685), Python job 128541868419, **82 unittest methods passed** in 0.798 seconds, including the new test_analytic_four_by_four_second_row_partition case. There are now **14 M8 test methods**. Earlier 81-test workflow 42418159452 and its artifact 13592321531 remain valid for their own source head; they are not retroactively replaced.
 
 **Publication interpretation:** Independent finite case enumeration proves the exact 4x4 count but does not establish polynomial-time generalized Sudoku counting, let alone P=NP. The next challenge is an exact reduction of frontier-state complexity on all growing sizes and arbitrary givens.
+
+
+## M8 XeLaTeX manuscript build and render inspection - 2026-11-07 22:04 UTC
+
+- **Source head:** 817a0d8e664ae9ed72721a00a394b5fd8a2ed60f, including the updated M8 theorem, independent 4x4 analytic enumeration, finite experiment table and 82-test evidence.
+- **Build:** [XeLaTeX run 42418714980](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418714980), succeeded with two passes and generated the PDF artifact structural-sat-milestone-paper, artifact ID **13592507759**. GitHub reported SHA256 archive digest 90def5ae036db8fb07c34eae2ec0679b2a02eb2a72957225f21dfea4d02eaa8f.
+- The extracted compiled paper is **8 A4 pages**, author Charalampos Nadiotis. Its pages were rendered and inspected; formulas, theorem sections and numeric tables are legible without evident clipping.
+- The working paper now contains the M7 phase-integral constraint results and new M8 exact Sudoku counting theorem, q! symmetry proof, 4x4 finite analytic proof, verified numerical state counts, exponential upper bound, and explicit unresolved P-vs-NP obligations.
+- This is an author-attributed **research continuation**, not a peer-reviewed proof of P=NP. The user reports prior M7 publication on ResearchGate; M8 does not assert a new external publication.
+
+A future manuscript revision must record a new source commit and GitHub Actions PDF artifact ID without overwriting prior verified evidence.
