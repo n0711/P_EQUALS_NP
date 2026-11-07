@@ -123,3 +123,17 @@ For later milestones, append a new log entry and extend the XeLaTeX source with 
 **Paper placement:** add Section 'Same-primal-graph SAT and UNSAT families' to \`paper/structural-sat-milestones.tex\`, and maintain the existing P-vs-NP proof obligation. Add immutable CI run/artifact IDs in a dated verification addendum.
 
 **Next falsification:** search residual high-width 3-SAT examples with no unit, pure variable, locally complete support or affine structure; measure whether exact solver state counts still grow exponentially. An impossibility theorem for any proposed universal polynomial-time rule would need an independent rigorous proof, not a histogram.
+
+
+## M6 verification addendum - 2026-11-07 18:58 UTC
+
+**Reviewed source head:** \`eaa214129f4ec4861dead806c6942aa07b8dc526\` in [PR #6](https://github.com/n0711/P_EQUALS_NP/pull/6), branch \`research/m6-polarity-signatures-20261107\`.
+
+- [SAT research GitHub Actions run 42403877621](https://github.com/n0711/P_EQUALS_NP/actions/runs/42403877621): **success**, 48 Python unittest methods passed in 0.609 seconds on its runner. Exactly **11** are new \`test_polarity_sat.py\` methods.
+- The M6 test method loops include **810** seeded independent exhaustive-SAT oracle comparisons for n=0..8, and **210** signed variable-renaming checks for n=1..7. Satisfying models are verified against original clauses. Graph invariants and family thresholds are additionally asserted; these counts describe checked finite cases, not a complexity theorem.
+- Graph and graph-search CI (3 jobs) and SAT cross-language CI (1 job) on the same source head: **success**.
+- The M6 bounded benchmark job completed and uploaded JSON artifact \`m6-same-primal-graph-results\` (ID **13586087780**, GitHub Actions run 42403877621). The script runs **9 generated inputs** (n=4,6,8 times 3 families) across three solver backends. Per-worker \`timeout\` and \`limit_calls\` are *undecided*, never UNSAT; workflow completion does not imply every individual solver run completed.
+- Existing graph-separator and structural benchmark artifacts in that run: \`graph-separator-results\` ID 13586816066 and \`structural-sat-results\` ID 13586697402.
+- M6 paper build is tracked in the separate XeLaTeX workflow. Record the successful artifact ID only after a verified build.
+
+**Outcome:** finite correctness regressions and same-graph constructions passed; performance superiority and the general polynomial-time SAT bound remain **unproved**. The three-family theorem follows from the written elementary proof, not solely these finite observations. No P = NP proof is claimed.
