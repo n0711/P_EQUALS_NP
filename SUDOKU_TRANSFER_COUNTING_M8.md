@@ -124,3 +124,10 @@ On an empty 4x4 Sudoku, use global digit renaming to fix row 1 to (1,2,3,4). Row
 | 4 3 2 1 | 4 | Symmetric case to 3 4 1 2 |
 
 Once the third row is chosen, the fourth row is forced by the unused digit in each column; checking bottom-box uniqueness yields the listed 4+2+2+4=12 possibilities. Multiplying by 4! different first rows gives **288** completions. This is a finite combinatorial result, independently checked in the new analytic-test case and the prior 288-grid oracle. It is not a claim about the asymptotic complexity of Sudoku.
+
+
+## Second verification addendum - 7 November 2026, 22:01 UTC
+
+After adding an independent elementary enumeration of the 4x4 first-row-normalized boards, GitHub Actions [run 42418569685](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418569685) completed successfully: **82 Python test methods passed in 0.798 seconds** on the runner, including **14 M8 methods**. The new analytic enumeration regression directly checks the four second-row cases yielding 4, 2, 2 and 4 lower completions, and verifies their sum 12 times 4! equals 288. These are finite case results, not a general Sudoku complexity proof.
+
+The earlier 81-test result and raw benchmark artifact 13592321531 remain valid for their recorded commit. The revised XeLaTeX paper also includes the independent finite counting argument. Preserve the first and second verification runs as distinct experimental records.
