@@ -325,7 +325,24 @@ artifact 13590907805. These are finite checks,
 not a polynomial-time guarantee or evidence that
 weighted Fourier windows yield an exact verifier.
 The milestone ledger records the source and artifact
-provenance. Nothing in this section proves
+provenance. In GitHub Actions artifact 13590907805,
+a valid complete $9\times9$ Sudoku yielded zero
+exact edge conflicts and uniform-Fourier real energy
+approximately $4.50\times10^{-14}$, consistent with
+roundoff. A changed cell created exactly two
+edge conflicts and uniform energy approximately $2$.
+By contrast, the absolute Blackman--Harris phase sums
+were approximately $208.315$ and $208.189$ in those
+same cases. Thus weighted audio windowing cannot
+serve as a sound Sudoku equality oracle.
+
+A puzzle with one blank had zero conflicts
+on its 790 evaluated edges, out of the full
+graph's 810 edges; this partial assignment
+does not constitute a completed Sudoku witness.
+These are numerical observations of elementary
+identities, not algorithmic complexity evidence.
+Nothing in this section proves
 $\mathsf{P}=\mathsf{NP}$.
 
 \section{Evidence, limitations and manuscript updates}
