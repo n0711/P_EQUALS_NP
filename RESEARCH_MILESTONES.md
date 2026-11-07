@@ -137,3 +137,13 @@ For later milestones, append a new log entry and extend the XeLaTeX source with 
 - M6 paper build is tracked in the separate XeLaTeX workflow. Record the successful artifact ID only after a verified build.
 
 **Outcome:** finite correctness regressions and same-graph constructions passed; performance superiority and the general polynomial-time SAT bound remain **unproved**. The three-family theorem follows from the written elementary proof, not solely these finite observations. No P = NP proof is claimed.
+
+
+## M6 XeLaTeX compile evidence - 2026-11-07 19:00 UTC
+
+- Source commit \`64dd783195f924e5d2c57dd30f8d2a7141cd570a\` includes the M6 mathematical statement, elementary proof, and verified 48-test evidence.
+- [XeLaTeX manuscript workflow 42404007834](https://github.com/n0711/P_EQUALS_NP/actions/runs/42404007834): **success**, two XeLaTeX passes and PDF output validation.
+- PDF artifact: \`structural-sat-milestone-paper\`, artifact ID **13586169439** (69,609 bytes reported by GitHub). This is a generated, reproducible working manuscript rather than a peer-reviewed publication. Artifacts are subject to GitHub retention limits.
+- The milestone log is append-only: this documentation update does not change the paper source or retrospectively alter earlier test observations.
+
+The subsequent research gate remains unrestricted, non-affine connected SAT formulas with explicit complexity accounting; nothing recorded here establishes a polynomial-time algorithm for general 3-SAT.
