@@ -32,6 +32,7 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M4 | 2026-11-07 | Exact primal-graph separator conditioning | Correct by exhaustive separator assignments plus independent component solving; exponential worst case | \`graph_separator_sat.py\`, \`test_graph_separator_sat.py\`; 9 local methods, 900 oracle cases, 210 renamings; 18 benchmark cases; GitHub Actions passed before this branch's later changes | Section: separator search |
 | M5 | 2026-11-07 | Affine recognizer + GF(2) / graph-adversary benchmark infrastructure | Exact equivalence for recognized complete XOR clause blocks, standard Gaussian elimination; connected odd-charge Tseitin contradiction | \`structural_hybrid_sat.py\`, \`graph_research_instances.py\`, \`test_structural_hybrid_sat.py\`, \`run_structural_benchmark.py\`; **CI on M5 head pending verification** | Section: algebraic shortcut, evaluation plan |
 | M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
+| M7 | 2026-11-07 | Nondeterministic generalized Sudoku graph coloring and RioTuner-inspired Fourier integral | NP certificate verification, exact one-hot CNF encoding, Fourier character orthogonality, nonuniform-window leakage | sudoku_graph_np.py, sudoku_graph_to_sat.py, sudoku_phase_integrals.py, tests; CI initially pending | Section: Sudoku and Fourier phase constraints |
 
 ## M5 hypothesis and mathematical scope
 
@@ -147,3 +148,26 @@ For later milestones, append a new log entry and extend the XeLaTeX source with 
 - The milestone log is append-only: this documentation update does not change the paper source or retrospectively alter earlier test observations.
 
 The subsequent research gate remains unrestricted, non-affine connected SAT formulas with explicit complexity accounting; nothing recorded here establishes a polynomial-time algorithm for general 3-SAT.
+
+
+## M7 hypothesis, proof obligations, and numerical experiment (2026-11-07)
+
+**Research question:** Transfer phase-demodulation mathematics from the separately maintained, private n0711/riotuner Rust pitch engine to generalized Sudoku graph coloring. Can a Fourier integral directly eliminate nondeterministic guessing? **Answer to the demonstrated mathematics:** the Fourier expression is an exact *constraint evaluator*, not an efficient solution generator.
+
+- **Source provenance:** The original RioTuner engine uses weighted complex sinusoidal demodulation and phase-slope regression on overlapping audio blocks (engine/src/partials.rs), a four-term Blackman-Harris analysis window (engine/src/window.rs), and YIN for coarse pitch estimation (engine/src/yin.rs). None of this private implementation code is copied. Only the standard complex Fourier mathematics is adapted in a new Python experiment, which is a different workload.
+- **Graph model:** For box width b, let q=b^2. Sudoku contains q^2 vertices, colors 1..q, and peer edges sharing row/column/box. The original 9x9 case has 81 vertices and 810 undirected edges. A complete proper coloring preserving givens is exactly a Sudoku completion.
+- **Nondeterministic membership:** A guessed q-color assignment is a witness of q^2 digit labels. One deterministic pass through colors, edges and givens verifies it in polynomial time. This proves generalized Sudoku in NP; it does not turn nondeterministic guesses into a deterministic polynomial-time search.
+- **Exact Fourier integral theorem:** For integer a,b in 1..q,
+
+      delta_{a,b} = (1/(2pi)) integral_0^{2pi} exp(i(a-b)t) dt
+                 = (1/q) sum_{k=0}^{q-1} exp(2pi i k(a-b)/q).
+
+  Character orthogonality yields 1 if a=b and 0 otherwise. For a complete coloring c, sum over all edges of delta(c_u,c_v) counts exact conflicts; zero *plus preserved givens* is equivalent to a valid coloring. For incomplete Sudoku, zero assigned-edge conflicts is inconclusive. Explicit phase projection costs O(q|E|), while integer edge checking costs O(|E|); this is not a runtime improvement.
+- **Window falsification:** Blackman-Harris weights are not uniform. Weighted phase projection lacks exact Kronecker-delta orthogonality in general, and a solved Sudoku can have nonzero numeric absolute phase leakage. Never use weighted or floating phase scores as an exact SAT decision.
+- **Polynomial encoding theorem:** sudoku_graph_to_sat.py encodes each cell-color pair as one Boolean variable (q^3 Boolean variables), exact-one-color constraints, peer inequalities and givens, with O(q^4) explicit CNF size. A satisfying assignment corresponds exactly to a Sudoku solution. This is Sudoku <=p SAT, not SAT <=p Sudoku.
+- **Partition function limitation:** Expressing the count of solutions as a sum over colorings of products of (1-delta) edge factors and clue-delta factors retains q^(q^2) candidate colorings. Rewriting delta factors as integrals does not prove a polynomial algorithm for evaluating the partition function.
+- **Practical experiment:** sudoku_graph_np.py provides graph construction, exact witness verification and deterministic domain-propagating backtracking with a distinct undecided node-limit state. Tests include an independent 4x4 Sudoku enumeration oracle, seeded clue sets, a known 9x9 solution, synthetic 16x16 validation, Fourier delta orthogonality, exact conflict counts and CNF witness conversion. run_sudoku_phase_experiment.py records solved/invalid/partial Sudoku phase diagnostics in JSON.
+- **Initial execution status:** tests are committed but have no passed status until actual CI checks finish. This remains unproven as a universal deterministic polynomial Sudoku algorithm.
+- **Next falsification:** Compare signed-phase integration, exact graph-edge checking and candidate ordering on general Sudoku as size b grows, including adversarial solutions and unsatisfiable puzzles. Count *total* integral evaluation cost, graph construction and all backtracking states. A probabilistic or nondeterministic certificate is not a deterministic polynomial worst-case proof.
+
+Technical research note: SUDOKU_RIOTUNER_PHASE_M7.md. Working XeLaTeX draft: paper/structural-sat-milestones.tex. Branch: research/m7-sudoku-graph-np-20261107, PR #7.
