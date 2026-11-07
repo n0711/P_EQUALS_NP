@@ -110,3 +110,17 @@ The blank 4x4 count satisfies the exact symmetry identity: 12 normalized-first-r
 The existing graph solver found a single valid witness on the given 9x9 example in one recursive search node; M8's exact counting reached its 60-state cap without concluding a count. Finding one witness and counting all witnesses are different tasks. None of these results establishes P=NP.
 
 **Scientific limitation and next falsification:** The masks are exact future-dependent state invariants, but they require O(q^2+bq) bits, allowing exponentially many distinct states. Any proposed polynomial compression of these states must preserve exact counts across all clue configurations, not only SAT/UNSAT on small tests.
+
+
+## Independent elementary 4x4 count derivation (not based on DP)
+
+On an empty 4x4 Sudoku, use global digit renaming to fix row 1 to (1,2,3,4). Row 2 must use (3,4) in its first box and (1,2) in its second box, so the only possibilities are:
+
+| Second row | Compatible bottom row pairs | Justification |
+| --- | ---: | --- |
+| 3 4 1 2 | 4 | Column leftovers and bottom two boxes permit four ways |
+| 3 4 2 1 | 2 | Column leftovers and bottom box constraints permit two ways |
+| 4 3 1 2 | 2 | Symmetric case to 3 4 2 1 |
+| 4 3 2 1 | 4 | Symmetric case to 3 4 1 2 |
+
+Once the third row is chosen, the fourth row is forced by the unused digit in each column; checking bottom-box uniqueness yields the listed 4+2+2+4=12 possibilities. Multiplying by 4! different first rows gives **288** completions. This is a finite combinatorial result, independently checked in the new analytic-test case and the prior 288-grid oracle. It is not a claim about the asymptotic complexity of Sudoku.
