@@ -117,20 +117,22 @@ For $n\ge3$, define
 {\cal T}_n=\{T\subseteq[n]:|T|=3\}.
 \]
 Consider the following three explicit clause families:
+Define $\ell_i(0)=x_i$ and $\ell_i(1)=\neg x_i$.
+Then
 \begin{align}
 A_n &= \bigwedge_{T\in{\cal T}_n}
           \left(\bigvee_{i\in T}x_i\right),\\
 B_n &= \bigwedge_{T\in{\cal T}_n}
        \bigwedge_{b\in\{0,1\}^{T}}
-        \left(\bigvee_{i\in T}
-          \begin{cases}x_i&b_i=0,\\\neg x_i&b_i=1,\end{cases}\right),\\
+        \left(\bigvee_{i\in T}\ell_i(b_i)\right),\\
 C_n &= \bigwedge_{T\in{\cal T}_n}
+       \left[
        \left(\bigvee_{i\in T}x_i\right)
-       \wedge\left(\bigvee_{i\in T}\neg x_i\right).
+       \wedge\left(\bigvee_{i\in T}\neg x_i\right)
+       \right].
 \end{align}
-In the expression for $B_n$, each sign choice excludes precisely
-one assignment $b$ to its triple; the displayed cases specify
-the corresponding literal, not a conditional algorithm.
+In $B_n$ every sign choice excludes precisely one assignment
+to its support triple.
 
 \begin{theorem}[Identical graph, distinct SAT outcomes]
 For every $n\ge3$, formulas $A_n$, $B_n$ and $C_n$ have
