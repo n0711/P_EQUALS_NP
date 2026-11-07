@@ -111,3 +111,17 @@ python run_graph_separator_benchmark.py > graph-separator-results.json
 ```
 
 The local run passed nine methods, including 900 seeded independent small-CNF oracle checks and 210 variable-renaming tests. Eighteen deterministic benchmark instances agreed with the DPLL baseline. Runtime improvement is **not** claimed: graph inspection can be slower than direct DPLL on easy examples. The SAT verification GitHub Actions job includes the tests and saves benchmark data as a workflow artifact.
+
+
+## Research milestone ledger and XeLaTeX paper (M5, 7 November 2026)
+
+The cumulative [RESEARCH_MILESTONES.md](RESEARCH_MILESTONES.md) records every milestone with dated hypotheses, scoped mathematical statements, implementation commits, experiments, independent verification status, adverse results, and the next falsification gate. The separate [XeLaTeX working manuscript](paper/structural-sat-milestones.tex) integrates the results as they are validated. The original [graph-search paper](paper/graph-search.tex) remains unchanged.
+
+Milestone M5 adds [structural_hybrid_sat.py](structural_hybrid_sat.py), which conservatively recognizes complete XOR CNF blocks of width up to three and solves recognized systems over GF(2), otherwise using the exact [graph-separator solver](graph_separator_sat.py). [graph_research_instances.py](graph_research_instances.py) generates connected cubic Tseitin, pigeonhole 3-CNF and graph-coloring instances and measures primal graph width bounds. [test_structural_hybrid_sat.py](test_structural_hybrid_sat.py) is the independent finite regression suite. [run_structural_benchmark.py](run_structural_benchmark.py) runs bounded comparisons (DPLL, graph separator, hybrid), preserving separate timeout, limit and UNSAT statuses.
+
+Reproduce with:
+- `python -m unittest -v test_structural_hybrid_sat.py`
+- `python run_structural_benchmark.py --quick --timeout-seconds 3 --max-calls 1200 > structural-results.json`
+- `cd paper && xelatex structural-sat-milestones.tex && xelatex structural-sat-milestones.tex`
+
+**Verification and novelty boundary:** This is a reproducible implementation of established affine SAT / AND-OR graph methods, not an unconditional polynomial-time SAT solver. Update the ledger and manuscript only with explicitly verified outcomes.

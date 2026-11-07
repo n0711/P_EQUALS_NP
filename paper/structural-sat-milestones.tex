@@ -1,0 +1,154 @@
+
+% XeLaTeX research manuscript. Evidence ledger: ../RESEARCH_MILESTONES.md
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec,amsmath,amssymb,amsthm,booktabs,hyperref}
+\hypersetup{colorlinks=true,pdftitle={Graph-Theoretic and Affine SAT Research},pdfauthor={Charalampos Nadiotis}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
+\author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
+\date{7 November 2026\\Working manuscript, milestone M5}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A reproducible study combines exact graph-separator conditioning,
+incidence-component decomposition and a conservative polynomial-time
+recognizer for complete XOR constraint blocks in Boolean CNF formulas.
+We introduce a seeded benchmark infrastructure for connected cubic
+Tseitin parity formulas, pigeonhole constraints and graph coloring.
+These are implementations of established graph-search and algebraic
+techniques. No proof that $\mathsf{P}=\mathsf{NP}$ is established.
+\end{abstract}
+
+\section{Background and research provenance}
+The author previously released a foundations manuscript on
+ResearchGate \cite{nadiotis}. The present working report is separate
+from that work and extends the exact SAT experiments recorded in
+the repository. Structural AND/OR search \cite{dechter} and the
+tractability of affine constraint classes \cite{schaefer} provide
+established mathematical context.
+
+\section{Exact graph conditioning}
+Let $F$ be a CNF formula and $S$ a set of its variables.
+An assignment $\alpha$ to $S$ restricts $F$ by deleting true
+clauses and false literals. For a residual formula, its primal
+graph joins variables co-occurring in a clause.
+
+\begin{theorem}
+$F$ is satisfiable if and only if there exists an assignment
+$\alpha\in\{0,1\}^{S}$ such that every variable-disjoint connected
+component of $F|_\alpha$ is satisfiable.
+\end{theorem}
+\begin{proof}
+Any satisfying assignment of $F$ restricts to a choice of $\alpha$,
+and its remaining values satisfy each component. Conversely,
+satisfying assignments of disjoint components combine with
+$\alpha$ into a satisfying assignment of $F$. Therefore exhaustive
+separator conditioning preserves the SAT decision.
+\end{proof}
+
+\begin{proposition}
+For explicit input size $N$, suppose a separator of size at most
+$s$ is found in polynomial time and all its assignments leave
+components of size at most $b$. Complete component search after
+conditioning has time upper bound
+\[
+T(N)=\operatorname{poly}(N)2^{O(s+b)}.
+\]
+In particular, $s+b=O(\log N)$ implies polynomial time for
+this restricted class.
+\end{proposition}
+\begin{proof}
+There are $2^s$ assignments to the separator, each yielding at
+most polynomially many explicit components, each of which can
+be decided in $2^{O(b)}\operatorname{poly}(N)$ bit operations.
+Multiplication gives the claim. The condition is not proved
+for arbitrary CNF.
+\end{proof}
+
+The program \texttt{graph\_separator\_sat.py} searches for single
+or paired primal-graph vertex separators and falls back to
+complete branching. General worst-case running time is exponential.
+
+\section{Affine-CNF recognition over the field with two elements}
+A clause with exactly one literal on each variable in a fixed
+support $X$ is falsified by exactly one truth assignment on $X$.
+For $1\le |X|\le3$, when the clause set contains precisely all
+$2^{|X|-1}$ clauses that forbid one parity class, it enforces
+the complementary XOR parity equation. A conjunction of such
+complete blocks is therefore a linear system over $\mathbb F_2$.
+
+\begin{theorem}
+Recognized complete parity CNF blocks are decided exactly in
+polynomial time by Gaussian elimination over $\mathbb F_2$.
+A complete exact SAT fallback on unrecognized inputs preserves
+correctness, but not a general polynomial-time guarantee.
+\end{theorem}
+\begin{proof}
+The forbidden assignments are exactly one of the two parity
+classes, so each recognized block is equivalent to its XOR
+equation. Gaussian elimination correctly decides the conjunction
+and recovers a solution where one exists. Recognition failure
+triggers an independent complete decision procedure rather
+than a spurious UNSAT answer.
+\end{proof}
+
+\section{Falsifiable graph experiments}
+The benchmark generator builds a connected cubic graph, one
+Boolean variable per edge, and a parity constraint at each vertex.
+Each constraint yields four 3-CNF clauses. XORing all vertex
+equations cancels each edge variable twice. An odd total parity
+charge therefore requires $0=1$ and is unsatisfiable; even total
+charge on a connected graph admits a solution.
+
+Additional cases include 3-CNF pigeonhole contradictions and
+clique three-coloring. Min-fill elimination produces an upper
+bound on primal treewidth, while degeneracy is a lower bound.
+Neither is a general SAT running-time lower bound.
+
+\section{Evidence, limitations and manuscript updates}
+The cumulative research log is
+\texttt{RESEARCH\_MILESTONES.md}. Milestones M3 and M4 contain
+previously tested exact decomposition and graph-separator methods.
+Milestone M5 adds an affine recognizer and graph-theoretic stress
+families. On 7 November 2026, GitHub Actions run 42401754276
+completed 37 Python unittest methods successfully, including eleven
+M5 structural hybrid tests. The bounded quick benchmark step
+also completed and archived its raw JSON under artifact ID
+13586040475. These observations concern finite validation only,
+and do not establish runtime improvement or a general bound.
+
+Each solver run has either a completed SAT/UNSAT result,
+an explicit call-limit status, or a timeout. The latter outcomes
+are not UNSAT answers. Results should report seeds, input size,
+runtime, memory measurement method and independently checked
+models. Python tracked allocations are not total resident memory.
+Experiments do not demonstrate a universal polynomial-time bound.
+
+To establish $\mathsf{P}=\mathsf{NP}$ via SAT, it remains necessary
+to exhibit a deterministic SAT algorithm whose total bit-operation
+cost is bounded by $CN^c$ for fixed constants $C,c$ on every
+encoded CNF. None of the present milestones supplies that theorem.
+
+\section*{Attribution and reproducibility}
+Copyright 2026 Charalampos Nadiotis.
+Repository: \url{https://github.com/n0711/P_EQUALS_NP}.
+Rebuild this manuscript with XeLaTeX twice. This is an
+AI-assisted working draft, not a peer-reviewed paper.
+
+\begin{thebibliography}{9}
+\bibitem{schaefer}
+T. J. Schaefer, The Complexity of Satisfiability Problems,
+STOC, 1978. \url{https://doi.org/10.1145/800133.804350}.
+\bibitem{dechter}
+R. Dechter and R. Mateescu, AND/OR Search Spaces for Graphical
+Models, Artificial Intelligence, 171, 2007.
+\url{https://doi.org/10.1016/j.artint.2006.11.003}.
+\bibitem{nadiotis}
+C. Nadiotis, On the Proposition P = NP: Formal Foundations,
+Necessary Proof Obligations, and Research Directions, 2026.
+\url{https://www.researchgate.net/publication/417206732_On_the_Proposition_P_NP_Formal_Foundations_Necessary_Proof_Obligations_and_Research_Directions}.
+\end{thebibliography}
+\end{document}

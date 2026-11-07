@@ -1,0 +1,38 @@
+name: XeLaTeX milestone manuscript
+
+on:
+  push:
+    paths:
+      - "paper/structural-sat-milestones.tex"
+      - "RESEARCH_MILESTONES.md"
+      - ".github/workflows/paper-xelatex-milestone.yml"
+  pull_request:
+    paths:
+      - "paper/structural-sat-milestones.tex"
+      - "RESEARCH_MILESTONES.md"
+      - ".github/workflows/paper-xelatex-milestone.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  compile-milestone-paper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XeLaTeX and standard LaTeX packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends texlive-xetex texlive-latex-recommended texlive-fonts-recommended
+      - name: Build reproducible working manuscript
+        working-directory: paper
+        run: |
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error structural-sat-milestones.tex
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error structural-sat-milestones.tex
+          test -s structural-sat-milestones.pdf
+      - name: Upload milestone manuscript PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: structural-sat-milestone-paper
+          path: paper/structural-sat-milestones.pdf
+          if-no-files-found: error
