@@ -68,3 +68,20 @@ python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py tes
 - Thomas J. Schaefer, *The Complexity of Satisfiability Problems*, STOC 1978, https://doi.org/10.1145/800133.804350.
 - Rina Dechter and Robert Mateescu, *AND/OR Search Spaces for Graphical Models*, Artificial Intelligence 171 (2007), https://doi.org/10.1016/j.artint.2006.11.003.
 - Prior Charalampos Nadiotis ResearchGate manuscript as linked in \`RESEARCH_NOTES.md\`: https://www.researchgate.net/publication/417206732_On_the_Proposition_P_NP_Formal_Foundations_Necessary_Proof_Obligations_and_Research_Directions.
+
+
+## M5 verification addendum - 2026-11-07 18:32 UTC
+
+**Pull request:** [#5](https://github.com/n0711/P_EQUALS_NP/pull/5), opened after #4 had merged.  
+**Verified code and documentation head:** \`4b55c1eace53d957f38548c6a19518316c1ed17b\`.  
+**Evidence source:** [GitHub Actions SAT research run 42401754276](https://github.com/n0711/P_EQUALS_NP/actions/runs/42401754276), plus associated cross-language and graph-search workflows on the same head.
+
+- **SAT research verification:** succeeded. The Python regression step ran **37 unittest methods** in **0.523 seconds on the GitHub runner**, all passed. Eleven belong to \`test_structural_hybrid_sat.py\`.
+- **New M5 test scope:** 640 seeded small CNFs compared against an exhaustive oracle (n=0..7), 120 variable-renaming/ordering comparisons, 120 sampled small XOR systems, parity Tseitin SAT and UNSAT tests on even-sized connected cubic graphs, pigeonhole contradictions, graph three-coloring, and width-bound invariants. These are finite regressions, not complexity proofs.
+- **Bounded benchmark reproduction:** succeeded for the CI quick case set; input labels and results are retained in workflow artifact \`structural-sat-results\` (artifact ID 13586040475; run 42401754276). The workflow step exited successfully, and its script asserts expected outcomes for completed runs. Limits/timeouts remain \`UNDECIDED\`.
+- **Graph-separator benchmark artifact:** \`graph-separator-results\` (artifact ID 13585573119; same run).
+- **Other workflows on the same head:** SAT and graph-search verification (three successful jobs) and SAT cross-language verification (one successful job).
+- **Boundaries:** No independently audited runtime speedup, memory improvement, SAT certificate proof beyond implementation crosschecks, or unrestricted polynomial upper bound is claimed. The benchmarks measure a finite sample on one CI platform.
+- **Paper update:** M5 can now cite the observed regression statuses, still without claiming an unrestricted theorem or a peer-reviewed scientific result.
+
+This addendum does not overwrite the originally pending M5 status; it records the subsequent evidence with an immutable workflow ID.
