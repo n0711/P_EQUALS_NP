@@ -88,3 +88,26 @@ The open-grid result depends strongly on the heuristic and tie breaking. The wal
 Read [RESEARCH_NOTES.md](RESEARCH_NOTES.md) for correctness arguments and the SAT connection, and [MATRICES.md](MATRICES.md) for matrix definitions and formats.
 
 Primary A* reference: Peter E. Hart, Nils J. Nilsson, Bertram Raphael (1968), [A Formal Basis for the Heuristic Determination of Minimum Cost Paths](https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf). The original paper treats positive-cost graphs; this finite-graph implementation also supports zero-cost edges with strict cost improvements.
+
+
+## New research milestone - exact component SAT (7 November 2026)
+
+[COMPONENT_FACTORIZATION_2026_11_07.md](COMPONENT_FACTORIZATION_2026_11_07.md) establishes the standard exact factorization and counting identity for disconnected CNF components, and a polynomial guarantee **only** when component size is O(log N) under the explicit-input convention. [component_sat.py](component_sat.py) implements independent-component DPLL and verified model reconstruction. The regression suite [test_component_sat.py](test_component_sat.py) passed six test methods locally, including 640 independent truth-table checks and 210 variable-renaming checks.
+
+Run: python -m unittest -v test_component_sat.py
+
+This result does not prove P = NP and does not claim new complexity-theoretic priority. It maintains the attribution to Charalampos Nadiotis's earlier ResearchGate work while clearly distinguishing that work from the 2026 OpenAI ETH preprint.
+
+
+## Graph-theoretic SAT milestone - separator conditioning (7 November 2026)
+
+[GRAPH_SEPARATOR_RESEARCH_2026_11_07.md](GRAPH_SEPARATOR_RESEARCH_2026_11_07.md) documents an exact, deterministic [graph_separator_sat.py](graph_separator_sat.py) prototype. It builds the CNF primal graph, searches one- and two-variable separators, conditions on those assignments, independently solves disconnected components, memoizes exact residuals, and verifies witnesses. This follows established cutset-conditioning / AND-OR search ideas and does **not** prove P = NP or claim mathematical novelty.
+
+Reproduce:
+
+```sh
+python -m unittest -v test_graph_separator_sat.py
+python run_graph_separator_benchmark.py > graph-separator-results.json
+```
+
+The local run passed nine methods, including 900 seeded independent small-CNF oracle checks and 210 variable-renaming tests. Eighteen deterministic benchmark instances agreed with the DPLL baseline. Runtime improvement is **not** claimed: graph inspection can be slower than direct DPLL on easy examples. The SAT verification GitHub Actions job includes the tests and saves benchmark data as a workflow artifact.

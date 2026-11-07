@@ -1,0 +1,50 @@
+name: SAT research verification
+
+on:
+  push:
+    paths:
+      - "sat.py"
+      - "frontier_sat.py"
+      - "component_sat.py"
+      - "graph_separator_sat.py"
+      - "run_graph_separator_benchmark.py"
+      - "test_sat.py"
+      - "test_frontier_sat.py"
+      - "test_component_sat.py"
+      - "test_graph_separator_sat.py"
+      - "test_proof_obligations.py"
+      - ".github/workflows/sat-research-verification.yml"
+  pull_request:
+    paths:
+      - "sat.py"
+      - "frontier_sat.py"
+      - "component_sat.py"
+      - "graph_separator_sat.py"
+      - "run_graph_separator_benchmark.py"
+      - "test_sat.py"
+      - "test_frontier_sat.py"
+      - "test_component_sat.py"
+      - "test_graph_separator_sat.py"
+      - "test_proof_obligations.py"
+      - ".github/workflows/sat-research-verification.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  python-sat-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run independent SAT regressions
+        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_proof_obligations.py
+      - name: Reproduce graph-separator benchmark
+        run: python run_graph_separator_benchmark.py --max-calls 50000 > graph-separator-ci-results.json
+      - name: Upload CI benchmark data
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-separator-results
+          path: graph-separator-ci-results.json
