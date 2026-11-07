@@ -184,3 +184,22 @@ Technical research note: SUDOKU_RIOTUNER_PHASE_M7.md. Working XeLaTeX draft: pap
 - **Scope/novelty:** The analytic equality and Sudoku-to-SAT encoding are established mathematics. The experiment is an implementation of the Fourier phase idea, inspired by RioTuner's signal processing. This does not produce a polynomial-time solver for generalized Sudoku or prove P=NP.
 
 No independent expert or peer review is claimed; maintain a separate dated addendum if any M7 result requires correction.
+
+
+## M7 numerical evidence addendum - 2026-11-07, GitHub artifact 13590907805
+
+The artifact m7-sudoku-phase-results.zip from SAT research run 42415413946 was downloaded and inspected. It contains m7-sudoku-phase-results.json with these measured values for the standard Sudoku graph (81 vertices, 810 edges):
+
+| Complete/partial 9x9 case | Exact equal-color graph edges | Uniform phase projection (real sum) | Blackman-Harris phase absolute sum |
+| --- | ---: | ---: | ---: |
+| Valid complete coloring | 0 | 4.50380473656e-14 | 208.315358276 |
+| Changed one digit | 2 | 2.0000000000000773 | 208.189111477 |
+| One blank cell | 0 among 790 assigned edges | 4.02455846427e-14 | 203.019813249 |
+
+The valid solution's small nonzero uniform result is floating-point rounding, not an exact mathematical contradiction; the exact character sum is 0. Replacing one cell's color in this chosen construction produces **two graph-conflicting edges**, which uniform phase projection faithfully approximates. Blackman-Harris weighting creates a large nonzero absolute sum even on a valid coloring, falsifying any inference that the weighted audio window is an exact Sudoku conflict indicator.
+
+For one blank 9x9 cell, only 790 of the 810 edges had both endpoints assigned. An exact conflict count of zero therefore does not certify satisfiability, because a complete witness is missing.
+
+A tested 4x4 puzzle was solved in **2 recursive nodes** by the deterministic graph backtracker (one finite example, not a worst-case bound). Candidate Fourier scores matched the integer peer counts within numerical error. For the first cell of a one-blank solved grid, digit 1 had an approximate phase clash score 4.79e-15 (exact 0); other digits had exact clashes 2 or 3.
+
+**Interpretation:** The phase integral is mathematically equivalent to the equality predicate; RioTuner's nonuniform audio window is not. No measured speedup or polynomial solver is claimed. The experiment's raw JSON, workflow ID and source commit remain preserved in the M7 PR.
