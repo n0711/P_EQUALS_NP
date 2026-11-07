@@ -8,6 +8,9 @@ on:
       - "component_sat.py"
       - "graph_separator_sat.py"
       - "structural_hybrid_sat.py"
+      - "polarity_sat.py"
+      - "dense_cnf_families.py"
+      - "run_polarity_benchmark.py"
       - "graph_research_instances.py"
       - "run_structural_benchmark.py"
       - "run_graph_separator_benchmark.py"
@@ -16,6 +19,7 @@ on:
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
       - "test_structural_hybrid_sat.py"
+      - "test_polarity_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
   pull_request:
@@ -25,6 +29,9 @@ on:
       - "component_sat.py"
       - "graph_separator_sat.py"
       - "structural_hybrid_sat.py"
+      - "polarity_sat.py"
+      - "dense_cnf_families.py"
+      - "run_polarity_benchmark.py"
       - "graph_research_instances.py"
       - "run_structural_benchmark.py"
       - "run_graph_separator_benchmark.py"
@@ -33,6 +40,7 @@ on:
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
       - "test_structural_hybrid_sat.py"
+      - "test_polarity_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
 
@@ -48,7 +56,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run independent SAT regressions
-        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_proof_obligations.py
+        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_polarity_sat.py test_proof_obligations.py
       - name: Reproduce graph-separator benchmark
         run: python run_graph_separator_benchmark.py --max-calls 50000 > graph-separator-ci-results.json
       - name: Upload CI benchmark data
@@ -63,3 +71,11 @@ jobs:
         with:
           name: structural-sat-results
           path: structural-ci-results.json
+      - name: Reproduce M6 same-graph counterfamily benchmark
+        run: python run_polarity_benchmark.py --quick --timeout-seconds 3 --max-calls 1800 > m6-polarity-results.json
+      - name: Upload M6 counterfamily benchmark data
+        uses: actions/upload-artifact@v4
+        with:
+          name: m6-same-primal-graph-results
+          path: m6-polarity-results.json
+          if-no-files-found: error
