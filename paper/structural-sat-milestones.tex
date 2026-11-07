@@ -108,6 +108,57 @@ clique three-coloring. Min-fill elimination produces an upper
 bound on primal treewidth, while degeneracy is a lower bound.
 Neither is a general SAT running-time lower bound.
 
+
+\section{M6: Exact mixed-affine CNF via an explicit backdoor}
+Rather than requiring all clauses to encode XOR, the M6 procedure
+recognizes complete XOR blocks of arity one to three and preserves
+every remaining clause. This gives an exact equivalence
+\[
+F\equiv A\land R,
+\]
+where $A$ consists of linear equations over $\mathbb F_2$ and
+$R$ is the unrecognized CNF. Variables can occur in both parts.
+Let $B$ be the set of variables occurring in $R$ and $r=|B|$.
+This $B$ is an explicit strong backdoor to affine SAT, in the
+established framework of Williams, Gomes and Selman
+\cite{backdoors2003}.
+
+\begin{theorem}[Mixed affine backdoor bound]
+On explicitly encoded inputs of bit size $N$, a deterministic
+algorithm which extracts recognized XOR blocks, branches only
+on variables of $R$, and applies Gaussian elimination to the
+remaining system decides SAT exactly within
+\[
+T(N)=\operatorname{poly}(N)\,2^r
+\]
+bit operations. In particular $r=O(\log N)$ suffices for
+polynomial-time decision on this restricted input class.
+\end{theorem}
+\begin{proof}
+The extraction preserves all models by the parity-clause
+equivalence. Assigning the $r$ residual variables decides
+all clauses of $R$. If any is false, that assignment cannot
+yield a satisfying model. If all are true, the remaining system
+$A$ is linear over $\mathbb F_2$ and can be solved exactly in
+polynomial bit time. Every satisfying model of $F$ has an
+assignment to these $r$ variables, so exhaustive binary
+branching finds one if it exists, while accepting an extension
+satisfies both $A$ and $R$. Unit and linear implications are
+logical consequences and cannot lose models. At most
+$2^{r+1}-1$ search nodes, each with polynomial work, are
+required, including preprocessing and verification.
+\end{proof}
+
+The bound may remain exponential for arbitrary CNF, where
+$r$ can equal the number of variables. This is an exact
+implementation of an established structural parameterization,
+not a new resolution of $\mathsf P$ versus $\mathsf{NP}$.
+The experiments use connected cubic parity graphs with
+additional non-affine 4-literal clauses, as well as pigeonhole
+and coloring controls. All solvers use explicit timeout and
+resource-limit statuses. Details and test evidence are
+tracked in the M6 research note and the cumulative ledger.
+
 \section{Evidence, limitations and manuscript updates}
 The cumulative research log is
 \texttt{RESEARCH\_MILESTONES.md}. Milestones M3 and M4 contain
@@ -146,6 +197,11 @@ STOC, 1978. \url{https://doi.org/10.1145/800133.804350}.
 R. Dechter and R. Mateescu, AND/OR Search Spaces for Graphical
 Models, Artificial Intelligence, 171, 2007.
 \url{https://doi.org/10.1016/j.artint.2006.11.003}.
+\bibitem{backdoors2003}
+R. Williams, C. P. Gomes and B. Selman,
+\emph{Backdoors To Typical Case Complexity},
+IJCAI, pp. 1173--1177, 2003.
+\url{https://ijcai.org/proceedings/2003/167}.
 \bibitem{nadiotis}
 C. Nadiotis, On the Proposition P = NP: Formal Foundations,
 Necessary Proof Obligations, and Research Directions, 2026.
