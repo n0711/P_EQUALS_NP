@@ -23,7 +23,7 @@ jobs:
       - name: Install XeLaTeX and standard LaTeX packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends texlive-xetex texlive-latex-recommended
+          sudo apt-get install -y --no-install-recommends texlive-xetex texlive-latex-recommended texlive-fonts-recommended
       - name: Build reproducible working manuscript
         working-directory: paper
         run: |
