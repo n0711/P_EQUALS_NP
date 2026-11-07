@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{7 November 2026\\Working manuscript, milestone M5}
+\date{7 November 2026\\Working manuscript, milestone M6}
 \begin{document}
 \maketitle
 
@@ -107,6 +107,86 @@ Additional cases include 3-CNF pigeonhole contradictions and
 clique three-coloring. Min-fill elimination produces an upper
 bound on primal treewidth, while degeneracy is a lower bound.
 Neither is a general SAT running-time lower bound.
+
+
+\section{M6: Same-primal-graph satisfiable and unsatisfiable CNFs}
+
+A graph-only SAT criterion is insufficient even for a complete primal graph.
+For $n\ge3$, define
+\[
+{\cal T}_n=\{T\subseteq[n]:|T|=3\}.
+\]
+Consider the following three explicit clause families:
+\begin{align}
+A_n &= \bigwedge_{T\in{\cal T}_n}
+          \left(\bigvee_{i\in T}x_i\right),\\
+B_n &= \bigwedge_{T\in{\cal T}_n}
+       \bigwedge_{b\in\{0,1\}^{T}}
+        \left(\bigvee_{i\in T}
+          \begin{cases}x_i&b_i=0,\\\neg x_i&b_i=1,\end{cases}\right),\\
+C_n &= \bigwedge_{T\in{\cal T}_n}
+       \left(\bigvee_{i\in T}x_i\right)
+       \wedge\left(\bigvee_{i\in T}\neg x_i\right).
+\end{align}
+In the expression for $B_n$, each sign choice excludes precisely
+one assignment $b$ to its triple; the displayed cases specify
+the corresponding literal, not a conditional algorithm.
+
+\begin{theorem}[Identical graph, distinct SAT outcomes]
+For every $n\ge3$, formulas $A_n$, $B_n$ and $C_n$ have
+identical primal graph $K_n$ and treewidth $n-1$.
+Formula $A_n$ is SAT; $B_n$ is UNSAT; and
+$C_n$ is SAT if and only if $n\le4$.
+\end{theorem}
+\begin{proof}
+Every pair of distinct variables occurs together in at least
+one triple because $n\ge3$, hence every primal graph equals
+$K_n$. Setting every variable True satisfies $A_n$.
+Any complete assignment to the first triple falsifies one of
+its eight possible signed clauses, so $B_n$ is UNSAT.
+For $C_n$, every positive triple must contain a True literal,
+equivalently there are at most two False variables; likewise,
+every negative triple must contain a False literal, so at most
+two variables are True. Both can hold if and only if $n\le4$
+under the assumption $n\ge3$. For $n=3,4$ explicit
+assignments with one or two True values suffice.
+\end{proof}
+
+\begin{proposition}[Exact bounded-width support detection]
+Let $S$ be a fixed support of $k$ distinct variables.
+If a CNF includes all $2^k$ non-tautological signed clauses,
+each mentioning exactly the variables $S$, the CNF is UNSAT.
+For fixed $k\le3$ this condition can be detected in polynomial
+time in the explicit CNF size.
+\end{proposition}
+\begin{proof}
+Each signed clause forbids exactly one truth assignment to $S$.
+With all $2^k$ sign choices, every assignment to $S$ falsifies
+at least one clause. Normalization and grouping by support
+take polynomial time in the explicit number of literals.
+\end{proof}
+
+The new implementation \texttt{polarity\_sat.py} applies
+normalization, complete-support contradiction detection,
+standard unit propagation and pure-literal elimination before
+the already verified affine-and-separator fallback. Pure-literal
+elimination is equisatisfiable and records its assignments
+for final witness reconstruction. This is classical SAT
+preprocessing, not a new universal polynomial-time method.
+
+The first formula family is immediately handled by pure-literal
+elimination, and the second by a complete-support contradiction.
+For the third family, the same preprocessing finds no unit
+or pure literals and no complete triple-support block;
+the exact fallback is still needed. The latter observation
+is a limitation, not evidence of exponential lower bounds.
+
+The experiment script \texttt{run\_polarity\_benchmark.py}
+compares the exact DPLL baseline, the affine-graph hybrid and
+the polarity-aware hybrid on these graph-identical inputs.
+Any \texttt{timeout} or \texttt{limit\_calls} result is
+\emph{undecided}, not UNSAT. Run and artifact IDs for each
+validated result are appended in the milestone ledger.
 
 \section{Evidence, limitations and manuscript updates}
 The cumulative research log is
