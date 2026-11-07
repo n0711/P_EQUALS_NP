@@ -54,9 +54,9 @@ The first-row constraint is NOT applied if any given clue exists, since arbitrar
 
 There are q columns with q-bit masks and b active box groups with q-bit masks. Thus a boundary description uses at most q^2+bq bits. A loose bound on the number of distinct transfer states over q rows is q * 2^(q^2+bq). At each state the implementation may inspect up to q! row permutations and q entries. Thus a valid coarse total upper bound is
 
-    T(q) = O(q^2 * q! * 2^(q^2+bq)),
+    T(q) = poly(q) * q! * 2^(q^2+bq)
 
-plus polynomial explicit-input handling. Memory is similarly exponential in the worst case. These bounds describe a deterministic exact method, but NOT a polynomial-time algorithm as q increases. The number of cells is q^2 and the number of possible row permutations is q!, so measuring fast 4x4 or partially filled 9x9 cases cannot establish any P=NP conclusion. This is a loose upper bound, NOT a SAT complexity lower bound.
+as a loose bit-complexity upper bound, where poly(q) includes dictionary, parsing and arbitrary-precision count arithmetic. Memory is similarly exponential in the worst case. These bounds describe a deterministic exact method, but NOT a polynomial-time algorithm as q increases. The number of cells is q^2 and the number of possible row permutations is q!, so measuring fast 4x4 or partially filled 9x9 cases cannot establish any P=NP conclusion. This is a loose upper bound, NOT a SAT complexity lower bound.
 
 The state mask recurrence is a standard transfer-matrix/dynamic-programming technique. We do not assert it is novel.
 
@@ -84,3 +84,29 @@ Every positive witness is independently verified using M7's graph-coloring certi
 4. Derive any claimed polynomial worst-case bound with all enumeration, memoization and arithmetic costs included. No such proof has been established in M8.
 
 **Publication boundary:** this is a research continuation of the author's reported ResearchGate M7 post, with established algorithmic techniques, a proof of correctness and a still-exponential upper bound. It does not establish P = NP.
+
+
+## M8 verified experimental addendum - 2026-11-07 21:55 UTC
+
+**PR #8** (stacked on open M7 PR #7): https://github.com/n0711/P_EQUALS_NP/pull/8.
+**Tested source head:** cd2de285f83d6424a5e0f67780970c0987360f9c.
+**GitHub Actions:** SAT research workflow run **42418159452**, job **128540623940**, completed successfully.
+**Result:** **81 Python unittest methods passed** in **1.046 seconds** on the runner, including **13 new M8 tests**. The M8 tests compare 240 seeded clue subsets, 160 adversarial random clue configurations, and all 288 full 4x4 Sudoku reference solutions against independent expected counts, plus 9x9/16x16 cases, digit relabeling and resource limit semantics. These finite checks support the implementation's tested behavior, not an asymptotic complexity claim.
+**Raw artifact:** m8-sudoku-transfer-results, ID **13592321531**, from the same run. The JSON has been retrieved and inspected.
+
+| Case | Exact count | Status | Memoized states | Accepted row transitions | Row trials |
+|---|---:|---|---:|---:|---:|
+| Empty 4x4, no symmetry | 288 | completed | 85 | 240 | 2040 |
+| Empty 4x4, normalized first row times 4! | 288 | completed | 15 | 26 | 337 |
+| 4x4 puzzle with four blanks | 1 | completed | 4 | 4 | 4 |
+| Completed 9x9 grid | 1 | completed | 9 | 9 | 9 |
+| One blank on completed 9x9 | 1 | completed | 9 | 9 | 9 |
+| Standard 9x9 example, 60-state limit | unknown | limit_states | 60 | 60 | 41262 |
+| Empty 9x9, max 5000 row permutations | unknown | limit_row_permutations | 0 | 0 | 0 |
+| Completed constructed 16x16 | 1 | completed | 16 | 16 | 16 |
+
+The blank 4x4 count satisfies the exact symmetry identity: 12 normalized-first-row completions times 4! = 288. This experiment shows **85 to 15** memoized-state reduction and **2040 to 337** row trials for this finite example; these are work counts, not an asymptotic speedup result.
+
+The existing graph solver found a single valid witness on the given 9x9 example in one recursive search node; M8's exact counting reached its 60-state cap without concluding a count. Finding one witness and counting all witnesses are different tasks. None of these results establishes P=NP.
+
+**Scientific limitation and next falsification:** The masks are exact future-dependent state invariants, but they require O(q^2+bq) bits, allowing exponentially many distinct states. Any proposed polynomial compression of these states must preserve exact counts across all clue configurations, not only SAT/UNSAT on small tests.
