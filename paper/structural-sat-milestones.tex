@@ -487,15 +487,17 @@ for every Sudoku algorithm and not a
 proof of $\mathsf{P}=\mathsf{NP}$.
 
 \subsection{Independently checked finite experiments}
-GitHub Actions SAT research run 42418159452
-passed 81 Python unittest methods, including
-13 new M8 counting tests. The latter used
+GitHub Actions SAT research run 42418569685
+passed 82 Python unittest methods, including
+14 new M8 counting tests. The latter used
 an independent exhaustive reference of 288
 completed $4\times4$ boards, 240 seeded
 clue subsets, 160 adversarial random
 clue sets, and additional fixed-grid cases.
-The machine-readable evidence was archived
-as artifact 13592321531.
+The original machine-readable evidence was archived
+as artifact 13592321531 (run 42418159452).
+The later 82-test validation added independent
+symbolic enumeration without changing the algorithm.
 
 \begin{table}[htbp]
 \centering
@@ -525,6 +527,37 @@ The memoized-state count decreases
 from $85$ to $15$ on this finite example.
 These observations do not establish an
 asymptotic improvement.
+
+\paragraph{Independent finite enumeration for $4\times4$.}
+The symmetry theorem first fixes the row $(1,2,3,4)$.
+The second row must place digits $3,4$ in its left
+box and $1,2$ in its right box. Exactly four
+second rows are possible. The remaining column
+values constrain the third row, while the fourth
+row is forced by the last unused digit in
+each column. Direct enumeration of the
+third-row possibilities is:
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}c l r@{}}
+\toprule
+Second row & Allowed third rows & Number\\
+\midrule
+$(3,4,1,2)$ & $2143,2341,4123,4321$ & 4\\
+$(3,4,2,1)$ & $2143,4312$ & 2\\
+$(4,3,1,2)$ & $2143,4312$ & 2\\
+$(4,3,2,1)$ & $2143,2413,3142,3412$ & 4\\
+\bottomrule
+\end{tabular}
+\caption{Independent combinatorial enumeration
+with canonical first row. Each listed third
+row gives exactly one box-valid fourth row.}
+\end{table}
+The canonical count is therefore
+$4+2+2+4=12$ and the total
+is $4!\times12=288$, consistent with
+the independently verified 288-completion oracle.
 
 On the standard $9\times9$ example the
 counting procedure reached the configured
