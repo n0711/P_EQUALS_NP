@@ -245,3 +245,12 @@ A tested 4x4 puzzle was solved in **2 recursive nodes** by the deterministic gra
 **Next falsifiable gate:** Seek exact quotienting of frontier states for arbitrary clue patterns, and measure failures on puzzles whose boundary signatures remain distinct. The proof obligation must include complete bit complexity, not only the number of sample search nodes.
 
 **Paper integration:** Add section M8 to paper/structural-sat-milestones.tex; the compiled paper requires a new successful XeLaTeX workflow and immutable artifact ID.
+
+
+## M8 independent finite enumeration and follow-up CI - 2026-11-07 22:01 UTC
+
+**New proof:** For clue-free 4x4 Sudoku, use unrestricted global digit relabeling to set row one to 1234. The four admissible second rows are 3412, 3421, 4312 and 4321. With column and bottom-box constraints, the admissible third-row sequences number 4, 2, 2 and 4 respectively; the fourth row is forced. Thus there are exactly 12 normalized completions and 4! times 12 = 288 unrestricted completions. This finite combinatorial derivation independently corroborates the integer transfer result and exhaustive oracle.
+
+**Verification of additional test:** [SAT research workflow run 42418569685](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418569685), Python job 128541868419, **82 unittest methods passed** in 0.798 seconds, including the new test_analytic_four_by_four_second_row_partition case. There are now **14 M8 test methods**. Earlier 81-test workflow 42418159452 and its artifact 13592321531 remain valid for their own source head; they are not retroactively replaced.
+
+**Publication interpretation:** Independent finite case enumeration proves the exact 4x4 count but does not establish polynomial-time generalized Sudoku counting, let alone P=NP. The next challenge is an exact reduction of frontier-state complexity on all growing sizes and arbitrary givens.
