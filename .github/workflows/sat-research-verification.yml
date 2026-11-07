@@ -7,11 +7,15 @@ on:
       - "frontier_sat.py"
       - "component_sat.py"
       - "graph_separator_sat.py"
+      - "structural_hybrid_sat.py"
+      - "graph_research_instances.py"
+      - "run_structural_benchmark.py"
       - "run_graph_separator_benchmark.py"
       - "test_sat.py"
       - "test_frontier_sat.py"
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
+      - "test_structural_hybrid_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
   pull_request:
@@ -20,11 +24,15 @@ on:
       - "frontier_sat.py"
       - "component_sat.py"
       - "graph_separator_sat.py"
+      - "structural_hybrid_sat.py"
+      - "graph_research_instances.py"
+      - "run_structural_benchmark.py"
       - "run_graph_separator_benchmark.py"
       - "test_sat.py"
       - "test_frontier_sat.py"
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
+      - "test_structural_hybrid_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
 
@@ -40,7 +48,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run independent SAT regressions
-        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_proof_obligations.py
+        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_proof_obligations.py
       - name: Reproduce graph-separator benchmark
         run: python run_graph_separator_benchmark.py --max-calls 50000 > graph-separator-ci-results.json
       - name: Upload CI benchmark data
@@ -48,3 +56,10 @@ jobs:
         with:
           name: graph-separator-results
           path: graph-separator-ci-results.json
+      - name: Reproduce bounded structural benchmark
+        run: python run_structural_benchmark.py --quick --max-calls 1200 --timeout-seconds 3 > structural-ci-results.json
+      - name: Upload bounded structural benchmark
+        uses: actions/upload-artifact@v4
+        with:
+          name: structural-sat-results
+          path: structural-ci-results.json
