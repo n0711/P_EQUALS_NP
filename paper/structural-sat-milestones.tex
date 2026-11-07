@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{7 November 2026\\Working manuscript, milestone M7}
+\date{7 November 2026\\Working manuscript, milestone M8}
 \begin{document}
 \maketitle
 
@@ -349,6 +349,203 @@ These are numerical observations of elementary
 identities, not algorithmic complexity evidence.
 Nothing in this section proves
 $\mathsf{P}=\mathsf{NP}$.
+
+
+\section{M8: Exact Sudoku counting by graph row-transfer states}
+
+The researcher reports that the previous M7 Sudoku and
+RioTuner-inspired Fourier-integral report was posted
+on ResearchGate. The publication identifier was not
+independently verified for the present milestone.
+We now examine whether exact graph constraint
+contraction can evaluate the Sudoku partition function
+more efficiently than direct enumeration of all
+$q^{q^2}$ complete color assignments.
+
+\subsection{Integer transfer recurrence}
+Retain the M7 notation $q=b^2$ for a generalized
+Sudoku board with $q$ rows and columns and
+$b\times b$ sub-boxes. Every valid full row is a
+permutation $p=(p_0,\ldots,p_{q-1})$ of $[q]$.
+After processing $r$ rows, keep a state
+\begin{equation}
+\sigma_r=(C_0,\ldots,C_{q-1}, B_0,\ldots,B_{b-1}),
+\end{equation}
+where $C_j$ is the $q$-bit set of digits already
+used in column $j$ and $B_k$ is the set used in the
+currently processed band of $b$ rows in box-column
+$k$. Reset the $B_k$ at the start of each new
+box-row band. A row permutation is admissible
+precisely when it respects its givens and no inserted
+digit occurs in its corresponding column or active
+box mask.
+
+Write $\Pi_r(\sigma)$ for the set of admissible
+row permutations and $U_r(\sigma,p)$ for the
+deterministic successor state. Define the suffix
+count recursively by
+\begin{equation}
+D_r(\sigma)=
+\begin{cases}
+1,&r=q,\\
+\displaystyle\sum_{p\in\Pi_r(\sigma)}
+D_{r+1}\bigl(U_r(\sigma,p)\bigr),&r<q.
+\end{cases}
+\label{eq:transfer}
+\end{equation}
+The algorithm stores a memoized integer result for
+each encountered pair $(r,\sigma)$ and records
+one positive-count transition to reconstruct
+a witness.
+
+\begin{theorem}[Exact Sudoku transfer counting]
+For a generalized Sudoku instance with arbitrary
+givens, $D_0(\mathbf{0})$ equals its number of
+completed solutions. In particular, the initial
+count is positive if and only if the puzzle is
+satisfiable.
+\end{theorem}
+\begin{proof}
+Every valid solution has exactly one ordered
+sequence of row permutations. The corresponding
+transfer path is admissible because its columns
+and boxes contain no repeated digit and all givens
+are respected. Conversely, each completed
+admissible path consists of row permutations
+and never repeats a digit within a column or
+box. Since each completed unit has exactly $q$
+cells with $q$ allowed digits, all digits occur
+exactly once. Thus every accepted path represents
+one valid solution, and no two accepted paths
+represent the same solution. Recurrence
+\eqref{eq:transfer} counts the accepted paths
+exactly once by induction from its base case.
+\end{proof}
+
+This is an exact regrouping of terms in the M7
+Fourier partition function, using only integer
+set operations and arbitrary-precision sums.
+The Fourier integral representation is a
+mathematical equivalence, not a source of
+additional computational power.
+
+\subsection{A provable but restricted symmetry quotient}
+For a clue-free board, the symmetric group
+$S_q$ acts on completed grids by globally
+relabeling all digit colors.
+
+\begin{theorem}[Canonical first row on clue-free boards]
+If a generalized Sudoku has no givens, its
+exact number $Z$ of completions satisfies
+\begin{equation}
+Z=q!\,Z_{\mathrm{canonical}},
+\end{equation}
+where $Z_{\mathrm{canonical}}$ counts completions
+whose first row is $(1,2,\ldots,q)$.
+\end{theorem}
+\begin{proof}
+Every completed first row is a permutation
+of $[q]$. There is exactly one global
+digit relabeling that sends its first row
+to the canonical ordering. Any color
+permutation fixing a completed first row
+must fix every digit, so this group action
+is free. Thus each orbit contains precisely
+$q!$ different colorings and exactly one
+canonical-first-row representative.
+Multiplication by $q!$ recovers the
+unrestricted count.
+\end{proof}
+
+This normalization is \emph{not} applied to
+puzzles with givens: changing color labels
+may violate an original clue. The symmetry
+argument is elementary and does not prove a
+general polynomial-time Sudoku algorithm.
+
+\subsection{Exponential state-space bound}
+A transfer frontier contains $q$ column
+masks and $b$ active box masks, each of $q$
+bits. Hence it uses at most $q^2+bq$
+bits, and the number of possible states
+over all row positions is bounded by
+$q\,2^{q^2+bq}$. Each state may inspect
+as many as $q!$ row permutations,
+with polynomial-time mask operations
+and arbitrary-precision integer addition.
+A loose upper bound on total bit time is
+\begin{equation}
+T(q)\le \operatorname{poly}(q)\,
+q!\,2^{q^2+bq}.
+\label{eq:transfer-bound}
+\end{equation}
+This bound is \emph{exponential} as the
+generalized board dimension increases.
+It is an upper bound for this exact
+implementation, not a proven lower bound
+for every Sudoku algorithm and not a
+proof of $\mathsf{P}=\mathsf{NP}$.
+
+\subsection{Independently checked finite experiments}
+GitHub Actions SAT research run 42418159452
+passed 81 Python unittest methods, including
+13 new M8 counting tests. The latter used
+an independent exhaustive reference of 288
+completed $4\times4$ boards, 240 seeded
+clue subsets, 160 adversarial random
+clue sets, and additional fixed-grid cases.
+The machine-readable evidence was archived
+as artifact 13592321531.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}p{.34\linewidth}r r r r@{}}
+\toprule
+Input & Count & States & Accepted & Row trials\\
+\midrule
+Empty $4\times4$, unrestricted & 288 & 85 & 240 & 2040\\
+Empty $4\times4$, canonical row & 288 & 15 & 26 & 337\\
+Four-blank $4\times4$ & 1 & 4 & 4 & 4\\
+One-blank $9\times9$ & 1 & 9 & 9 & 9\\
+Completed $16\times16$ & 1 & 16 & 16 & 16\\
+\bottomrule
+\end{tabular}
+\caption{Exact counts and state-work measurements
+from the M8 GitHub Actions artifact.
+The canonical-row result includes the
+$q!$ symmetry multiplier.}
+\label{tab:m8-measurements}
+\end{table}
+
+For clue-free $4\times4$, the observed
+canonical count is $12$, which multiplied
+by $4!=24$ reproduces $288$ solutions.
+The memoized-state count decreases
+from $85$ to $15$ on this finite example.
+These observations do not establish an
+asymptotic improvement.
+
+On the standard $9\times9$ example the
+counting procedure reached the configured
+limit of 60 states after 41,262 row trials.
+Its exact completion count is therefore
+\emph{unknown from this run}, even though
+the previous graph solver produced one
+valid witness. For the clue-free $9\times9$
+case, a row contains $9!=362{,}880$
+permutations, exceeding the configured
+5,000-permutation budget. Both limited
+experiments are \emph{undecided}, not UNSAT.
+
+The implementation is
+\texttt{sudoku\_transfer\_count.py};
+independent regressions are in
+\texttt{test\_sudoku\_transfer\_count.py}.
+The dated theoretical derivation and
+all source identifiers are recorded in
+\texttt{SUDOKU\_TRANSFER\_COUNTING\_M8.md}
+and the cumulative milestone ledger.
 
 \section{Evidence, limitations and manuscript updates}
 The cumulative research log is
