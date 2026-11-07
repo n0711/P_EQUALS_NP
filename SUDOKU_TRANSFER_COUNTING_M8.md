@@ -1,0 +1,86 @@
+# M8 - Exact Sudoku partition-function evaluation by graph row transfers
+
+Researcher: Charalampos Nadiotis / PELAOS Tech
+Date: 7 November 2026
+Status: theory and implementation; GitHub test evidence must be recorded separately.
+Prior milestone: M7 Sudoku as precolored graph coloring and RioTuner-inspired Fourier equality integrals.
+ResearchGate: the author reports posting the preceding M7 paper; no DOI or publication metadata was independently retrieved for M8.
+
+## Question
+
+The M7 integral represents a Sudoku conflict exactly, but the partition function still sums over q^(q^2) complete colorings. Can graph structure eliminate redundant intermediate summation *without losing exactness*?
+
+M8 builds a sparse, deterministic, row-transfer dynamic program, an exact integer analogue of variable elimination, with memoized boundary signatures. It is a legitimate reduction from naive full-color enumeration for some instances and a way to measure whether distinct assignments collapse to the same future-relevant state. It is NOT a polynomial-time general algorithm.
+
+## Mathematical model and recurrence
+
+For generalized Sudoku with b-by-b boxes let q=b^2, V have q^2 cell vertices, and the color set be [q]. Every complete Sudoku row is a permutation of [q].
+
+After processing rows 0 through r-1, keep a state
+
+    s_r = (C_0,...,C_(q-1), B_0,...,B_(b-1))
+
+where each C_j is a q-bit mask recording digits already assigned in column j, and each B_k is a q-bit mask of digits already placed in box-column k during the current b-row band. The B masks are reset to zero at each new box-row band. These masks represent precisely the constraints that can affect the unprocessed rows.
+
+For a proposed row permutation p=(p_0,...,p_(q-1)), reject it if it disagrees with givens or if any bit p_j already occurs in column-mask C_j or current box-mask B_floor(j/b). For every accepted p, update both masks. Let T_r(s,p) be this deterministic next state, and let P_r be the permutations consistent with the row's givens.
+
+The exact recurrence is
+
+    F_q(s) = 1,
+    F_r(s) = sum_{p in P_r and p compatible with s} F_(r+1)(T_r(s,p)).
+
+The initial state has all masks zero; the solution count is F_0(s_0). Memoization reuses F_r(s) when different earlier row sequences reach the same boundary masks. Reconstruct one witness by storing the first compatible transition with positive suffix count.
+
+### Exactness theorem
+
+A Sudoku solution consists of q row permutations (each row contains q distinct colors), and the masks enforce that no two processed cells in any column or current box share a digit. Conversely, a complete sequence of row permutations that passes every mask transition uses q distinct colors in each column and completed box. Because these units each contain q cells, they necessarily contain every digit once. Givens are checked rowwise. Every solution therefore corresponds to exactly one accepted row path and vice versa. The recurrence sums 1 for each valid path and 0 for all rejected paths, hence counts Sudoku solutions exactly.
+
+The M7 Fourier partition function
+
+    Z = sum_{c in [q]^V} product_{edges (u,v)} (1 - delta(c_u,c_v))
+                                   product_{given v} delta(c_v,g_v)
+
+equals the M8 count. The transfer DP groups terms by the constraints visible at a row boundary; no numerical Fourier approximation is required.
+
+### Symmetry theorem for clue-free boards
+
+On a board with NO givens, every global permutation of digit labels sends a solution to another solution. Because the first row of every solution is a permutation, exactly one digit relabeling maps it to canonical first row (1,2,...,q). The group action is free, so each canonical first-row solution corresponds to exactly q! original solutions:
+
+    Z_blank = q! * F_0^canonical.
+
+The first-row constraint is NOT applied if any given clue exists, since arbitrary digit relabeling would generally violate fixed clues. This is a genuine exact symmetry reduction. It reduces one row of search by q! but does not remove the exponential worst case.
+
+## Upper bound, not P=NP
+
+There are q columns with q-bit masks and b active box groups with q-bit masks. Thus a boundary description uses at most q^2+bq bits. A loose bound on the number of distinct transfer states over q rows is q * 2^(q^2+bq). At each state the implementation may inspect up to q! row permutations and q entries. Thus a valid coarse total upper bound is
+
+    T(q) = O(q^2 * q! * 2^(q^2+bq)),
+
+plus polynomial explicit-input handling. Memory is similarly exponential in the worst case. These bounds describe a deterministic exact method, but NOT a polynomial-time algorithm as q increases. The number of cells is q^2 and the number of possible row permutations is q!, so measuring fast 4x4 or partially filled 9x9 cases cannot establish any P=NP conclusion. This is a loose upper bound, NOT a SAT complexity lower bound.
+
+The state mask recurrence is a standard transfer-matrix/dynamic-programming technique. We do not assert it is novel.
+
+## Implementation and test protocol
+
+Files:
+- sudoku_transfer_count.py: exact integer count and model, row masks, box-band masks, state memoization, optional first-row symmetry, explicit resource limits.
+- test_sudoku_transfer_count.py: independent counts against the M7 exhaustive oracle of 288 valid 4x4 grids, 240 seeded random clue subsets, 160 additional random adversarial clue sets, all 288 completed boards, exact 9x9 and constructed 16x16 checks, and incomplete resource-limit handling.
+- run_sudoku_transfer_benchmark.py: compares clue-free 4x4 transfer with and without first-row symmetry, exact 4x4 reference counts, solved and partially solved 9x9, bounded unknown 9x9 and synthetic solved 16x16. Raw JSON is retained in CI.
+
+Reproduction:
+
+    python -m unittest -v test_sudoku_transfer_count.py
+    python run_sudoku_transfer_benchmark.py > m8-transfer-results.json
+
+The API returns (count, witness, metrics). Count=0 with status="completed" establishes UNSAT. Count=None with status="limit_states" or "limit_row_permutations" is UNDECIDED and must never be reported as zero or UNSAT.
+
+Every positive witness is independently verified using M7's graph-coloring certificate checker. Reference counts for finite 4x4 boards come from the separate M7 permutation oracle, not from the transfer implementation.
+
+## Falsifiable M9 gate
+
+1. On a clue-free 4x4 board show exact 288 completions, with/without symmetry; the normalized count should be 12 and the group multiplier 4!=24.
+2. For the published 9x9 example, independently distinguish solving one completion (easy in some instances) from counting all completions (may hit a budget).
+3. Audit whether the row/column/box boundary state can be soundly compressed beyond q^2+bq bits for all generalized instances; counterexamples must check exact counts, not just feasibility.
+4. Derive any claimed polynomial worst-case bound with all enumeration, memoization and arithmetic costs included. No such proof has been established in M8.
+
+**Publication boundary:** this is a research continuation of the author's reported ResearchGate M7 post, with established algorithmic techniques, a proof of correctness and a still-exponential upper bound. It does not establish P = NP.
