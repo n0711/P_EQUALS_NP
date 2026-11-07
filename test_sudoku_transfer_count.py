@@ -33,6 +33,25 @@ class SudokuTransferCountingTests(unittest.TestCase):
         self.assertEqual(exhaustive["symmetry_multiplier"], 1)
         self.assertLess(symmetric["states"], exhaustive["states"])
 
+    def test_analytic_four_by_four_second_row_partition(self):
+        # Fix canonical row 1234. Direct column/box combinatorics gives
+        # 4, 2, 2, 4 possible bottom two-row completions respectively.
+        top = [1, 2, 3, 4]
+        counts = {
+            (3, 4, 1, 2): 4,
+            (3, 4, 2, 1): 2,
+            (4, 3, 1, 2): 2,
+            (4, 3, 2, 1): 4,
+        }
+        total = 0
+        for second, expected in counts.items():
+            puzzle = [top, list(second), [0]*4, [0]*4]
+            self.assertEqual(self.oracle_count(puzzle), expected)
+            self.check_count(2, puzzle, expected)
+            total += expected
+        self.assertEqual(total, 12)
+        self.assertEqual(total * 24, 288)
+
     def test_all_288_known_solutions_count_one(self):
         for rows in self.oracle:
             puzzle = [list(row) for row in rows]
