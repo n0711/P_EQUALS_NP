@@ -8,6 +8,8 @@ on:
       - "component_sat.py"
       - "graph_separator_sat.py"
       - "structural_hybrid_sat.py"
+      - "mixed_affine_sat.py"
+      - "run_m6_backdoor_benchmark.py"
       - "graph_research_instances.py"
       - "run_structural_benchmark.py"
       - "run_graph_separator_benchmark.py"
@@ -16,6 +18,7 @@ on:
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
       - "test_structural_hybrid_sat.py"
+      - "test_mixed_affine_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
   pull_request:
@@ -25,6 +28,8 @@ on:
       - "component_sat.py"
       - "graph_separator_sat.py"
       - "structural_hybrid_sat.py"
+      - "mixed_affine_sat.py"
+      - "run_m6_backdoor_benchmark.py"
       - "graph_research_instances.py"
       - "run_structural_benchmark.py"
       - "run_graph_separator_benchmark.py"
@@ -33,6 +38,7 @@ on:
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
       - "test_structural_hybrid_sat.py"
+      - "test_mixed_affine_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
 
@@ -48,7 +54,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run independent SAT regressions
-        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_proof_obligations.py
+        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_mixed_affine_sat.py test_proof_obligations.py
       - name: Reproduce graph-separator benchmark
         run: python run_graph_separator_benchmark.py --max-calls 50000 > graph-separator-ci-results.json
       - name: Upload CI benchmark data
@@ -63,3 +69,11 @@ jobs:
         with:
           name: structural-sat-results
           path: structural-ci-results.json
+      - name: Run bounded M6 mixed-affine backdoor comparison
+        run: python run_m6_backdoor_benchmark.py --quick --max-calls 2500 --timeout-seconds 3 > mixed-affine-ci-results.json
+      - name: Upload reproducible M6 results
+        uses: actions/upload-artifact@v4
+        with:
+          name: mixed-affine-m6-results
+          path: mixed-affine-ci-results.json
+          if-no-files-found: error
