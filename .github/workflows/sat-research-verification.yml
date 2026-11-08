@@ -10,6 +10,8 @@ on:
       - "structural_hybrid_sat.py"
       - "polarity_sat.py"
       - "sudoku_graph_np.py"
+      - "sudoku_transfer_count.py"
+      - "run_sudoku_transfer_benchmark.py"
       - "sudoku_graph_to_sat.py"
       - "sudoku_phase_integrals.py"
       - "run_sudoku_phase_experiment.py"
@@ -25,6 +27,7 @@ on:
       - "test_structural_hybrid_sat.py"
       - "test_polarity_sat.py"
       - "test_sudoku_graph_np.py"
+      - "test_sudoku_transfer_count.py"
       - "test_sudoku_phase_integrals.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
@@ -37,6 +40,8 @@ on:
       - "structural_hybrid_sat.py"
       - "polarity_sat.py"
       - "sudoku_graph_np.py"
+      - "sudoku_transfer_count.py"
+      - "run_sudoku_transfer_benchmark.py"
       - "sudoku_graph_to_sat.py"
       - "sudoku_phase_integrals.py"
       - "run_sudoku_phase_experiment.py"
@@ -52,6 +57,7 @@ on:
       - "test_structural_hybrid_sat.py"
       - "test_polarity_sat.py"
       - "test_sudoku_graph_np.py"
+      - "test_sudoku_transfer_count.py"
       - "test_sudoku_phase_integrals.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
@@ -68,7 +74,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run independent SAT regressions
-        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_polarity_sat.py test_sudoku_graph_np.py test_sudoku_phase_integrals.py test_proof_obligations.py
+        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_polarity_sat.py test_sudoku_graph_np.py test_sudoku_transfer_count.py test_sudoku_phase_integrals.py test_proof_obligations.py
       - name: Reproduce graph-separator benchmark
         run: python run_graph_separator_benchmark.py --max-calls 50000 > graph-separator-ci-results.json
       - name: Upload CI benchmark data
@@ -98,4 +104,12 @@ jobs:
         with:
           name: m7-sudoku-phase-results
           path: m7-sudoku-phase-results.json
+          if-no-files-found: error
+      - name: Reproduce M8 Sudoku integer counting and symmetry benchmark
+        run: python run_sudoku_transfer_benchmark.py > m8-transfer-results.json
+      - name: Upload M8 exact Sudoku counting results
+        uses: actions/upload-artifact@v4
+        with:
+          name: m8-sudoku-transfer-results
+          path: m8-transfer-results.json
           if-no-files-found: error
