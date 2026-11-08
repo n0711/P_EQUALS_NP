@@ -31,6 +31,7 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M3 | 2026-11-07 | Incidence-component factorization | SAT iff every component SAT; #SAT product; bounded-component conditional polynomial | \`component_sat.py\`, \`test_component_sat.py\`, PR #4 merged | Section: decomposition |
 | M4 | 2026-11-07 | Exact primal-graph separator conditioning | Correct by exhaustive separator assignments plus independent component solving; exponential worst case | \`graph_separator_sat.py\`, \`test_graph_separator_sat.py\`; 9 local methods, 900 oracle cases, 210 renamings; 18 benchmark cases; GitHub Actions passed before this branch's later changes | Section: separator search |
 | M5 | 2026-11-07 | Affine recognizer + GF(2) / graph-adversary benchmark infrastructure | Exact equivalence for recognized complete XOR clause blocks, standard Gaussian elimination; connected odd-charge Tseitin contradiction | \`structural_hybrid_sat.py\`, \`graph_research_instances.py\`, \`test_structural_hybrid_sat.py\`, \`run_structural_benchmark.py\`; **CI on M5 head pending verification** | Section: algebraic shortcut, evaluation plan |
+| M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
 
 ## M5 hypothesis and mathematical scope
 
@@ -97,3 +98,52 @@ This addendum does not overwrite the originally pending M5 status; it records th
 - **Publication status:** compile-successful, author-attributed **working XeLaTeX manuscript**, not independently peer reviewed, not yet a claim of a novel complexity result or a proof of P = NP.
 
 For later milestones, append a new log entry and extend the XeLaTeX source with only verified claims and commit-specific evidence. Preserve old artifacts, add corrected versions with new run IDs, and do not quietly alter past experimental outcomes.
+
+
+## M6 research hypothesis and falsifiable construction - 2026-11-07
+
+**Question:** Can a high-treewidth connected SAT formula be trivially solved using literal polarity, and can two formulas with the *same* graph have opposite SAT status? **Answer:** Yes, by explicit constructions. This refutes any claim that connectivity, treewidth or separator size alone determines satisfiability or the actual search effort.
+
+**Definition, for n >= 3.** Let T_n be all three-element subsets of [n] and let G be the primal variable graph. Define:
+
+1. **A_n (positive):** conjunction over T in T_n of the clause containing all three positive variables. All-True is a satisfying assignment. Every active variable is pure positive, so one full pure-literal reduction solves it.
+2. **B_n (full patterns):** for every T, include all eight signed clauses with support T. A particular triple's eight clauses collectively exclude *every* truth assignment to its three variables, proving UNSAT without SAT branching.
+3. **C_n (opposing monotone):** for every T, include both the all-positive and all-negative clause. The positive clauses require the number of False values <= 2; the negative clauses require the number of True values <= 2. With n >= 3, C_n is SAT iff n <= 4. Its unit/pure/signature preprocessor detects none of these contradictions for n >= 5; complete fallback is necessary.
+
+**Graph theorem.** All A_n, B_n and C_n have exactly the primal graph K_n, because every pair of variables appears together in some triple. Thus their treewidth is exactly n-1, they are connected, and neither one- nor two-vertex deletion separates any graph when n >= 4. Yet A_n is SAT, B_n is UNSAT, and C_n has a threshold at n=5. **These are standard constructions and elementary arguments, not a new proof of any SAT complexity lower bound.**
+
+**Support-pattern certificate.** A non-tautological clause with one signed occurrence of each variable in a support S excludes one assignment to S. If all 2^{|S|} sign patterns occur, every assignment violates one clause: the formula is UNSAT. The implementation searches only support widths <=3 (configurable), in time polynomial in explicit CNF length.
+
+**Reduction theorem.** Unit propagation fixes logically necessary values. A pure variable appears in only one sign and may safely be assigned to satisfy every remaining clause mentioning it, leaving an equisatisfiable residual CNF. Iteration terminates in at most n variable-elimination stages. The residual is solved by the previous exact affine-or-separator portfolio. Assigned values are restored, and the final model is verified against the original clauses. A complete-support contradiction is sound independently of the rest of the formula. The complete combined solver is correct, with unrestricted exponential worst case.
+
+**Implementation:** \`polarity_sat.py\` supplies the polynomial preprocessing and exact fallback; \`dense_cnf_families.py\` supplies three graph-identical mathematical construction families; \`test_polarity_sat.py\` includes 810 seeded independently enumerated CNF oracle cases (n=0..8, 90 each), 210 signed-renaming cases, witness validation, family threshold and graph-width invariants, affine fallback checks and explicit undecided resource limit semantics. \`run_polarity_benchmark.py\` compares DPLL, previous hybrid, and new portfolio as separate processes with explicit wall-time/call ceilings, retaining raw JSON and statuses.
+
+**Verification at initial commit:** tests and benchmark workflow added; *do not claim passing CI until the run completes*. Neither new theorem claims a worst-case SAT advantage: these are previously recognized easy or locally contradictory families. The mixed-polarity C_n family remains a useful input on which this preprocessing has no simplification; no claim is made that C_n is computationally hard.
+
+**Paper placement:** add Section 'Same-primal-graph SAT and UNSAT families' to \`paper/structural-sat-milestones.tex\`, and maintain the existing P-vs-NP proof obligation. Add immutable CI run/artifact IDs in a dated verification addendum.
+
+**Next falsification:** search residual high-width 3-SAT examples with no unit, pure variable, locally complete support or affine structure; measure whether exact solver state counts still grow exponentially. An impossibility theorem for any proposed universal polynomial-time rule would need an independent rigorous proof, not a histogram.
+
+
+## M6 verification addendum - 2026-11-07 18:58 UTC
+
+**Reviewed source head:** \`eaa214129f4ec4861dead806c6942aa07b8dc526\` in [PR #6](https://github.com/n0711/P_EQUALS_NP/pull/6), branch \`research/m6-polarity-signatures-20261107\`.
+
+- [SAT research GitHub Actions run 42403877621](https://github.com/n0711/P_EQUALS_NP/actions/runs/42403877621): **success**, 48 Python unittest methods passed in 0.609 seconds on its runner. Exactly **11** are new \`test_polarity_sat.py\` methods.
+- The M6 test method loops include **810** seeded independent exhaustive-SAT oracle comparisons for n=0..8, and **210** signed variable-renaming checks for n=1..7. Satisfying models are verified against original clauses. Graph invariants and family thresholds are additionally asserted; these counts describe checked finite cases, not a complexity theorem.
+- Graph and graph-search CI (3 jobs) and SAT cross-language CI (1 job) on the same source head: **success**.
+- The M6 bounded benchmark job completed and uploaded JSON artifact \`m6-same-primal-graph-results\` (ID **13586087780**, GitHub Actions run 42403877621). The script runs **9 generated inputs** (n=4,6,8 times 3 families) across three solver backends. Per-worker \`timeout\` and \`limit_calls\` are *undecided*, never UNSAT; workflow completion does not imply every individual solver run completed.
+- Existing graph-separator and structural benchmark artifacts in that run: \`graph-separator-results\` ID 13586816066 and \`structural-sat-results\` ID 13586697402.
+- M6 paper build is tracked in the separate XeLaTeX workflow. Record the successful artifact ID only after a verified build.
+
+**Outcome:** finite correctness regressions and same-graph constructions passed; performance superiority and the general polynomial-time SAT bound remain **unproved**. The three-family theorem follows from the written elementary proof, not solely these finite observations. No P = NP proof is claimed.
+
+
+## M6 XeLaTeX compile evidence - 2026-11-07 19:00 UTC
+
+- Source commit \`64dd783195f924e5d2c57dd30f8d2a7141cd570a\` includes the M6 mathematical statement, elementary proof, and verified 48-test evidence.
+- [XeLaTeX manuscript workflow 42404007834](https://github.com/n0711/P_EQUALS_NP/actions/runs/42404007834): **success**, two XeLaTeX passes and PDF output validation.
+- PDF artifact: \`structural-sat-milestone-paper\`, artifact ID **13586169439** (69,609 bytes reported by GitHub). This is a generated, reproducible working manuscript rather than a peer-reviewed publication. Artifacts are subject to GitHub retention limits.
+- The milestone log is append-only: this documentation update does not change the paper source or retrospectively alter earlier test observations.
+
+The subsequent research gate remains unrestricted, non-affine connected SAT formulas with explicit complexity accounting; nothing recorded here establishes a polynomial-time algorithm for general 3-SAT.

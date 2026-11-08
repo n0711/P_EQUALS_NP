@@ -125,3 +125,19 @@ Reproduce with:
 - `cd paper && xelatex structural-sat-milestones.tex && xelatex structural-sat-milestones.tex`
 
 **Verification and novelty boundary:** This is a reproducible implementation of established affine SAT / AND-OR graph methods, not an unconditional polynomial-time SAT solver. Update the ledger and manuscript only with explicitly verified outcomes.
+
+
+## M6 - Literal polarity and identical primal graph counterfamilies (7 November 2026)
+
+[RESEARCH_MILESTONES.md](RESEARCH_MILESTONES.md) records the M6 theorem, experimental evidence and falsification criteria. The [XeLaTeX research manuscript](paper/structural-sat-milestones.tex) includes the mathematical proof.
+
+Three explicit 3-CNF families share the complete primal graph K_n but have different SAT statuses: all-positive triples are SAT, all eight sign patterns on every triple are UNSAT, and all-positive plus all-negative triples are SAT exactly for n=3,4. Therefore connectivity/treewidth alone do not determine satisfiability. [dense_cnf_families.py](dense_cnf_families.py) generates the cases, and [polarity_sat.py](polarity_sat.py) implements standard exact unit/pure-literal preprocessing and complete-support contradiction detection, falling back to the previous affine/graph solver when needed. This does not provide a general polynomial-time SAT algorithm.
+
+Run the tests and benchmark:
+
+```sh
+python -m unittest -v test_polarity_sat.py
+python run_polarity_benchmark.py --quick --timeout-seconds 3 --max-calls 1800 > m6-polarity-results.json
+```
+
+A GitHub Actions workflow runs M6 alongside the earlier SAT regression suites and archives the benchmark JSON. See the milestone ledger for the verified run ID, not merely the existence of a test file.

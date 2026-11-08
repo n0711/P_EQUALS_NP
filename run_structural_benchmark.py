@@ -56,6 +56,10 @@ def worker():
         from structural_hybrid_sat import structural_hybrid_sat
         model, details = structural_hybrid_sat(n, clauses, max_calls=max_calls,
                                                pair_scan_limit=24)
+    elif method == "polarity":
+        from polarity_sat import polarity_hybrid_sat
+        model, details = polarity_hybrid_sat(
+            n, clauses, max_calls=max_calls, pair_scan_limit=24)
     else:
         raise ValueError("unrecognized solver")
     elapsed = perf_counter() - start
