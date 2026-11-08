@@ -141,3 +141,41 @@ python run_polarity_benchmark.py --quick --timeout-seconds 3 --max-calls 1800 > 
 ```
 
 A GitHub Actions workflow runs M6 alongside the earlier SAT regression suites and archives the benchmark JSON. See the milestone ledger for the verified run ID, not merely the existence of a test file.
+
+
+## M7 - Nondeterministic Sudoku, graph coloring and RioTuner phase integrals (7 November 2026)
+
+The [M7 research note](SUDOKU_RIOTUNER_PHASE_M7.md) formalizes generalized Sudoku as graph coloring, an exact deterministic polynomial-time NP witness verifier, and a one-hot [Sudoku-to-CNF encoding](sudoku_graph_to_sat.py). The [Sudoku graph implementation](sudoku_graph_np.py) includes a complete deterministic backtracking solver with explicit undecided node limits, **not** a polynomial-time search guarantee.
+
+Using mathematical Fourier complex demodulation inspired by the independently maintained private RioTuner pitch engine, [sudoku_phase_integrals.py](sudoku_phase_integrals.py) expresses equality of Sudoku colors as a finite Fourier sum and a circle integral. The graph-conflict energy counts equal-color adjacent cells for complete assignments, but direct integer checking is asymptotically faster. The experiment demonstrates that nonuniform Blackman-Harris audio windowing breaks exact finite character orthogonality, so numeric phase scores are diagnostic only.
+
+Reproduce:
+
+```sh
+python -m unittest -v test_sudoku_graph_np.py test_sudoku_phase_integrals.py
+python run_sudoku_phase_experiment.py > m7-sudoku-phase-results.json
+```
+
+GitHub Actions SAT research workflow run [42415413946](https://github.com/n0711/P_EQUALS_NP/actions/runs/42415413946) passed **68 tests**, including 20 new M7 tests, and uploaded experiment artifact **m7-sudoku-phase-results** (ID 13590907805). The [cumulative research milestone ledger](RESEARCH_MILESTONES.md) and [XeLaTeX working manuscript](paper/structural-sat-milestones.tex) document the formal identities, experiments, limitations and provenance.
+
+These are mathematical reductions and finite implementation tests. They do **not** prove P = NP.
+
+
+## M8 - Exact generalized Sudoku counting via sparse row transfers (7 November 2026)
+
+The latest [M8 mathematical research note](SUDOKU_TRANSFER_COUNTING_M8.md) and [XeLaTeX working paper](paper/structural-sat-milestones.tex) continue the M7 Sudoku / RioTuner Fourier-integral work. The author reports the preceding M7 paper was posted on ResearchGate; this repository does not independently verify its publication record.
+
+The [exact transfer counter](sudoku_transfer_count.py) evaluates the number of Sudoku completions using memoized column and box-band digit masks, reconstructing a graph-verified witness when the count is positive. A clue-free board can soundly fix its first row and multiply by q!, where q is the number of colors. This is a standard finite symmetry reduction, not a polynomial-time general Sudoku solver.
+
+The [independent regression suite](test_sudoku_transfer_count.py) and [reproducible benchmark](run_sudoku_transfer_benchmark.py) were verified on [GitHub Actions SAT research run 42418159452](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418159452): 81 tests passed (13 new M8 methods) on the initial M8 run. A follow-up [CI run 42418569685](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418569685) passed 82 tests (14 M8 methods), adding an independent 4x4 combinatorial count proof. Raw JSON artifact: m8-sudoku-transfer-results, ID 13592321531.
+
+On the empty 4x4 grid, both methods count **288** solutions; memoized transfer states fell **85 to 15** with symmetry. A bounded 9x9 counting run returned **undecided**, not UNSAT. The upper-bound proof still allows exponential memory and time for generalized Sudoku.
+
+Run:
+
+```sh
+python -m unittest -v test_sudoku_transfer_count.py
+python run_sudoku_transfer_benchmark.py > m8-transfer-results.json
+```
+
+Every milestone's proof, test status, countercases, source head, and paper artifact belongs in the [append-only research ledger](RESEARCH_MILESTONES.md). None of M0-M8 establishes P=NP.

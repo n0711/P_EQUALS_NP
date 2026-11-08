@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{7 November 2026\\Working manuscript, milestone M6}
+\date{7 November 2026\\Working manuscript, milestone M8}
 \begin{document}
 \maketitle
 
@@ -190,6 +190,396 @@ Any \texttt{timeout} or \texttt{limit\_calls} result is
 \emph{undecided}, not UNSAT. Run and artifact IDs for each
 validated result are appended in the milestone ledger.
 
+
+\section{M7: Generalized Sudoku and RioTuner-inspired Fourier integrals}
+
+\subsection{Nondeterministic graph-coloring formulation}
+Let $b\ge1$ denote the box width and $q=b^2$. A generalized Sudoku
+board has $q$ rows, $q$ columns, $q^2$ cells, and labels $1,\ldots,q$.
+Create a vertex per cell; connect two vertices if and only if their
+cells share a row, column, or $b\times b$ box. An assignment
+$c:V\rightarrow[q]$ respects a Sudoku puzzle precisely when it
+is a proper graph coloring and preserves every prescribed given digit.
+
+\begin{theorem}[Polynomial witness verification]
+Generalized Sudoku belongs to $\mathsf{NP}$.
+\end{theorem}
+\begin{proof}
+A certificate contains one color per cell, a total of $q^2$
+integers each represented in $O(\log q)$ bits. A deterministic
+verifier confirms the digits lie in $[q]$, checks prescribed
+givens, and compares assigned colors across every graph edge.
+Each vertex has $O(q)$ neighbors, so $|E|=O(q^3)$, and
+verification is polynomial in the explicit board size.
+A nondeterministic machine guesses this certificate.
+The argument does not show a deterministic polynomial-time
+method for discovering a certificate.
+\end{proof}
+
+NP-completeness for generalized Number Place
+was established by Yato and Seta~\cite{yato2003}.
+This separate published hardness result is not
+derived from membership in NP alone.
+
+The reference implementation
+\texttt{sudoku\_graph\_np.py} constructs the graph, checks
+certificates, and solves examples via deterministic
+constraint propagation and backtracking. It is exact when
+completed, but its worst case may be exponential.
+An explicit node budget yields an \emph{undecided} status
+rather than an unsatisfiability certificate.
+
+\subsection{A Fourier integral as a color-conflict indicator}
+The author's separate RioTuner engine (repository
+\texttt{n0711/riotuner}, \texttt{engine/src/partials.rs})
+uses weighted complex phase demodulation to estimate
+audio frequency. Here we transfer only its Fourier
+projection principle, not the audio code or its
+pitch-estimation guarantees.
+
+\begin{theorem}[Fourier--Kronecker projection]
+For colors $a,b\in\{1,\ldots,q\}$, define
+\begin{equation}
+\delta_q(a,b)=\frac{1}{2\pi}\int_0^{2\pi}
+ e^{i(a-b)t}\,dt =
+ \frac1q\sum_{k=0}^{q-1}
+ e^{2\pi i k(a-b)/q}.
+\end{equation}
+Then $\delta_q(a,b)=1$ if $a=b$ and is zero otherwise.
+For any complete coloring $c$, the energy
+\begin{equation}
+E(c)=\sum_{\{u,v\}\in E}\delta_q(c(u),c(v))
+\end{equation}
+equals the integer number of same-color graph edges.
+\end{theorem}
+\begin{proof}
+If $a=b$, every integrand and discrete summand equals one.
+Otherwise $d=a-b$ is a nonzero integer with $|d|<q$.
+Integrating the nonconstant integer-frequency exponential
+over the circle gives zero. In the discrete sum,
+$\omega=e^{2\pi i d/q}$ is a nontrivial $q$th root
+of unity, hence
+$\sum_{k=0}^{q-1}\omega^k=(1-\omega^q)/(1-\omega)=0$.
+Summing edge indicators gives the collision count.
+\end{proof}
+
+For a \emph{complete} coloring, zero energy together
+with preserved givens is exactly a Sudoku solution.
+For a partial assignment, zero conflicts among assigned
+cells cannot decide whether a full solution exists.
+Evaluating the displayed discrete phase sum directly
+requires $O(q|E|)$ numerical operations, whereas direct
+exact integer comparisons require $O(|E|)$. The
+integral notation therefore does \emph{not} improve
+the complexity of certificate checking.
+
+\paragraph{Audio window transfer obstruction.}
+RioTuner uses a nonuniform four-term Blackman--Harris
+analysis window. Replacing the uniform coefficients
+in the finite Fourier sum by these weights generally
+destroys exact character orthogonality. The resulting
+nonzero leakage can appear even for valid Sudoku
+colorings. Consequently, weighted phase diagnostics
+and floating-point cancellation are not valid SAT
+or Sudoku decision certificates.
+
+\subsection{Polynomial encoding and counting obstruction}
+The module \texttt{sudoku\_graph\_to\_sat.py}
+encodes one Boolean variable for each cell-color pair,
+for a total of $q^3$ variables. Clauses enforce
+exactly one color per cell, unequal colors along graph
+edges, and the original givens. The encoding has
+$O(q^4)$ explicit size and preserves solutions:
+Sudoku reduces to CNF-SAT in polynomial time.
+
+Let $D$ be the given-cell set and $g_v$ its required
+color. The number of valid completions is
+\begin{equation}
+Z=\sum_{c\in[q]^V}
+\left[\prod_{\{u,v\}\in E}
+ (1-\delta_q(c(u),c(v)))\right]
+\left[\prod_{v\in D}\delta_q(c(v),g_v)\right].
+\end{equation}
+There are $q^{q^2}$ candidate complete colorings.
+Replacing the indicators by Fourier integrals does
+not itself provide a polynomial procedure to evaluate
+this partition function.
+
+\subsection{Experiment and reproducibility}
+The source files are \texttt{sudoku\_graph\_np.py},
+\texttt{sudoku\_graph\_to\_sat.py},
+\texttt{sudoku\_phase\_integrals.py}, and
+\texttt{run\_sudoku\_phase\_experiment.py}.
+Tests independently enumerate all valid $4\times4$
+Sudoku boards, compare generated puzzles against an
+oracle, exercise a practical $9\times9$ example and
+a synthetic $16\times16$ board, and compare Fourier
+phase projections to exact graph conflicts. The
+dedicated research note is
+\texttt{SUDOKU\_RIOTUNER\_PHASE\_M7.md}.
+
+On 7 November 2026, SAT research GitHub Actions
+run 42415413946 completed successfully: 68 Python
+unittest methods passed, including 20 new M7
+tests. Those M7 cases include 540 independently
+oracle-checked $4\times4$ clue sets and 240 seeded
+complete $4\times4$ assignments used to compare
+Fourier and integer edge counts. The graph-conflict
+experiment completed and was archived as GitHub
+artifact 13590907805. These are finite checks,
+not a polynomial-time guarantee or evidence that
+weighted Fourier windows yield an exact verifier.
+The milestone ledger records the source and artifact
+provenance. In GitHub Actions artifact 13590907805,
+a valid complete $9\times9$ Sudoku yielded zero
+exact edge conflicts and uniform-Fourier real energy
+approximately $4.50\times10^{-14}$, consistent with
+roundoff. A changed cell created exactly two
+edge conflicts and uniform energy approximately $2$.
+By contrast, the absolute Blackman--Harris phase sums
+were approximately $208.315$ and $208.189$ in those
+same cases. Thus weighted audio windowing cannot
+serve as a sound Sudoku equality oracle.
+
+A puzzle with one blank had zero conflicts
+on its 790 evaluated edges, out of the full
+graph's 810 edges; this partial assignment
+does not constitute a completed Sudoku witness.
+These are numerical observations of elementary
+identities, not algorithmic complexity evidence.
+Nothing in this section proves
+$\mathsf{P}=\mathsf{NP}$.
+
+
+\section{M8: Exact Sudoku counting by graph row-transfer states}
+
+The researcher reports that the previous M7 Sudoku and
+RioTuner-inspired Fourier-integral report was posted
+on ResearchGate. The publication identifier was not
+independently verified for the present milestone.
+We now examine whether exact graph constraint
+contraction can evaluate the Sudoku partition function
+more efficiently than direct enumeration of all
+$q^{q^2}$ complete color assignments.
+
+\subsection{Integer transfer recurrence}
+Retain the M7 notation $q=b^2$ for a generalized
+Sudoku board with $q$ rows and columns and
+$b\times b$ sub-boxes. Every valid full row is a
+permutation $p=(p_0,\ldots,p_{q-1})$ of $[q]$.
+After processing $r$ rows, keep a state
+\begin{equation}
+\sigma_r=(C_0,\ldots,C_{q-1}, B_0,\ldots,B_{b-1}),
+\end{equation}
+where $C_j$ is the $q$-bit set of digits already
+used in column $j$ and $B_k$ is the set used in the
+currently processed band of $b$ rows in box-column
+$k$. Reset the $B_k$ at the start of each new
+box-row band. A row permutation is admissible
+precisely when it respects its givens and no inserted
+digit occurs in its corresponding column or active
+box mask.
+
+Write $\Pi_r(\sigma)$ for the set of admissible
+row permutations and $U_r(\sigma,p)$ for the
+deterministic successor state. Define the suffix
+count recursively by
+\begin{equation}
+D_r(\sigma)=
+\begin{cases}
+1,&r=q,\\
+\displaystyle\sum_{p\in\Pi_r(\sigma)}
+D_{r+1}\bigl(U_r(\sigma,p)\bigr),&r<q.
+\end{cases}
+\label{eq:transfer}
+\end{equation}
+The algorithm stores a memoized integer result for
+each encountered pair $(r,\sigma)$ and records
+one positive-count transition to reconstruct
+a witness.
+
+\begin{theorem}[Exact Sudoku transfer counting]
+For a generalized Sudoku instance with arbitrary
+givens, $D_0(\mathbf{0})$ equals its number of
+completed solutions. In particular, the initial
+count is positive if and only if the puzzle is
+satisfiable.
+\end{theorem}
+\begin{proof}
+Every valid solution has exactly one ordered
+sequence of row permutations. The corresponding
+transfer path is admissible because its columns
+and boxes contain no repeated digit and all givens
+are respected. Conversely, each completed
+admissible path consists of row permutations
+and never repeats a digit within a column or
+box. Since each completed unit has exactly $q$
+cells with $q$ allowed digits, all digits occur
+exactly once. Thus every accepted path represents
+one valid solution, and no two accepted paths
+represent the same solution. Recurrence
+\eqref{eq:transfer} counts the accepted paths
+exactly once by induction from its base case.
+\end{proof}
+
+This is an exact regrouping of terms in the M7
+Fourier partition function, using only integer
+set operations and arbitrary-precision sums.
+The Fourier integral representation is a
+mathematical equivalence, not a source of
+additional computational power.
+
+\subsection{A provable but restricted symmetry quotient}
+For a clue-free board, the symmetric group
+$S_q$ acts on completed grids by globally
+relabeling all digit colors.
+
+\begin{theorem}[Canonical first row on clue-free boards]
+If a generalized Sudoku has no givens, its
+exact number $Z$ of completions satisfies
+\begin{equation}
+Z=q!\,Z_{\mathrm{canonical}},
+\end{equation}
+where $Z_{\mathrm{canonical}}$ counts completions
+whose first row is $(1,2,\ldots,q)$.
+\end{theorem}
+\begin{proof}
+Every completed first row is a permutation
+of $[q]$. There is exactly one global
+digit relabeling that sends its first row
+to the canonical ordering. Any color
+permutation fixing a completed first row
+must fix every digit, so this group action
+is free. Thus each orbit contains precisely
+$q!$ different colorings and exactly one
+canonical-first-row representative.
+Multiplication by $q!$ recovers the
+unrestricted count.
+\end{proof}
+
+This normalization is \emph{not} applied to
+puzzles with givens: changing color labels
+may violate an original clue. The symmetry
+argument is elementary and does not prove a
+general polynomial-time Sudoku algorithm.
+
+\subsection{Exponential state-space bound}
+A transfer frontier contains $q$ column
+masks and $b$ active box masks, each of $q$
+bits. Hence it uses at most $q^2+bq$
+bits, and the number of possible states
+over all row positions is bounded by
+$q\,2^{q^2+bq}$. Each state may inspect
+as many as $q!$ row permutations,
+with polynomial-time mask operations
+and arbitrary-precision integer addition.
+A loose upper bound on total bit time is
+\begin{equation}
+T(q)\le \operatorname{poly}(q)\,
+q!\,2^{q^2+bq}.
+\label{eq:transfer-bound}
+\end{equation}
+This bound is \emph{exponential} as the
+generalized board dimension increases.
+It is an upper bound for this exact
+implementation, not a proven lower bound
+for every Sudoku algorithm and not a
+proof of $\mathsf{P}=\mathsf{NP}$.
+
+\subsection{Independently checked finite experiments}
+GitHub Actions SAT research run 42418569685
+passed 82 Python unittest methods, including
+14 new M8 counting tests. The latter used
+an independent exhaustive reference of 288
+completed $4\times4$ boards, 240 seeded
+clue subsets, 160 adversarial random
+clue sets, and additional fixed-grid cases.
+The original machine-readable evidence was archived
+as artifact 13592321531 (run 42418159452).
+The later 82-test validation added independent
+symbolic enumeration without changing the algorithm.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}p{.34\linewidth}r r r r@{}}
+\toprule
+Input & Count & States & Accepted & Row trials\\
+\midrule
+Empty $4\times4$, unrestricted & 288 & 85 & 240 & 2040\\
+Empty $4\times4$, canonical row & 288 & 15 & 26 & 337\\
+Four-blank $4\times4$ & 1 & 4 & 4 & 4\\
+One-blank $9\times9$ & 1 & 9 & 9 & 9\\
+Completed $16\times16$ & 1 & 16 & 16 & 16\\
+\bottomrule
+\end{tabular}
+\caption{Exact counts and state-work measurements
+from the M8 GitHub Actions artifact.
+The canonical-row result includes the
+$q!$ symmetry multiplier.}
+\label{tab:m8-measurements}
+\end{table}
+
+For clue-free $4\times4$, the observed
+canonical count is $12$, which multiplied
+by $4!=24$ reproduces $288$ solutions.
+The memoized-state count decreases
+from $85$ to $15$ on this finite example.
+These observations do not establish an
+asymptotic improvement.
+
+\paragraph{Independent finite enumeration for $4\times4$.}
+The symmetry theorem first fixes the row $(1,2,3,4)$.
+The second row must place digits $3,4$ in its left
+box and $1,2$ in its right box. Exactly four
+second rows are possible. The remaining column
+values constrain the third row, while the fourth
+row is forced by the last unused digit in
+each column. Direct enumeration of the
+third-row possibilities is:
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}c l r@{}}
+\toprule
+Second row & Allowed third rows & Number\\
+\midrule
+$(3,4,1,2)$ & $2143,2341,4123,4321$ & 4\\
+$(3,4,2,1)$ & $2143,4312$ & 2\\
+$(4,3,1,2)$ & $2143,4312$ & 2\\
+$(4,3,2,1)$ & $2143,2413,3142,3412$ & 4\\
+\bottomrule
+\end{tabular}
+\caption{Independent combinatorial enumeration
+with canonical first row. Each listed third
+row gives exactly one box-valid fourth row.}
+\end{table}
+The canonical count is therefore
+$4+2+2+4=12$ and the total
+is $4!\times12=288$, consistent with
+the independently verified 288-completion oracle.
+
+On the standard $9\times9$ example the
+counting procedure reached the configured
+limit of 60 states after 41,262 row trials.
+Its exact completion count is therefore
+\emph{unknown from this run}, even though
+the previous graph solver produced one
+valid witness. For the clue-free $9\times9$
+case, a row contains $9!=362{,}880$
+permutations, exceeding the configured
+5,000-permutation budget. Both limited
+experiments are \emph{undecided}, not UNSAT.
+
+The implementation is
+\texttt{sudoku\_transfer\_count.py};
+independent regressions are in
+\texttt{test\_sudoku\_transfer\_count.py}.
+The dated theoretical derivation and
+all source identifiers are recorded in
+\texttt{SUDOKU\_TRANSFER\_COUNTING\_M8.md}
+and the cumulative milestone ledger.
+
 \section{Evidence, limitations and manuscript updates}
 The cumulative research log is
 \texttt{RESEARCH\_MILESTONES.md}. Milestones M3 and M4 contain
@@ -231,6 +621,13 @@ Rebuild this manuscript with XeLaTeX twice. This is an
 AI-assisted working draft, not a peer-reviewed paper.
 
 \begin{thebibliography}{9}
+\bibitem{yato2003}
+T. Yato and T. Seta,
+\emph{Complexity and Completeness of Finding Another
+Solution and Its Application to Puzzles},
+IEICE Transactions on Fundamentals,
+E86-A(5), pp. 1052--1060, 2003.
+\url{https://globals.ieice.org/en_transactions/fundamentals/10.1587/e86-a_5_1052/_p}.
 \bibitem{schaefer}
 T. J. Schaefer, The Complexity of Satisfiability Problems,
 STOC, 1978. \url{https://doi.org/10.1145/800133.804350}.

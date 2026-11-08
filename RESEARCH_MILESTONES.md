@@ -32,6 +32,8 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M4 | 2026-11-07 | Exact primal-graph separator conditioning | Correct by exhaustive separator assignments plus independent component solving; exponential worst case | \`graph_separator_sat.py\`, \`test_graph_separator_sat.py\`; 9 local methods, 900 oracle cases, 210 renamings; 18 benchmark cases; GitHub Actions passed before this branch's later changes | Section: separator search |
 | M5 | 2026-11-07 | Affine recognizer + GF(2) / graph-adversary benchmark infrastructure | Exact equivalence for recognized complete XOR clause blocks, standard Gaussian elimination; connected odd-charge Tseitin contradiction | \`structural_hybrid_sat.py\`, \`graph_research_instances.py\`, \`test_structural_hybrid_sat.py\`, \`run_structural_benchmark.py\`; **CI on M5 head pending verification** | Section: algebraic shortcut, evaluation plan |
 | M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
+| M7 | 2026-11-07 | Nondeterministic generalized Sudoku graph coloring and RioTuner-inspired Fourier integral | NP certificate verification, exact one-hot CNF encoding, Fourier character orthogonality, nonuniform-window leakage | sudoku_graph_np.py, sudoku_graph_to_sat.py, sudoku_phase_integrals.py, tests; CI initially pending | Section: Sudoku and Fourier phase constraints |
+| M8 | 2026-11-07 | Exact generalized Sudoku counting by row-transfer masks | Exact count recurrence, q! first-row symmetry, exponential loose bound | sudoku_transfer_count.py, test_sudoku_transfer_count.py, run_sudoku_transfer_benchmark.py; 81 CI tests passed, run 42418159452, artifact 13592321531 | Section: transfer counting and symmetry |
 
 ## M5 hypothesis and mathematical scope
 
@@ -147,3 +149,119 @@ For later milestones, append a new log entry and extend the XeLaTeX source with 
 - The milestone log is append-only: this documentation update does not change the paper source or retrospectively alter earlier test observations.
 
 The subsequent research gate remains unrestricted, non-affine connected SAT formulas with explicit complexity accounting; nothing recorded here establishes a polynomial-time algorithm for general 3-SAT.
+
+
+## M7 hypothesis, proof obligations, and numerical experiment (2026-11-07)
+
+**Research question:** Transfer phase-demodulation mathematics from the separately maintained, private n0711/riotuner Rust pitch engine to generalized Sudoku graph coloring. Can a Fourier integral directly eliminate nondeterministic guessing? **Answer to the demonstrated mathematics:** the Fourier expression is an exact *constraint evaluator*, not an efficient solution generator.
+
+- **Source provenance:** The original RioTuner engine uses weighted complex sinusoidal demodulation and phase-slope regression on overlapping audio blocks (engine/src/partials.rs), a four-term Blackman-Harris analysis window (engine/src/window.rs), and YIN for coarse pitch estimation (engine/src/yin.rs). None of this private implementation code is copied. Only the standard complex Fourier mathematics is adapted in a new Python experiment, which is a different workload.
+- **Graph model:** For box width b, let q=b^2. Sudoku contains q^2 vertices, colors 1..q, and peer edges sharing row/column/box. The original 9x9 case has 81 vertices and 810 undirected edges. A complete proper coloring preserving givens is exactly a Sudoku completion.
+- **Nondeterministic membership:** A guessed q-color assignment is a witness of q^2 digit labels. One deterministic pass through colors, edges and givens verifies it in polynomial time. This proves generalized Sudoku in NP; it does not turn nondeterministic guesses into a deterministic polynomial-time search.
+- **Exact Fourier integral theorem:** For integer a,b in 1..q,
+
+      delta_{a,b} = (1/(2pi)) integral_0^{2pi} exp(i(a-b)t) dt
+                 = (1/q) sum_{k=0}^{q-1} exp(2pi i k(a-b)/q).
+
+  Character orthogonality yields 1 if a=b and 0 otherwise. For a complete coloring c, sum over all edges of delta(c_u,c_v) counts exact conflicts; zero *plus preserved givens* is equivalent to a valid coloring. For incomplete Sudoku, zero assigned-edge conflicts is inconclusive. Explicit phase projection costs O(q|E|), while integer edge checking costs O(|E|); this is not a runtime improvement.
+- **Window falsification:** Blackman-Harris weights are not uniform. Weighted phase projection lacks exact Kronecker-delta orthogonality in general, and a solved Sudoku can have nonzero numeric absolute phase leakage. Never use weighted or floating phase scores as an exact SAT decision.
+- **Polynomial encoding theorem:** sudoku_graph_to_sat.py encodes each cell-color pair as one Boolean variable (q^3 Boolean variables), exact-one-color constraints, peer inequalities and givens, with O(q^4) explicit CNF size. A satisfying assignment corresponds exactly to a Sudoku solution. This is Sudoku <=p SAT, not SAT <=p Sudoku.
+- **Partition function limitation:** Expressing the count of solutions as a sum over colorings of products of (1-delta) edge factors and clue-delta factors retains q^(q^2) candidate colorings. Rewriting delta factors as integrals does not prove a polynomial algorithm for evaluating the partition function.
+- **Practical experiment:** sudoku_graph_np.py provides graph construction, exact witness verification and deterministic domain-propagating backtracking with a distinct undecided node-limit state. Tests include an independent 4x4 Sudoku enumeration oracle, seeded clue sets, a known 9x9 solution, synthetic 16x16 validation, Fourier delta orthogonality, exact conflict counts and CNF witness conversion. run_sudoku_phase_experiment.py records solved/invalid/partial Sudoku phase diagnostics in JSON.
+- **Initial execution status:** tests are committed but have no passed status until actual CI checks finish. This remains unproven as a universal deterministic polynomial Sudoku algorithm.
+- **Next falsification:** Compare signed-phase integration, exact graph-edge checking and candidate ordering on general Sudoku as size b grows, including adversarial solutions and unsatisfiable puzzles. Count *total* integral evaluation cost, graph construction and all backtracking states. A probabilistic or nondeterministic certificate is not a deterministic polynomial worst-case proof.
+
+Technical research note: SUDOKU_RIOTUNER_PHASE_M7.md. Working XeLaTeX draft: paper/structural-sat-milestones.tex. Branch: research/m7-sudoku-graph-np-20261107, PR #7.
+
+
+## M7 verified CI and experimental evidence - 2026-11-07 21:20 UTC
+
+- **PR:** [#7](https://github.com/n0711/P_EQUALS_NP/pull/7), M7 branch research/m7-sudoku-graph-np-20261107. The M7 code head tested was commit 0df1ae8a254e85629df4d7e4075627cc2a529862.
+- [SAT research run 42415413946](https://github.com/n0711/P_EQUALS_NP/actions/runs/42415413946): **completed/success**. GitHub job 128532292855 ran **68 Python unittest methods in 1.128 seconds**, all passed. Exactly 20 methods are new M7 tests: 11 in test_sudoku_graph_np.py and 9 in test_sudoku_phase_integrals.py. The other 48 prior tests remain passing.
+- **Independent checker evidence:** an independent 4x4 oracle enumerates 288 completed grids. The tests compare 240 seeded clue subsets and 300 seeded random clue grids to the oracle (540 total 4x4 puzzle evaluations). They also test the conventional 9x9 example, constructed 16x16 validation, conflicting givens, a resource-budget undecided status and CNF witness round-tripping.
+- **Phase/integral evidence:** tests check 1-,2-,4-,9-,16-color character orthogonality on every color pair; 240 seeded complete 4x4 random assignments compare complex projection with exact graph edge-clash counts. Nonuniform Blackman-Harris projection exhibits nonzero leakage on a correct full Sudoku. Numerical phase results are **not** used as exact solver decisions.
+- **Reproducible experiment:** the M7 JSON-producing program completed successfully in the CI run and uploaded artifact **m7-sudoku-phase-results**, ID **13590907805**. It measures solved, conflicted and partially filled 9x9 boards; a 4x4 graph-search example; and the Fourier-vs-direct candidate edge scores. Explicit Fourier evaluation is O(q|E|), vs O(|E|) for exact integer comparisons, so no speedup claim is made.
+- The corresponding SAT cross-language, SAT and graph-search (three jobs) and XeLaTeX workflows on the tested code head also completed successfully. The *M7-updated* XeLaTeX manuscript will have a separate build run after the paper is pushed; do not conflate it with the older manuscript build.
+- **Scope/novelty:** The analytic equality and Sudoku-to-SAT encoding are established mathematics. The experiment is an implementation of the Fourier phase idea, inspired by RioTuner's signal processing. This does not produce a polynomial-time solver for generalized Sudoku or prove P=NP.
+
+No independent expert or peer review is claimed; maintain a separate dated addendum if any M7 result requires correction.
+
+
+## M7 numerical evidence addendum - 2026-11-07, GitHub artifact 13590907805
+
+The artifact m7-sudoku-phase-results.zip from SAT research run 42415413946 was downloaded and inspected. It contains m7-sudoku-phase-results.json with these measured values for the standard Sudoku graph (81 vertices, 810 edges):
+
+| Complete/partial 9x9 case | Exact equal-color graph edges | Uniform phase projection (real sum) | Blackman-Harris phase absolute sum |
+| --- | ---: | ---: | ---: |
+| Valid complete coloring | 0 | 4.50380473656e-14 | 208.315358276 |
+| Changed one digit | 2 | 2.0000000000000773 | 208.189111477 |
+| One blank cell | 0 among 790 assigned edges | 4.02455846427e-14 | 203.019813249 |
+
+The valid solution's small nonzero uniform result is floating-point rounding, not an exact mathematical contradiction; the exact character sum is 0. Replacing one cell's color in this chosen construction produces **two graph-conflicting edges**, which uniform phase projection faithfully approximates. Blackman-Harris weighting creates a large nonzero absolute sum even on a valid coloring, falsifying any inference that the weighted audio window is an exact Sudoku conflict indicator.
+
+For one blank 9x9 cell, only 790 of the 810 edges had both endpoints assigned. An exact conflict count of zero therefore does not certify satisfiability, because a complete witness is missing.
+
+A tested 4x4 puzzle was solved in **2 recursive nodes** by the deterministic graph backtracker (one finite example, not a worst-case bound). Candidate Fourier scores matched the integer peer counts within numerical error. For the first cell of a one-blank solved grid, digit 1 had an approximate phase clash score 4.79e-15 (exact 0); other digits had exact clashes 2 or 3.
+
+**Interpretation:** The phase integral is mathematically equivalent to the equality predicate; RioTuner's nonuniform audio window is not. No measured speedup or polynomial solver is claimed. The experiment's raw JSON, workflow ID and source commit remain preserved in the M7 PR.
+
+
+## M7 manuscript compile and primary-source verification - 2026-11-07 21:27 UTC
+
+- **Primary NP-completeness literature:** Takayuki Yato and Takahiro Seta, *Complexity and Completeness of Finding Another Solution and Its Application to Puzzles*, IEICE Transactions on Fundamentals, E86-A(5), pp. 1052-1060, May 2003, https://globals.ieice.org/en_transactions/fundamentals/10.1587/e86-a_5_1052/_p. This established generalized Number Place hardness result is cited separately from our proof of membership in NP. It is prior art, not a theorem discovered by M7.
+- **Working paper source head:** ce5bcf3d0f66f7c81aa65d7d34814a2dad1a7a6e, which contains the Sudoku/RioTuner mathematical argument, finite regression evidence, experimental values and literature citation.
+- **Build:** [XeLaTeX milestone run 42415890343](https://github.com/n0711/P_EQUALS_NP/actions/runs/42415890343) passed. It built paper/structural-sat-milestones.tex twice and uploaded **structural-sat-milestone-paper**, artifact ID **13591880379**.
+- The exact PDF archived in that artifact is **6 A4 pages**. Its metadata names Charalampos Nadiotis as author and it was visually rendered and inspected; the theorem, Fourier integral, Yato-Seta citation and experiment results are legible.
+- **Research interpretation:** a correct NP certificate verifier, a polynomial Sudoku-to-CNF encoding and a numerical Fourier integral equality diagnostic all stand independently of the unproved conjecture P=NP. No deterministic polynomial-time solver for every generalized Sudoku instance is established.
+
+
+## M8 - Sudoku graph transfer counting, 7 November 2026
+
+**Publication provenance:** The researcher reports that the M7 Sudoku and RioTuner-inspired integral working manuscript has been posted on ResearchGate. Its URL/DOI and any editorial review have not been independently checked. M8 is a separate follow-up, with its own falsifiable results.
+
+**Question:** Can the exact M7 Fourier Sudoku partition function be evaluated by grouping graph-color assignments that have the same future-relevant boundary masks, rather than by enumerating all complete colorings separately?
+
+**Construction:** For q=b^2 colors, every full Sudoku row must be a permutation of [q]. State after r rows contains q column masks (q bits each) and b masks (q bits each) for the current box-row band. Accepted row permutations add their digits to the masks. Box masks reset between bands. Cache the count of accepted suffixes keyed by (r, columns, active boxes).
+
+**Exactness theorem:** Each valid completed coloring has exactly one sequence of row permutations. Each accepted sequence yields q distinct digits in every row, column and b-by-b box, and respects all givens. Every unit has q cells and q colors, so these conditions are sufficient. Summing 1 over all completed transfer paths therefore counts exactly the valid completions. This is a mathematically sound reordering of the finite M7 Fourier partition function, not a polynomial-time evaluation theorem.
+
+**Blank-board symmetry theorem:** On a puzzle with NO givens, global color permutations form an S_q action that is free on complete grids. Every orbit contains precisely one completion with first row (1,2,...,q). Consequently Z_blank=q! times Z_canonical. A clue-bearing board cannot be normalized by this unrestricted operation.
+
+**Complexity:** There are at most q*2^(q^2+bq) transfer states because q column masks and b active box masks each contain q bits. Each state may inspect q! row permutations and requires polynomial transition and arbitrary-precision arithmetic. A loose worst-case bit-operation upper bound is poly(q)*q!*2^(q^2+bq), exponential as generalized board dimension grows; this is NOT a proof of P=NP and not an exponential lower bound for all solvers.
+
+**Implementation:** sudoku_transfer_count.py (exact arbitrary-precision count, model reconstruction and explicit resource budgets), test_sudoku_transfer_count.py (independent oracle and symmetry checks), run_sudoku_transfer_benchmark.py (JSON CI evidence). Count 0 is UNSAT only with status completed; the limit_states and limit_row_permutations statuses are UNKNOWN.
+
+**Verified CI:** GitHub Actions SAT research run 42418159452 (https://github.com/n0711/P_EQUALS_NP/actions/runs/42418159452), Python job 128540623940, succeeded with 81 unittest methods in 1.046 s, including 13 new M8 methods. Cases include all 288 known completed 4x4 grids, 240 seeded clue subsets, 160 random adversarial 4x4 clue patterns, 9x9 and 16x16 examples, independent model validation, digit relabeling and resource limit semantics.
+
+**Artifact:** m8-sudoku-transfer-results, ID 13592321531, downloaded and inspected. Exact measurements:
+- Empty 4x4 without symmetry: count 288, 85 transfer states, 240 accepted transitions, 2040 row trials.
+- Empty 4x4 with first-row symmetry: count 288, 15 states, 26 accepted transitions, 337 row trials. Canonical count 12 multiplied by 24.
+- Four-blank 4x4: count 1, 4 states. Solved and one-blank 9x9: count 1 each, 9 states. Fully solved constructed 16x16: count 1, 16 states.
+- Standard 9x9 under 60-state budget: 41,262 row trials, then limit_states; exact count UNKNOWN, not UNSAT. The previous graph finder recovered one witness in one node.
+- Empty 9x9 under max 5000 row permutations: limit_row_permutations before state search (9! = 362880); exact count UNKNOWN.
+
+**Interpretation:** A provably correct, special-case symmetry optimization reduces this finite search from 85 to 15 memoized states. Generalized Sudoku counting still has exponential possible boundary states. No uniform polynomial-time bound has been established.
+
+**Next falsifiable gate:** Seek exact quotienting of frontier states for arbitrary clue patterns, and measure failures on puzzles whose boundary signatures remain distinct. The proof obligation must include complete bit complexity, not only the number of sample search nodes.
+
+**Paper integration:** Add section M8 to paper/structural-sat-milestones.tex; the compiled paper requires a new successful XeLaTeX workflow and immutable artifact ID.
+
+
+## M8 independent finite enumeration and follow-up CI - 2026-11-07 22:01 UTC
+
+**New proof:** For clue-free 4x4 Sudoku, use unrestricted global digit relabeling to set row one to 1234. The four admissible second rows are 3412, 3421, 4312 and 4321. With column and bottom-box constraints, the admissible third-row sequences number 4, 2, 2 and 4 respectively; the fourth row is forced. Thus there are exactly 12 normalized completions and 4! times 12 = 288 unrestricted completions. This finite combinatorial derivation independently corroborates the integer transfer result and exhaustive oracle.
+
+**Verification of additional test:** [SAT research workflow run 42418569685](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418569685), Python job 128541868419, **82 unittest methods passed** in 0.798 seconds, including the new test_analytic_four_by_four_second_row_partition case. There are now **14 M8 test methods**. Earlier 81-test workflow 42418159452 and its artifact 13592321531 remain valid for their own source head; they are not retroactively replaced.
+
+**Publication interpretation:** Independent finite case enumeration proves the exact 4x4 count but does not establish polynomial-time generalized Sudoku counting, let alone P=NP. The next challenge is an exact reduction of frontier-state complexity on all growing sizes and arbitrary givens.
+
+
+## M8 XeLaTeX manuscript build and render inspection - 2026-11-07 22:04 UTC
+
+- **Source head:** 817a0d8e664ae9ed72721a00a394b5fd8a2ed60f, including the updated M8 theorem, independent 4x4 analytic enumeration, finite experiment table and 82-test evidence.
+- **Build:** [XeLaTeX run 42418714980](https://github.com/n0711/P_EQUALS_NP/actions/runs/42418714980), succeeded with two passes and generated the PDF artifact structural-sat-milestone-paper, artifact ID **13592507759**. GitHub reported SHA256 archive digest 90def5ae036db8fb07c34eae2ec0679b2a02eb2a72957225f21dfea4d02eaa8f.
+- The extracted compiled paper is **8 A4 pages**, author Charalampos Nadiotis. Its pages were rendered and inspected; formulas, theorem sections and numeric tables are legible without evident clipping.
+- The working paper now contains the M7 phase-integral constraint results and new M8 exact Sudoku counting theorem, q! symmetry proof, 4x4 finite analytic proof, verified numerical state counts, exponential upper bound, and explicit unresolved P-vs-NP obligations.
+- This is an author-attributed **research continuation**, not a peer-reviewed proof of P=NP. The user reports prior M7 publication on ResearchGate; M8 does not assert a new external publication.
+
+A future manuscript revision must record a new source commit and GitHub Actions PDF artifact ID without overwriting prior verified evidence.
