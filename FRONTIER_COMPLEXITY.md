@@ -53,3 +53,49 @@ This is a standard width-parameterized style of dynamic programming, not a new g
 1. Check the same exact method against more UNSAT benchmark families and independent certificates when available; oracle truth tables only scale to small n.
 2. Add measured variable-order construction cost, compare fixed, interleaved, and a predeclared polynomial-time order heuristic on reproducible instance families.
 3. Attempt a rigorous general bound on **both** the width/number of states and the cost of finding/recognizing the representation. A valid counterfamily rejects that bound for the specified algorithm; it does not settle P versus NP.
+
+## Connected 3-CNF surviving polarity preprocessing
+
+For k ≥ 2, use variables x₁,…,xₖ, y₁,…,yₖ and z. For each i include
+(xᵢ ∨ yᵢ ∨ z) and (¬xᵢ ∨ ¬yᵢ ∨ ¬z). For each i < j include
+(xᵢ ∨ xⱼ ∨ z). This gives 2k + 1 variables and 2k + k(k−1)/2 clauses.
+The x variables and z induce a clique of size k+1, giving primal treewidth
+at least k. Every variable occurs in both polarities. All clauses have
+width three and each support carries at most two patterns. Consequently
+polarity preprocessing leaves the whole formula intact and the implemented
+complete XOR-block recognizer declines it.
+
+Process all x variables first, then z, then all y variables. At the x cut
+no clause has closed. The satisfaction bit of each positive diagonal clause
+equals its xᵢ, so the frontier contains exactly 2^k distinct states there.
+
+Even merging prefixes with identical suffix truth functions cannot compress
+that cut. Set z true, set yᵢ true and set every other y false. This suffix
+satisfies the formula exactly when xᵢ is false. Choosing any coordinate on
+which two prefixes differ therefore distinguishes them. A decision procedure
+can still find a model immediately by setting z true and every y false.
+
+The explicit encoding has O(k² log k) bits, so 2^k grows faster than any
+polynomial in that length. The obstruction applies to processing this prefix
+while preserving exact suffix behavior. It gives no lower bound for other
+orders or for deciding unrestricted SAT.
+
+| k | Clauses | States at x cut (exact) | Peak over full run (measured) |
+| ---: | ---: | ---: | ---: |
+| 4 | 14 | 16 | 20 |
+| 8 | 44 | 256 | 264 |
+| 12 | 90 | 4096 | 4108 |
+
+Reproduce the measured column from the repository root:
+
+```python
+from dense_cnf_families import guarded_frontier_family
+from frontier_sat import frontier_sat
+
+for k in (4, 8, 12):
+    n, clauses = guarded_frontier_family(k)
+    order = [*range(1, k + 1), n, *range(k + 1, n)]
+    model, stats = frontier_sat(n, clauses, order)
+    assert stats["status"] == "completed" and model is not None
+    print(k, len(clauses), stats["peak_states"])
+```

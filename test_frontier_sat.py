@@ -3,7 +3,10 @@ import itertools
 import random
 import unittest
 
+from dense_cnf_families import guarded_frontier_family
 from frontier_sat import frontier_sat
+from polarity_sat import preprocess_polarity
+from structural_hybrid_sat import try_affine_sat
 from sat import verify
 
 
@@ -50,6 +53,32 @@ class FrontierTests(unittest.TestCase):
         self.assertEqual(s['peak_states'], 1 << k)
         self.assertEqual(t['max_frontier'], 1)
         self.assertLessEqual(t['peak_states'], 2)
+
+    def test_guarded_family_survives_preprocessing_and_exceeds_cap(self):
+        for k in range(2, 9):
+            n, clauses = guarded_frontier_family(k)
+            state, residual, partial, _ = preprocess_polarity(n, clauses)
+            self.assertEqual(state, "RESIDUAL")
+            self.assertFalse(partial)
+            self.assertEqual(set(clauses), set(residual))
+            self.assertFalse(try_affine_sat(n, residual)[0])
+            order = [*range(1, k + 1), n, *range(k + 1, n)]
+            model, metrics = frontier_sat(n, residual, order, max_states=2**k - 1)
+            self.assertIsNone(model)
+            self.assertEqual(metrics["status"], "limit_states")
+            model, metrics = frontier_sat(n, residual, order)
+            self.assertEqual(metrics["status"], "completed")
+            self.assertGreaterEqual(metrics["peak_states"], 2**k)
+            self.assertTrue(verify(n, clauses, model))
+
+    def test_guarded_prefixes_have_distinct_suffix_functions(self):
+        for k in range(2, 7):
+            n, clauses = guarded_frontier_family(k)
+            for prefix in itertools.product((False, True), repeat=k):
+                for i in range(k):
+                    suffix = tuple(j == i for j in range(k))
+                    self.assertEqual(verify(n, clauses, prefix + suffix + (True,)),
+                                     not prefix[i])
 
     def test_limit_is_not_unsat(self):
         model, m = frontier_sat(24, pairs(12), max_states=32)

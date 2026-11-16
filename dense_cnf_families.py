@@ -49,3 +49,19 @@ def validate_family_cases():
             "sat_if": "n <= 4",
             "reason": "both number of True and False variables at most two"},
     }
+
+
+def guarded_frontier_family(k):
+    """Connected 3-CNF with 2**k distinct residual functions after the x block.
+
+    IDs 1..k encode x, k+1..2k encode y, and 2k+1 is the shared guard.
+    """
+    if type(k) is not int or k < 2:
+        raise ValueError("k must be an integer of at least two")
+    guard = 2 * k + 1
+    xs = range(1, k + 1)
+    clauses = [(i, j, guard) for i, j in combinations(xs, 2)]
+    for x in xs:
+        y = k + x
+        clauses.extend([(x, y, guard), (-x, -y, -guard)])
+    return guard, clauses
