@@ -147,3 +147,19 @@ For later milestones, append a new log entry and extend the XeLaTeX source with 
 - The milestone log is append-only: this documentation update does not change the paper source or retrospectively alter earlier test observations.
 
 The subsequent research gate remains unrestricted, non-affine connected SAT formulas with explicit complexity accounting; nothing recorded here establishes a polynomial-time algorithm for general 3-SAT.
+
+## M7 — Structural hybrid lower bound, 16 November 2026
+
+Can the existing uncapped structural hybrid decide every 3-CNF in polynomial time? The M7 theorem in [the working manuscript](paper/structural-sat-milestones.tex) disproves this for the implementation at `65de5e025d5f3a23f35c4717c80277d6ed7dc01e`. A linear-clause family forces a full binary prefix tree under maximum-frequency branching and exact residual memoization. This advances the M6 falsification gate and leaves the general P versus NP question open.
+
+Reproduce with `python3 -m unittest -v test_structural_branch_lower_bound`. The deterministic generator uses no seed. The UNSAT baseline is the elementary five-variable counting contradiction proved in the manuscript. The test checks the public hybrid without a call limit. Local root Python test discovery passed all 55 methods on x86_64, Python 3.12.14. Recorded recursive calls include the initial call and cache lookups.
+
+| k | Variables | Clauses | Recursive calls | Fallback branches |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 9 | 86 | 11 | 5 |
+| 2 | 18 | 158 | 23 | 11 |
+| 3 | 27 | 230 | 47 | 23 |
+| 4 | 36 | 302 | 95 | 47 |
+| 5 | 45 | 374 | 191 | 95 |
+
+The proof gives a lower bound for every k. Exact counts above are finite measurements. The input uses O(k log(k+1)) bits under binary variable indexing. A next falsifiable question is whether a variable order or clause selection rule can detect this embedded contradiction before branching on the private blocks, including after variable renaming. Success there would cover this family only.

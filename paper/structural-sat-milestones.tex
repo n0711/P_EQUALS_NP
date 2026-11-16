@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{7 November 2026\\Working manuscript, milestone M6}
+\date{16 November 2026\\Working manuscript, milestone M7}
 \begin{document}
 \maketitle
 
@@ -223,6 +223,61 @@ To establish $\mathsf{P}=\mathsf{NP}$ via SAT, it remains necessary
 to exhibit a deterministic SAT algorithm whose total bit-operation
 cost is bounded by $CN^c$ for fixed constants $C,c$ on every
 encoded CNF. None of the present milestones supplies that theorem.
+
+\section{M7: A lower bound for the implemented fallback}
+\begin{theorem}
+For every $k\ge1$ there is an unsatisfiable 3-CNF on $9k$ variables
+for which the uncapped structural hybrid makes at least $2^{k+1}-1$
+recursive calls under its current pivot and cache rules.
+\end{theorem}
+\begin{proof}
+Use pivots $x_1,\ldots,x_k$ and a cycle of $8k$ auxiliary variables,
+partitioned in cyclic order into private blocks of eight, one per pivot.
+For each triple below, add its all-positive and all-negative clauses,
+discarding duplicates.
+Use every triple of consecutive cycle vertices (with wraparound), every
+triple among the first five cycle vertices, and every triple consisting
+of a pivot and an unordered pair from its block.
+
+Among the first five vertices at least three have the same Boolean value.
+One of their two clauses is false. Thus every pivot assignment is
+unsatisfiable. Initially each support has two sign patterns, while the
+affine recognizer requires four for width three. Both polarities occur
+everywhere, with no units or complete sign block. The hybrid enters
+separator search.
+
+Consider any prefix assigning only the first $d<k$ pivots. Each assigned
+pivot leaves one binary clause on each private pair, positive for a false
+pivot and negative for a true one. All cycle triples survive. No unit or
+empty clause appears. The primal graph contains the square of the cycle
+on its auxiliary vertices. Deleting two adjacent cycle vertices leaves
+a path around the other side. Isolated deleted vertices can each be
+skipped by a distance-two edge. Thus deleting at most two vertices leaves
+the surviving cycle vertices connected. Every surviving unassigned pivot
+retains at least six neighbors on that cycle. Neither component splitting
+nor a one- or two-vertex separator applies.
+
+An unassigned pivot occurs $2\binom{8}{2}=56$ times. Each auxiliary
+variable occurs at most $2(8-1)+2\cdot3+2\binom{4}{2}=32$ times,
+counting private pairs, cycle triples and the five-vertex core.
+Restriction can only decrease these counts. The fallback selects a
+maximum-frequency variable, breaking ties by smallest ID. Number the
+pivots $1,\ldots,k$, so it selects $x_{d+1}$.
+
+At fixed depth, the binary signs on each assigned block recover its
+pivot choice from the canonical clause tuple. Different prefix depths
+have different remaining pivot sets. After depth $k$, a proper recursive
+child also loses at least one auxiliary variable, while every depth-$k$
+state retains the whole cycle. The exact-key cache therefore cannot
+shortcut the prefix tree. Both branches must fail, so all $2^d$ prefixes
+are called at every depth $0\le d\le k$. Summing proves the bound.
+\end{proof}
+The family has $O(k)$ clauses of constant width and variable IDs at
+most $9k$, giving encoded length $N=O(k\log(k+1))$ with binary IDs.
+The call count exceeds every fixed polynomial in $N$. This rules out
+a polynomial worst-case guarantee for this implementation. A solver
+that recognizes the five-vertex contradiction could immediately reject
+this particular family.
 
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.
