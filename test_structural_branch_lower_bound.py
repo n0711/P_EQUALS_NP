@@ -89,10 +89,21 @@ class StructuralBranchLowerBound(unittest.TestCase):
             self.assertIsNotNone(model)
             self.assertTrue(verify(5, reduced, model))
 
-    def test_odd_cycle_still_forces_exponential_prefix(self):
+    def test_mixed_odd_cycle_detected_before_search(self):
         for k in range(1, 6):
             n, clauses = branch_family(k, odd_cycle=True)
-            model, stats = structural_hybrid_sat(n, clauses)
+            model, stats = structural_hybrid_sat(n, clauses, max_calls=1)
+            self.assertIsNone(model)
+            self.assertEqual(stats["status"], "completed")
+            self.assertEqual(stats["method"], "binary_parity_conflict")
+
+    def test_guarded_odd_cycle_still_branches(self):
+        for k in range(1, 6):
+            n, clauses = branch_family(k, odd_cycle=True)
+            guarded = [c + (g,) for c in clauses if len(c) == 2
+                       for g in (n + 1, -n - 1)]
+            guarded.extend(c for c in clauses if len(c) == 3)
+            model, stats = structural_hybrid_sat(n + 1, guarded)
             self.assertIsNone(model)
             self.assertEqual(stats["status"], "completed")
             self.assertEqual(stats["method"], "graph_separator")

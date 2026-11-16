@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{16 November 2026\\Working manuscript, milestone M8}
+\date{16 November 2026\\Working manuscript, milestone M9}
 \begin{document}
 \maketitle
 
@@ -325,6 +325,51 @@ is a pair outside the three core vertices whose binary sign still
 recovers its pivot value. Thus at least $2^{k+1}-1$ calls persist for
 this revised solver. The construction has $9k$ variables and $O(k)$
 clauses.
+
+\section{M9: Binary parity inside mixed formulas}
+After whole-formula affine recognition declines, collect each pair of
+binary clauses $(a\lor b)$ and $(\neg a\lor\neg b)$ on distinct
+underlying variables. Their conjunction says precisely that the
+\emph{signed} literals have opposite truth values. A graph edge
+therefore records equality or inequality of the underlying variables,
+depending on their signs. Traversal labels every reached variable by
+one component representative and one sign. Two paths giving opposite
+signs for one variable imply an inconsistent cycle, which certifies
+UNSAT independently of every other clause.
+
+If labels agree, every assignment satisfying these edges is determined
+on each component by its representative bit. Conversely each choice of
+the representative bits satisfies every extracted edge. Substituting
+the signed representatives into all clauses therefore preserves
+satisfiability in both directions. Duplicate literals can be dropped
+and tautologies discarded. A model of the reduced clauses lifts by
+the same signs; the implementation verifies it against the original
+formula. Components and edges require linear traversal after indexing.
+Normalization, sorting and substitution all take polynomial time in
+the encoded input length. A consistent parity graph alone does not
+decide the remaining clauses. The M8 odd-cycle family is now rejected
+during graph traversal for every $k$, including under signed renamings.
+
+\paragraph{Equivalent ternary encoding.}
+Replace every one of the six binary clauses $C$ of the M8 triangle
+by $(C\lor z)\land(C\lor\neg z)$ using a single fresh variable $z$.
+For either value of $z$ this equals $C$. The resulting formula has
+no binary clauses at the root. M8's five-variable detector still
+misses: any certificate containing $z$ would require it to share
+triples with four distinct neighbors, but it has only three.
+All triples omitting $z$ are among those already considered in M8.
+A cycle triple outside the guarded pairs has only two clause patterns,
+so whole-formula affine recognition declines.
+
+The added vertex retains a neighbor after removal of at most two
+vertices. The M7 connectivity argument persists. The guard occurs
+twelve times and each triangle vertex gains at most eight occurrences
+from the guarded pairs, so no auxiliary reaches the 56 occurrences
+of an unassigned pivot. Prefixes still produce distinguishable binary
+signs on their private pairs. No unit appears and the unsatisfiable
+triangle is logically present on every branch. With parity preprocessing
+only at the root, the M7 prefix-tree argument again gives at least
+$2^{k+1}-1$ recursive calls. Encoded length remains $O(k\log(k+1))$.
 
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.

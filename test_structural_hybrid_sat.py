@@ -147,6 +147,29 @@ class StructuralHybridTests(unittest.TestCase):
         self.assertEqual(metrics["status"], "limit_calls")
         self.assertIsNone(model)
 
+    def test_mixed_signed_parity_against_exhaustive_oracle(self):
+        rng = random.Random(914)
+        for n in range(3, 8):
+            for _ in range(50):
+                clauses = []
+                for _ in range(n):
+                    a, b = rng.sample(range(1, n + 1), 2)
+                    b *= rng.choice((-1, 1))
+                    clauses.extend([(a, b), (-a, -b)])
+                for _ in range(4):
+                    clauses.append(tuple(v * rng.choice((-1, 1))
+                                         for v in rng.sample(range(1, n + 1), 3)))
+                self.check(n, clauses)
+
+    def test_parity_lifts_model_through_mixed_clauses(self):
+        # x1 != x2, x2 == x3. The wide clause forces x1 when x4 is false.
+        clauses = [(1, 2), (-1, -2), (-2, 3), (2, -3),
+                   (1, -2, -3, 4), (-4,)]
+        model, stats = structural_hybrid_sat(4, (iter(c) for c in clauses))
+        self.assertEqual(stats["status"], "completed")
+        self.assertEqual(model, [True, False, False, False])
+        self.assertTrue(verify(4, clauses, model))
+
     def test_bad_inputs_and_generator_parameters(self):
         with self.assertRaises(ValueError):
             try_affine_sat(2, [(3,)])
