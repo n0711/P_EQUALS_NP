@@ -19,6 +19,7 @@ on:
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
       - "test_structural_hybrid_sat.py"
+      - "test_structural_branch_lower_bound.py"
       - "test_polarity_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
@@ -40,6 +41,7 @@ on:
       - "test_component_sat.py"
       - "test_graph_separator_sat.py"
       - "test_structural_hybrid_sat.py"
+      - "test_structural_branch_lower_bound.py"
       - "test_polarity_sat.py"
       - "test_proof_obligations.py"
       - ".github/workflows/sat-research-verification.yml"
@@ -56,7 +58,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run independent SAT regressions
-        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_polarity_sat.py test_proof_obligations.py
+        run: python -m unittest -v test_sat.py test_frontier_sat.py test_component_sat.py test_graph_separator_sat.py test_structural_hybrid_sat.py test_structural_branch_lower_bound.py test_polarity_sat.py test_proof_obligations.py
       - name: Reproduce graph-separator benchmark
         run: python run_graph_separator_benchmark.py --max-calls 50000 > graph-separator-ci-results.json
       - name: Upload CI benchmark data

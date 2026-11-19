@@ -163,3 +163,9 @@ Reproduce with `python3 -m unittest -v test_structural_branch_lower_bound`. The 
 | 5 | 45 | 374 | 191 | 95 |
 
 The proof gives a lower bound for every k. Exact counts above are finite measurements. The input uses O(k log(k+1)) bits under binary variable indexing. A next falsifiable question is whether a variable order or clause selection rule can detect this embedded contradiction before branching on the private blocks, including after variable renaming. Success there would cover this family only.
+
+## M8 — Signed five-variable contradiction and a surviving lower bound
+
+The public structural hybrid now returns five signed literals as an independently checkable UNSAT certificate when all ten complementary clause pairs occur. The manuscript proves recognition for every signed renaming of the M7 family and gives an alternate odd-cycle core that still forces exponential fallback calls. The original separator algorithm and its lower-bound regression remain available.
+
+Local verification on x86_64, Python 3.12.14: 58 root unittest methods passed. Run `python3 -m unittest -v test_structural_branch_lower_bound` to reproduce. The test covers 32 seeded signed renamings across k=1,2,5,20, all 20 one-clause deletions of the isolated core, the old fallback and the revised solver. With no call cap, the odd-cycle variant produced 7, 15, 31, 63 and 127 recursive calls for k=1 through 5. These measurements are distinct from the all-k lower bound. The next research question is how to propagate implied parity constraints in a mixed CNF before branching.

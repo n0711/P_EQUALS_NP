@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{16 November 2026\\Working manuscript, milestone M7}
+\date{16 November 2026\\Working manuscript, milestone M8}
 \begin{document}
 \maketitle
 
@@ -227,7 +227,7 @@ encoded CNF. None of the present milestones supplies that theorem.
 \section{M7: A lower bound for the implemented fallback}
 \begin{theorem}
 For every $k\ge1$ there is an unsatisfiable 3-CNF on $9k$ variables
-for which the uncapped structural hybrid makes at least $2^{k+1}-1$
+for which the M7 uncapped structural hybrid makes at least $2^{k+1}-1$
 recursive calls under its current pivot and cache rules.
 \end{theorem}
 \begin{proof}
@@ -278,6 +278,53 @@ The call count exceeds every fixed polynomial in $N$. This rules out
 a polynomial worst-case guarantee for this implementation. A solver
 that recognizes the five-vertex contradiction could immediately reject
 this particular family.
+
+\section{M8: Detecting a signed five-variable core}
+Given five literals on distinct variables, suppose every triple of them
+occurs as a clause together with its simultaneous negation. In any
+assignment at least three of the five literals agree. One of the two
+clauses for that triple is false. The five literals therefore certify
+UNSAT, and a reviewer can verify the certificate by checking twenty
+input clauses (after dropping repeated literals).
+
+The revised hybrid indexes complementary clause triples by their first
+two signed literals in increasing variable-ID order. Up to simultaneous
+negation the smallest variable has positive sign. The last three
+literals of every witness therefore occur in a common index bucket.
+Enumerating triples of bucket entries and checking all ten supports
+finds every witness of this form. This argument is invariant under
+permutation and complementation of variables. With $m$ input clauses
+the total number of bucket entries is at most $m$, so the number of
+candidates is $O(m^3)$. Verification per candidate uses a fixed number
+of membership checks over input-sized data, giving polynomial total
+bit cost even with linear scans per lookup. An unsuccessful search
+continues to the existing complete fallback.
+
+\paragraph{A surviving lower bound.}
+In the M7 construction replace the triples on the first five cycle
+vertices by both signs of each of the three pairs on the first three
+cycle vertices. The three binary constraints require three Boolean
+values to be pairwise unequal, an impossibility. The new core adds
+at most four occurrences per cycle vertex. Its binary clauses survive
+every prefix of pivot assignments and produce no units there.
+
+No five-variable certificate is present at the root. Two pivots share
+no triple. A witness with at most one pivot would contain four cycle
+vertices with all four triples present. Fix one of these four vertices.
+The pairs completing it to a consecutive cycle triple form a path of
+three edges among its two predecessors and two successors. To cover
+the three remaining vertices pairwise this path would need a triangle.
+The cycle length is at least eight, so its four neighbors are distinct.
+Hence the five-variable detector misses this core under every signing.
+The affine recognizer also declines because a cycle triple has just two
+sign patterns. The hybrid falls back at the root. The separator,
+frequency and distinct-cache-key arguments of M7 still hold: the cycle
+and private blocks are unchanged, and binary clauses of the new core
+have both signs regardless of the prefix. For each private block there
+is a pair outside the three core vertices whose binary sign still
+recovers its pivot value. Thus at least $2^{k+1}-1$ calls persist for
+this revised solver. The construction has $9k$ variables and $O(k)$
+clauses.
 
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.

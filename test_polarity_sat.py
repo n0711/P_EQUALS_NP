@@ -133,7 +133,7 @@ class PolaritySATTests(unittest.TestCase):
                     self.assertTrue(verify(n, renamed, right))
 
     def test_limit_not_unsat(self):
-        n, clauses = opposite_monotone_triples(6)
+        n, clauses = opposite_monotone_triples(4)
         model, stats = polarity_hybrid_sat(n, clauses, max_calls=1)
         self.assertIsNone(model)
         self.assertEqual(stats["status"], "limit_calls")

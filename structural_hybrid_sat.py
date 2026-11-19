@@ -1,12 +1,8 @@
-"""Exact affine-CNF recognition and deterministic GF(2) elimination.
-
-Recognizes only conjunctions of complete 1-, 2-, or 3-XOR clause blocks.
-Other CNFs are left to a complete solver. This is a standard tractable
-Boolean class, not a polynomial-time algorithm for arbitrary SAT.
-"""
+"""Exact SAT portfolio using affine recognition, five-literal cores and separator search."""
 from __future__ import annotations
 
 from collections import defaultdict
+from itertools import combinations
 from time import perf_counter
 
 from sat import _validate, verify
@@ -18,8 +14,11 @@ def try_affine_sat(n, clauses):
     If recognized=False, model is None and no SAT decision was made.
     If recognized=True, None means UNSAT and otherwise model is verified.
     """
+    return _affine_on_validated(n, _validate(n, clauses))
+
+
+def _affine_on_validated(n, original):
     started = perf_counter()
-    original = _validate(n, clauses)
     cleaned = set()
     for clause in original:
         lits = set(clause)
@@ -85,13 +84,42 @@ def try_affine_sat(n, clauses):
     return finish(True, model)
 
 
+def _five_literal_core(clauses):
+    """Return five signed literals whose triples all occur in both polarities."""
+    triples = set()
+    for clause in clauses:
+        literals = set(clause)
+        if len(literals) == 3 and len({abs(v) for v in literals}) == 3:
+            triples.add(tuple(sorted(literals, key=abs)))
+
+    paired = {t for t in triples if tuple(-v for v in t) in triples}
+    tails = defaultdict(list)
+    for a, b, c in sorted(paired):
+        if a > 0:  # A global sign flip gives an equivalent witness.
+            tails[a, b].append(c)
+
+    for (a, b), candidates in tails.items():
+        for rest in combinations(sorted(candidates, key=abs), 3):
+            core = (a, b, *rest)
+            if len({abs(v) for v in core}) == 5 and all(
+                triple in paired for triple in combinations(core, 3)
+            ):
+                return core
+    return None
+
+
 def structural_hybrid_sat(n, clauses, *, max_calls=None,
                           max_separator_size=2, pair_scan_limit=36):
-    """An exact portfolio: GF(2) for recognized affine CNF, else separator SAT."""
-    recognized, model, affine_metrics = try_affine_sat(n, clauses)
+    """Decide by affine elimination, a five-literal witness, or separator search."""
+    clauses = _validate(n, clauses)
+    recognized, model, affine_metrics = _affine_on_validated(n, clauses)
     if recognized:
         return model, {"status": "completed", "method": "affine_gf2",
                        "affine": affine_metrics}
+    core = _five_literal_core(clauses)
+    if core is not None:
+        return None, {"status": "completed", "method": "five_literal_core",
+                      "core": core, "affine": affine_metrics}
     from graph_separator_sat import graph_separator_sat
     model, graph_metrics = graph_separator_sat(
         n, clauses, max_calls=max_calls,
