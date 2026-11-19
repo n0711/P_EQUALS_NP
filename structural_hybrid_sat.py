@@ -1,4 +1,4 @@
-"""Exact SAT portfolio using affine recognition, five-literal cores and separator search."""
+"""Exact SAT portfolio using affine recognition, binary parity, five-literal cores and separator search."""
 from __future__ import annotations
 
 from collections import defaultdict
@@ -84,6 +84,47 @@ def _affine_on_validated(n, original):
     return finish(True, model)
 
 
+def _binary_parity(clauses):
+    """Orient each parity component relative to one representative.
+
+    Positive representatives mean equal values, negative ones mean opposites.
+    None denotes an inconsistent component.
+    """
+    pairs = set()
+    for clause in clauses:
+        literals = set(clause)
+        if len(literals) == 2:
+            a, b = sorted(literals, key=abs)
+            if abs(a) != abs(b):
+                pairs.add((a, b))
+
+    edges = defaultdict(list)
+    for a, b in sorted(pairs):
+        if a > 0 and (-a, -b) in pairs:
+            # Complementary clauses require the two signed literals to differ.
+            sign = -1 if b > 0 else 1
+            edges[a].append((abs(b), sign))
+            edges[abs(b)].append((a, sign))
+
+    representative = {}
+    for root in sorted(edges):
+        if root in representative:
+            continue
+        representative[root] = root
+        pending = [root]
+        while pending:
+            v = pending.pop()
+            for w, sign in edges[v]:
+                implied = sign * representative[v]
+                if w in representative:
+                    if representative[w] != implied:
+                        return None
+                else:
+                    representative[w] = implied
+                    pending.append(w)
+    return representative
+
+
 def _five_literal_core(clauses):
     """Return five signed literals whose triples all occur in both polarities."""
     triples = set()
@@ -110,21 +151,38 @@ def _five_literal_core(clauses):
 
 def structural_hybrid_sat(n, clauses, *, max_calls=None,
                           max_separator_size=2, pair_scan_limit=36):
-    """Decide by affine elimination, a five-literal witness, or separator search."""
+    """Decide by affine elimination, five-literal recognition, binary parity and separator search."""
     clauses = _validate(n, clauses)
     recognized, model, affine_metrics = _affine_on_validated(n, clauses)
     if recognized:
         return model, {"status": "completed", "method": "affine_gf2",
                        "affine": affine_metrics}
+    original = clauses
+    representatives = _binary_parity(original)
+    if representatives is None:
+        return None, {"status": "completed", "method": "binary_parity_conflict",
+                      "affine": affine_metrics}
     core = _five_literal_core(clauses)
     if core is not None:
         return None, {"status": "completed", "method": "five_literal_core",
                       "core": core, "affine": affine_metrics}
+    if representatives:
+        clauses = []
+        for clause in original:
+            literals = {representatives.get(abs(v), abs(v)) * (1 if v > 0 else -1)
+                        for v in clause}
+            if not any(-v in literals for v in literals):
+                clauses.append(tuple(sorted(literals, key=abs)))
     from graph_separator_sat import graph_separator_sat
     model, graph_metrics = graph_separator_sat(
         n, clauses, max_calls=max_calls,
         max_separator_size=max_separator_size,
         pair_scan_limit=pair_scan_limit,
     )
+    if model is not None and representatives:
+        reduced_model = model.copy()
+        for variable, rep in representatives.items():
+            model[variable - 1] = reduced_model[abs(rep) - 1] ^ (rep < 0)
+        assert verify(n, original, model)
     return model, {"status": graph_metrics["status"], "method": "graph_separator",
                    "affine": affine_metrics, "graph": graph_metrics}
