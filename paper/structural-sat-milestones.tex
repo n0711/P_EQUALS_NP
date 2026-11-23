@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{16 November 2026\\Working manuscript, milestone M9}
+\date{23 November 2026\\Working manuscript, milestone M12}
 \begin{document}
 \maketitle
 
@@ -470,6 +470,71 @@ enumeration and computes the exact local coefficients from a
 supplied model count; it is not a general polynomial-time solver.
 See \texttt{SAT\_ZETA\_RIEMANN\_RESEARCH\_2026\_11\_23.md}
 for the full proof, independent field-extension tests and limits.
+
+\section{M12: Polynomial-time model counting and zeta exponents on affine CNF}
+For the M10--M11 arithmetic zeta encoding, the global exponent
+$S(F)$ equals the number of satisfying assignments to all named
+Boolean variables of $F$. Computing this exponent is generally
+\#SAT-hard, but certain exactly recognized constraint families
+admit polynomial-time counting.
+
+The existing conservative recognizer accepts a CNF if each
+non-tautological unsigned support of size one, two, or three has
+exactly all signed clauses forbidding a single parity class.
+Each support is then equivalent to one XOR equation over
+$\mathbb F_2$. Let $Ax=b$ denote the resulting linear system
+on the original $n$ Boolean variables, including unused variables.
+
+\begin{theorem}[Affine zeta exponent for recognized CNF]
+If the linear system $Ax=b$ is inconsistent, then $S(F)=0$ and
+$\zeta_{X_F}(s)=1$. If it is consistent and
+$r=\operatorname{rank}_{\mathbb F_2}A$, then
+\[
+S(F)=2^{n-r},\qquad
+\zeta_{X_F}(s)=\zeta(s)^{2^{n-r}}\quad(\Re(s)>1).
+\]
+The count and each fixed finite number of local zeta coefficients
+are computable in deterministic polynomial bit time from the
+explicitly encoded CNF, for this recognized class.
+\end{theorem}
+\begin{proof}
+The complete sign-pattern property enforces precisely one XOR
+parity equation per support. Their conjunction is the system
+$Ax=b$. Elimination over $\mathbb F_2$ detects inconsistency;
+otherwise the kernel has dimension $n-r$, and every assignment
+to its free variables extends uniquely to a solution.
+Thus exactly $2^{n-r}$ original Boolean assignments satisfy
+$F$. The M10 auxiliary variables have unique extensions, so
+M11 applies without changing the count. Since $2^{n-r}$ has
+at most $n+1$ binary digits, constructing this exact count
+from the rank requires polynomial bit operations. Given any
+fixed requested local degree, coefficient construction also
+has polynomial total bit cost.
+\end{proof}
+
+This is the established affine tractability phenomenon
+underlying Schaefer's classification~\cite{schaefer}.
+It does not extend to CNFs not recognized as complete XOR
+blocks. Specifically, the implementation
+\texttt{affine\_zeta\_sat.py} reports \emph{unrecognized}
+rather than 0 when a support is incomplete or outside
+its grammar, and therefore does not mistake an unknown
+instance for UNSAT. Given a variable-count parameter encoded
+only as an arbitrarily large binary number with few clauses,
+printing all Boolean variables would be a compressed-input
+problem outside the explicit-input theorem.
+When a user requests local coefficients up to degree $d$,
+the runtime is polynomial in $d$ and in the explicit input
+and output bit lengths, not necessarily in $\log d$.
+
+The independent finite-oracle tests include even/odd
+Tseitin parity constructions, signed variable renamings,
+unconstrained variables, inconsistent equations, and large
+recognized systems without enumeration.
+See \texttt{AFFINE\_ZETA\_M12\_2026\_11\_23.md} for
+the independent proof record and validation limits.
+No unconditional general $\mathsf P$ versus $\mathsf{NP}$
+conclusion follows.
 
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.
