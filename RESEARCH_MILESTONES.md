@@ -34,6 +34,7 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
 | M10 | 2026-11-23 | RH/GRH bridge: CNF to quadratic integer polynomial systems | Unconditional field-independent polynomial-sized reduction, GRH only for general HN upper bound | `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, dedicated CI; execution pending | M10: algebraic feasibility and number theory |
 | M11 | 2026-11-23 | Arithmetic zeta encoding of CNF-SAT | For every finite field extension, point count equals #SAT; global zeta = Riemann zeta to power #SAT; pole criterion is SAT-equivalent | `zeta_sat.py`, `test_zeta_sat.py`, isolated CI; execution pending | M11: exact zeta identity and computational barrier |
+| M12 | 2026-11-23 | Counting/zeta exponent for complete affine CNF blocks | Consistent GF(2) rank r gives #SAT=2^(n-r), inconsistent system #SAT=0; polynomial bit time on this restricted class | `affine_zeta_sat.py`, `test_affine_zeta_sat.py`; 19 combined unittest methods passed in M12 CI | M12: affine rank/count theorem |
 
 ## M5 hypothesis and mathematical scope
 
@@ -211,3 +212,19 @@ Reproduce with `python3 -m unittest discover -v`. On x86_64 with Python 3.12.14 
 - [XeLaTeX manuscript run 45254437953](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254437953): **success** on commit `9db9dc0f8d634a3caea7be7c78e22340570ba03c` containing the M11 manuscript section. A later final-head XeLaTeX run was not yet completed when this record was written.
 
 These are CI execution results, not peer review or proof of any open conjecture. The final-head check must be inspected before merge.
+
+## M12 addendum (23 November 2026): efficiently computable zeta exponent for affine SAT
+
+**Question.** Can the number-theoretic zeta exponent from M11 ever be computed in polynomial time from a compact CNF? **Yes, but only for a precisely specified tractable subclass**: CNFs whose complete signed clause blocks on supports of width 1-3 encode a system of XOR equations over GF(2).
+
+**Theorem.** If recognized and consistent, then the number of Boolean models, including unconstrained original variables, is `2^(n-r)`, where `r` is the GF(2) matrix rank. If recognized and inconsistent the count is zero. Therefore the M11 zeta exponent is computable in deterministic polynomial bit time for this restricted class. This is established affine tractability (Schaefer 1978), not a new P-vs-NP result. Complete derivation: [M12 proof and evidence](AFFINE_ZETA_M12_2026_11_23.md).
+
+**Implementation.** `affine_zeta_sat.py` reuses the existing conservative affine recognizer/linear elimination and computes the exact count and requested finite local-zeta coefficients. An input not recognized as an affine block *never* receives a fabricated SAT/UNSAT answer, even if a separate solver could decide it.
+
+**Verified evidence.** [GitHub Actions M12 run 45260360585](https://github.com/n0711/P_EQUALS_NP/actions/runs/45260360585) completed successfully on commit `1aaf0fdebcd24f56b057471e43b32df1d0f19efa`, with **19** unittest methods passed (9 M12 + 5 M11 + 5 M10). Observed CI logs include independent truth-table oracles, F2/F4 finite-extension point counts, seeded variable-renaming checks, a connected Tseitin graph-count family, 200-variable rank reduction, and a 1000-variable unconstrained count.
+
+**Manuscript.** A new XeLaTeX M12 section was added to `paper/structural-sat-milestones.tex`. Its latest build is a separate verification gate; do not claim it passed until the relevant commit's workflow is complete.
+
+**Falsification gate.** Cross-check the recognized output with independent small truth tables and signed relabeling, verify that inconsistent recognized systems give zero, ensure no unrecognized input is silently returned as UNSAT, and audit large input time/bit-size accounting.
+
+**Unresolved target.** No general deterministic polynomial-time SAT algorithm or general superpolynomial SAT lower bound is known here. Hence neither P=NP nor P!=NP has been proved.
