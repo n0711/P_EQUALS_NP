@@ -1,7 +1,7 @@
 # P_EQUALS_NP - Research milestone ledger
 
 **Researcher and manuscript author:** Charalampos Nadiotis (PELAOS Tech)
-**Last updated:** 2026-11-07
+**Last updated:** 2026-11-23
 **Scope:** Graph-theoretic and algebraic exact SAT research, with every result labeled by evidence class.
 **Status:** No proof of P = NP. This record is a research log, not a priority claim.
 
@@ -33,6 +33,7 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M5 | 2026-11-07 | Affine recognizer + GF(2) / graph-adversary benchmark infrastructure | Exact equivalence for recognized complete XOR clause blocks, standard Gaussian elimination; connected odd-charge Tseitin contradiction | \`structural_hybrid_sat.py\`, \`graph_research_instances.py\`, \`test_structural_hybrid_sat.py\`, \`run_structural_benchmark.py\`; **CI on M5 head pending verification** | Section: algebraic shortcut, evaluation plan |
 | M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
 | M10 | 2026-11-23 | RH/GRH bridge: CNF to quadratic integer polynomial systems | Unconditional field-independent polynomial-sized reduction, GRH only for general HN upper bound | `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, dedicated CI; execution pending | M10: algebraic feasibility and number theory |
+| M11 | 2026-11-23 | Arithmetic zeta encoding of CNF-SAT | For every finite field extension, point count equals #SAT; global zeta = Riemann zeta to power #SAT; pole criterion is SAT-equivalent | `zeta_sat.py`, `test_zeta_sat.py`, isolated CI; execution pending | M11: exact zeta identity and computational barrier |
 
 ## M5 hypothesis and mathematical scope
 
@@ -188,3 +189,15 @@ Reproduce with `python3 -m unittest discover -v`. On x86_64 with Python 3.12.14 
 **Implementation:** `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, and isolated GitHub Actions workflow `.github/workflows/rh-grh-bridge.yml`. **Current execution classification:** CI pending verification at branch creation. Do not claim test success without inspecting the run. The XeLaTeX working manuscript includes the theorem and citation; its build is also subject to verification.
 
 **Falsification gate:** brute-force over small prime fields must agree with independent Boolean truth-table SAT; Boolean lifts must satisfy the equations iff the original assignment satisfies the formula; long clauses must remain quadratic with linear-sized auxiliary encodings. Any failed check blocks merge. **Missing proof obligation:** a deterministic polynomial worst-case bit bound for unrestricted SAT (or a general P-vs-NP separation) remains unsolved.
+
+## M11 addendum (23 November 2026): arithmetic zeta counts and the P vs NP proof barrier
+
+**Question:** Can the ordinary Riemann zeta function or RH solve SAT when applied to the M10 quadratic encoding?
+
+**Established identity (standard consequence of point-counting):** Let S(F) be #SAT on all n original variables, and let X_F be the integer polynomial scheme from M10, including its unique auxiliary extensions. Every finite field extension F_(p^r) has exactly S(F) zeros. The local zeta factor equals (1-t)^(-S(F)); the global arithmetic zeta is zeta(s)^(S(F)) for Re(s)>1. The pole at 1 has order S(F), so detecting a pole decides SAT; extracting its order computes #SAT. See [the detailed theorem, proof, and computational limitations](SAT_ZETA_RIEMANN_RESEARCH_2026_11_23.md).
+
+**Implication:** This exact identity is a computational reparameterization, not a polynomial algorithm. RH constrains zeta zero locations, not the exponent S(F). No P=NP, P!=NP, RH or GRH result has been established here.
+
+**Implementation:** `zeta_sat.py` is bounded exhaustive counting, `test_zeta_sat.py` independently enumerates F2 and F4 field-valued zeros, and `.github/workflows/m11-zeta-sat.yml` runs the tests. The XeLaTeX paper contains a mathematical section. **Current execution status:** submitted for GitHub Actions verification, not presumed passing. The core finite tests cannot imply general worst-case complexity statements.
+
+**Next falsifiable gate:** compare every field-point count with the independent Boolean truth-table count, require zero non-Boolean roots in F4, verify the local coefficients are binomial(S+k-1,k), and inspect all new workflow and manuscript build results before merge.
