@@ -32,6 +32,7 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M4 | 2026-11-07 | Exact primal-graph separator conditioning | Correct by exhaustive separator assignments plus independent component solving; exponential worst case | \`graph_separator_sat.py\`, \`test_graph_separator_sat.py\`; 9 local methods, 900 oracle cases, 210 renamings; 18 benchmark cases; GitHub Actions passed before this branch's later changes | Section: separator search |
 | M5 | 2026-11-07 | Affine recognizer + GF(2) / graph-adversary benchmark infrastructure | Exact equivalence for recognized complete XOR clause blocks, standard Gaussian elimination; connected odd-charge Tseitin contradiction | \`structural_hybrid_sat.py\`, \`graph_research_instances.py\`, \`test_structural_hybrid_sat.py\`, \`run_structural_benchmark.py\`; **CI on M5 head pending verification** | Section: algebraic shortcut, evaluation plan |
 | M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
+| M10 | 2026-11-23 | RH/GRH bridge: CNF to quadratic integer polynomial systems | Unconditional field-independent polynomial-sized reduction, GRH only for general HN upper bound | `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, dedicated CI; execution pending | M10: algebraic feasibility and number theory |
 
 ## M5 hypothesis and mathematical scope
 
@@ -175,3 +176,15 @@ Local verification on x86_64, Python 3.12.14: 58 root unittest methods passed. R
 Starting from M8 commit `dc1f6c8196abeb55512393eddf1b9559a85af830`, the structural hybrid extracts equality and inequality edges, rejects inconsistent components before recursive search, and substitutes signed representatives into consistent residuals. The M9 manuscript section proves soundness, model lifting and a surviving lower bound for an equivalent all-ternary encoding.
 
 Reproduce with `python3 -m unittest discover -v`. On x86_64 with Python 3.12.14 all 61 root tests passed, including 250 seeded mixed-formula comparisons with exhaustive search, explicit original-model reconstruction and both odd-cycle encodings. The former M8 family is decided at the root even with max_calls=1. Uncapped recursive calls on the guarded family for k=1 through 5 were 15, 31, 63, 127 and 191. These are finite observations. The lower bound for all k follows from the manuscript. The next falsifiable step is deriving the missing binary clauses by resolving opposite guard literals, with the number and cost of derived clauses accounted for.
+
+## M10 addendum (23 November 2026): Riemann hypotheses and exact SAT
+
+**Question:** Can classical RH or GRH be used as a valid step in a proof of P=NP?
+
+**Proven result (standard construction, rederived):** CNF-SAT has a polynomial-size quadratic integer-polynomial feasibility encoding over every field under the conventional explicit-input measure. Auxiliary prefix products avoid an exponential expanded-clause representation. The equivalence needs neither RH nor GRH. See [the full statement, proof, caveats, and bibliography](RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md).
+
+**Known conditional theorem:** Koiran's 1996 GRH-conditional placement of general HN in RP^NP / the polynomial hierarchy does not show HN is in deterministic P and does not settle P versus NP. The distinction RH versus GRH is explicit.
+
+**Implementation:** `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, and isolated GitHub Actions workflow `.github/workflows/rh-grh-bridge.yml`. **Current execution classification:** CI pending verification at branch creation. Do not claim test success without inspecting the run. The XeLaTeX working manuscript includes the theorem and citation; its build is also subject to verification.
+
+**Falsification gate:** brute-force over small prime fields must agree with independent Boolean truth-table SAT; Boolean lifts must satisfy the equations iff the original assignment satisfies the formula; long clauses must remain quadratic with linear-sized auxiliary encodings. Any failed check blocks merge. **Missing proof obligation:** a deterministic polynomial worst-case bit bound for unrestricted SAT (or a general P-vs-NP separation) remains unsolved.
