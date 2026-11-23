@@ -35,6 +35,7 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M10 | 2026-11-23 | RH/GRH bridge: CNF to quadratic integer polynomial systems | Unconditional field-independent polynomial-sized reduction, GRH only for general HN upper bound | `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, dedicated CI; execution pending | M10: algebraic feasibility and number theory |
 | M11 | 2026-11-23 | Arithmetic zeta encoding of CNF-SAT | For every finite field extension, point count equals #SAT; global zeta = Riemann zeta to power #SAT; pole criterion is SAT-equivalent | `zeta_sat.py`, `test_zeta_sat.py`, isolated CI; execution pending | M11: exact zeta identity and computational barrier |
 | M12 | 2026-11-23 | Counting/zeta exponent for complete affine CNF blocks | Consistent GF(2) rank r gives #SAT=2^(n-r), inconsistent system #SAT=0; polynomial bit time on this restricted class | `affine_zeta_sat.py`, `test_affine_zeta_sat.py`; 19 combined unittest methods passed in M12 CI | M12: affine rank/count theorem |
+| M13 | 2026-11-23 | Cutset #SAT and zeta exponents for mixed non-affine/affine components | Provided |S|<=log N, large components affine-recognized, non-affine components <=log N: polynomial bit-time exact counting or explicit unrecognized | `cutset_zeta_sat.py`, `test_cutset_zeta_sat.py`; 29 combined unittests passed in M13 CI | M13: cutset product-sum theorem |
 
 ## M5 hypothesis and mathematical scope
 
@@ -228,3 +229,20 @@ These are CI execution results, not peer review or proof of any open conjecture.
 **Falsification gate.** Cross-check the recognized output with independent small truth tables and signed relabeling, verify that inconsistent recognized systems give zero, ensure no unrecognized input is silently returned as UNSAT, and audit large input time/bit-size accounting.
 
 **Unresolved target.** No general deterministic polynomial-time SAT algorithm or general superpolynomial SAT lower bound is known here. Hence neither P=NP nor P!=NP has been proved.
+
+
+## M13 addendum (23 November 2026): polynomial counting beyond affine by logarithmic cutset conditioning
+
+**Mathematical identity:** For a supplied separator S and its Boolean assignments alpha, after conditioning obtain variable-disjoint residual components, and let u_alpha count free original variables. Exact #SAT is the sum across alpha of `2^u_alpha * product_i #component_i`. This is established connected-component model counting / cutset conditioning, not an original solution of P vs NP.
+
+**Proved restricted guarantee:** Under explicit-size proxy `N=max(2,n+m+L)`, accept supplied separator `|S|<=floor(log2 N)`. For each conditioned residual component, either compute its count via the established affine XOR rank method (any size), or enumerate at most `floor(log2 N)` non-affine variables. If a branch has unsupported non-affine components, return `unrecognized` instead of a count. Total bit complexity on accepted instances is `poly(N+d) 2^(|S|+floor(log2 N))`, polynomial in N+d, with d the requested explicit finite local-zeta degree. The algorithm **does not find a separator automatically**, and the class does not include arbitrary SAT.
+
+**Non-affine witness family:** `F_k=AND_i(s OR a_i OR b_i OR c_i)` with distinct private triples. Its global primal graph is connected, but conditioning s gives exact `#F_k=8^k+7^k` and arithmetic zeta `zeta_X(s)=zeta(s)^(8^k+7^k)`. Count is odd >1 and therefore cannot be a GF(2) affine solution-space count. A guarded XOR chain can coexist and be counted by rank.
+
+**Code:** `cutset_zeta_sat.py`, `test_cutset_zeta_sat.py`, `.github/workflows/m13-cutset-zeta.yml`, and manuscript section M13. Full statement and references: [M13 note](CUTSET_ZETA_M13_2026_11_23.md).
+
+**Verified finite execution:** [GitHub Actions run 45261663593](https://github.com/n0711/P_EQUALS_NP/actions/runs/45261663593) passed **29** unittest methods on head commit `148a2ce9936762c4ae7e919716096d1747c2db35` (10 M13, 9 M12, 5 M11, 5 M10); Python syntax verification passed. It includes independent random truth tables, 100 non-affine guarded petals, 120-variable guarded affine XOR chain and mixed component tests. Later manuscript/ledger commits require their own final-head CI before merging.
+
+**Falsification gate:** Never return a numeric count on an input failing the separator bound or a non-affine residual component bound. Check zero-variable, tautological, contradictory and free-variable edge cases against independent exhaustive truth tables. Validate exact bit-cost and representation assumptions separately from measured runtime.
+
+**Open proof obligation:** Finding and exploiting a suitable small structural decomposition for every arbitrary CNF in provably polynomial worst-case bit complexity remains unsolved; nor has a superpolynomial bound for every SAT solver been established. No proof of P=NP or P!=NP is claimed.
