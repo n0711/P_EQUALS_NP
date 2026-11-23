@@ -1,0 +1,35 @@
+name: M13 cutset exact model counting
+
+on:
+  push:
+    paths:
+      - "cutset_zeta_sat.py"
+      - "test_cutset_zeta_sat.py"
+      - "affine_zeta_sat.py"
+      - "zeta_sat.py"
+      - "rh_grh_bridge.py"
+      - ".github/workflows/m13-cutset-zeta.yml"
+  pull_request:
+    paths:
+      - "cutset_zeta_sat.py"
+      - "test_cutset_zeta_sat.py"
+      - "affine_zeta_sat.py"
+      - "zeta_sat.py"
+      - "rh_grh_bridge.py"
+      - ".github/workflows/m13-cutset-zeta.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  cutset-counting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: M10-M13 independent oracles and separator-boundary tests
+        run: python -m unittest -v test_cutset_zeta_sat.py test_affine_zeta_sat.py test_zeta_sat.py test_rh_grh_bridge.py
+      - name: Verify Python syntax
+        run: python -m compileall -q cutset_zeta_sat.py test_cutset_zeta_sat.py
