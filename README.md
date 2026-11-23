@@ -141,3 +141,16 @@ python run_polarity_benchmark.py --quick --timeout-seconds 3 --max-calls 1800 > 
 ```
 
 A GitHub Actions workflow runs M6 alongside the earlier SAT regression suites and archives the benchmark JSON. See the milestone ledger for the verified run ID, not merely the existence of a test file.
+
+
+## M10-M11: Riemann zeta and exact algebraic SAT correspondence (23 November 2026)
+
+**This is not a proof that P = NP or P != NP.** The [M10 research note](RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md) proves an unconditional polynomial-size encoding of arbitrary explicitly written CNF formulas as degree-two integer polynomial systems. Every satisfying original Boolean assignment extends uniquely to a polynomial root over *any* field. The [M11 note](SAT_ZETA_RIEMANN_RESEARCH_2026_11_23.md) derives the exact arithmetic zeta identity `zeta_X(s)=zeta(s)^(#SAT(F))` for `Re(s)>1`. The pole order at 1 is exactly #SAT. Thus the reformulation does not bypass the unsolved counting/decision problem, and neither RH nor GRH yields a polynomial-time SAT algorithm here.
+
+Reproduce the bounded independent Boolean and finite-field tests:
+
+```sh
+python -m unittest -v test_rh_grh_bridge.py test_zeta_sat.py
+```
+
+[Source](rh_grh_bridge.py) | [Zeta model-count demonstration](zeta_sat.py) | [Proof-status boundary](PROOF_STATUS.md) | [XeLaTeX manuscript](paper/structural-sat-milestones.tex).
