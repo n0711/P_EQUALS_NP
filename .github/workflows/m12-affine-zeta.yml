@@ -1,0 +1,33 @@
+name: M12 affine SAT counting and zeta certificate
+
+on:
+  push:
+    paths:
+      - "affine_zeta_sat.py"
+      - "test_affine_zeta_sat.py"
+      - "structural_hybrid_sat.py"
+      - "zeta_sat.py"
+      - ".github/workflows/m12-affine-zeta.yml"
+  pull_request:
+    paths:
+      - "affine_zeta_sat.py"
+      - "test_affine_zeta_sat.py"
+      - "structural_hybrid_sat.py"
+      - "zeta_sat.py"
+      - ".github/workflows/m12-affine-zeta.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verified-affine-counting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Independent affine counting and zeta oracle regressions
+        run: python -m unittest -v test_affine_zeta_sat.py test_zeta_sat.py test_rh_grh_bridge.py
+      - name: Python syntax verification
+        run: python -m compileall -q affine_zeta_sat.py test_affine_zeta_sat.py
