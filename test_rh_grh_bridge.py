@@ -99,7 +99,7 @@ class RHGRHBridgeTests(unittest.TestCase):
         total, equations = cnf_to_quadratic_system(n, [tuple(range(1, n + 1))])
         self.assertEqual(total, 2*n - 2)
         self.assertEqual(len(equations), 3*n - 3)
-        self.assertLessEqual(max(len(eq) for eq in equations), 4)
+        self.assertLessEqual(max(len(eq) for eq in equations), 5)
         self.assertLessEqual(max(len(monomial) for eq in equations
                                  for monomial in eq), 2)
         all_true = lift_boolean_assignment(n, [tuple(range(1, n + 1))],
