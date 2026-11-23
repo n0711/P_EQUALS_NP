@@ -1,0 +1,31 @@
+name: M11 SAT zeta arithmetic identity
+
+on:
+  push:
+    paths:
+      - "zeta_sat.py"
+      - "test_zeta_sat.py"
+      - "rh_grh_bridge.py"
+      - ".github/workflows/m11-zeta-sat.yml"
+  pull_request:
+    paths:
+      - "zeta_sat.py"
+      - "test_zeta_sat.py"
+      - "rh_grh_bridge.py"
+      - ".github/workflows/m11-zeta-sat.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  zeta-identity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify independent F2 and F4 point counts and zeta coefficients
+        run: python -m unittest -v test_zeta_sat.py test_rh_grh_bridge.py
+      - name: Verify syntax
+        run: python -m compileall -q zeta_sat.py test_zeta_sat.py
