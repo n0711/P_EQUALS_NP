@@ -154,3 +154,13 @@ python -m unittest -v test_rh_grh_bridge.py test_zeta_sat.py
 ```
 
 [Source](rh_grh_bridge.py) | [Zeta model-count demonstration](zeta_sat.py) | [Proof-status boundary](PROOF_STATUS.md) | [XeLaTeX manuscript](paper/structural-sat-milestones.tex).
+
+## M12: Exact polynomial-time counting and zeta exponent on recognized affine CNF
+
+[M12's theorem and verification record](AFFINE_ZETA_M12_2026_11_23.md) extend the M10/M11 algebraic identity into a **tractable, explicitly limited** case. For complete XOR-clause blocks of width 1-3 recognized by the existing affine solver, GF(2) elimination gives model count `0` if inconsistent or `2^(n-r)` for `n` original variables and matrix rank `r`. This is an established property of affine satisfiability, not an unrestricted polynomial-time SAT algorithm. Inputs outside the recognized grammar return `unrecognized` with a null count.
+
+```sh
+python -m unittest -v test_affine_zeta_sat.py test_zeta_sat.py test_rh_grh_bridge.py
+```
+
+The [M12 verifier](.github/workflows/m12-affine-zeta.yml) runs independent counting oracles, even/odd Tseitin parity checks, signed-renaming cases and large polynomial-class regression instances. Source: [affine_zeta_sat.py](affine_zeta_sat.py). The general P-vs-NP proof obligations remain unresolved in [PROOF_STATUS.md](PROOF_STATUS.md).
