@@ -113,3 +113,29 @@ polynomial-time SAT algorithm has been provided.
 
 M12 mathematical and reproducibility record:
 [AFFINE_ZETA_M12_2026_11_23.md](AFFINE_ZETA_M12_2026_11_23.md).
+
+
+## M13 addendum (23 November 2026): tractable non-affine cutset family, not general SAT
+
+The M13 exact cutset counter sums the model counts for disjoint
+assignments of a *supplied*, logarithmically small variable separator.
+For each separator assignment, disjoint residual components multiply
+their counts; the algorithm uses M12 rank counting for fully
+recognized affine components and exhaustive counting only for
+residual components of logarithmic variable size.
+
+In the explicit-input convention this is polynomial time on
+instances satisfying the checked restrictions, even if the original
+formula is not affine. For example, the connected CNF family
+`F_k=AND_i(s OR a_i OR b_i OR c_i)` has exactly
+`8^k + 7^k` models under this method, and this count is not
+a power of two. The arithmetic zeta exponent is exactly that count.
+
+The implementation returns **unrecognized** for a cutset that is
+too large or for an unsupported residual component, and makes no
+SAT/UNSAT claim in those cases. The cutset is supplied, not
+discovered for arbitrary formulas.
+
+This does **not** prove P=NP or P!=NP. The unrestricted
+worst-case proof obligation remains unfulfilled. See the
+[M13 mathematical record](CUTSET_ZETA_M13_2026_11_23.md).
