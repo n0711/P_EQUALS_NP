@@ -2,7 +2,7 @@
 
 **Researcher:** Charalampos Nadiotis (PELAOS Tech)  
 **Status:** Exact mathematical identities derived from standard Boolean algebra, point-counting and arithmetic-zeta definitions. The results are **not new P-versus-NP theorems**. No proof of P=NP, P!=NP, RH or GRH is claimed.  
-**Dependencies:** M10's quadratic encoding in \`rh_grh_bridge.py\` and \`RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md\`.
+**Dependencies:** M10's quadratic encoding in `rh_grh_bridge.py` and `RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md`.
 
 ## Question and hypotheses
 
@@ -18,7 +18,7 @@ For **every prime p and integer r >= 1**,
 \#X_F(\mathbb{F}_{p^r}) = S(F).
 \]
 
-**Proof.** M10 imposes \`x_i(x_i-1)=0\`, which has precisely the roots 0 and 1 in any field. Every original variable at a common zero is therefore Boolean. Each prefix equation \`z_j-q_j z_{j-1}=0\` fixes its auxiliary uniquely from the original Boolean values, and the final clause-product equation holds exactly when the clause is true. Thus restriction to original variables is a bijection between field-valued zeros and satisfying assignments, independent of p or r. QED.
+**Proof.** M10 imposes `x_i(x_i-1)=0`, which has precisely the roots 0 and 1 in any field. Every original variable at a common zero is therefore Boolean. Each prefix equation `z_j-q_j z_{j-1}=0` fixes its auxiliary uniquely from the original Boolean values, and the final clause-product equation holds exactly when the clause is true. Thus restriction to original variables is a bijection between field-valued zeros and satisfying assignments, independent of p or r. QED.
 
 **Stronger integral explanation.** \(\mathbb{Z}[x]/(x(x-1)) \cong \mathbb{Z}\times\mathbb{Z}\) by the Chinese remainder theorem because the ideals \((x)\) and \((x-1)\) are comaximal. Applying this to n variables identifies the Boolean coordinate algebra with \(\mathbb{Z}^{2^n}\). Each clause equation sets the nonsatisfying coordinates to zero; each auxiliary equation simply eliminates one uniquely determined auxiliary variable. Consequently the full coordinate algebra is isomorphic to \(\mathbb{Z}^{S(F)}\), with the convention that \(\mathbb{Z}^{0}\) is the zero ring. Geometrically, X_F is a disjoint union of S(F) copies of \(\operatorname{Spec}\mathbb{Z}\). Nothing number-theoretically subtle remains in this special scheme.
 
@@ -74,17 +74,17 @@ Similarly, deciding merely whether a pole exists from this input is equivalent t
 
 ## Reproducible finite evidence
 
-- \`zeta_sat.py\` implements bounded exhaustive **#SAT** (maximum 16 variables by default) and the exact symbolic coefficients of \((1-t)^{-S}\). It does **not** evaluate an arithmetic zeta function from a CNF in polynomial time.
-- \`test_zeta_sat.py\` independently counts all points of the M10 polynomial system over \(\mathbb F_2\) and its nontrivial extension field \(\mathbb F_4\) in small examples (including non-Boolean candidate values); it cross-checks truth tables, seeded formulas, model counts, local coefficients and input validation.
-- \`.github/workflows/m11-zeta-sat.yml\` runs the tests and Python syntax checks.
+- `zeta_sat.py` implements bounded exhaustive **#SAT** (maximum 16 variables by default) and the exact symbolic coefficients of \((1-t)^{-S}\). It does **not** evaluate an arithmetic zeta function from a CNF in polynomial time.
+- `test_zeta_sat.py` independently counts all points of the M10 polynomial system over \(\mathbb F_2\) and its nontrivial extension field \(\mathbb F_4\) in small examples (including non-Boolean candidate values); it cross-checks truth tables, seeded formulas, model counts, local coefficients and input validation.
+- `.github/workflows/m11-zeta-sat.yml` runs the tests and Python syntax checks.
 
-Reproduce: \`python -m unittest -v test_zeta_sat.py\`.
+Reproduce: `python -m unittest -v test_zeta_sat.py`.
 
 **Status at authorship:** source and tests pushed; passing CI must be independently inspected before upgrading to CI-verified evidence. Finite cases do not prove the complexity classification or an open conjecture.
 
 ## Next falsifiable target
 
-1. Assess whether an independently defined **restricted family** admits efficiently computable S (for example, complete recognized affine systems over GF(2), where \`S=0\` or \`2^{n-rank}\`); this is a standard tractability result and must not be generalized beyond its hypotheses.
+1. Assess whether an independently defined **restricted family** admits efficiently computable S (for example, complete recognized affine systems over GF(2), where `S=0` or `2^{n-rank}`); this is a standard tractability result and must not be generalized beyond its hypotheses.
 2. Track the conversion bit cost and any hidden expansion separately from analytic notation.
 3. Seek a *new* worst-case theorem for unrestricted SAT or a genuinely general lower bound. Neither is provided by the arithmetic zeta reformulation.
 
