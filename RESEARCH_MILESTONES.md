@@ -201,3 +201,13 @@ Reproduce with `python3 -m unittest discover -v`. On x86_64 with Python 3.12.14 
 **Implementation:** `zeta_sat.py` is bounded exhaustive counting, `test_zeta_sat.py` independently enumerates F2 and F4 field-valued zeros, and `.github/workflows/m11-zeta-sat.yml` runs the tests. The XeLaTeX paper contains a mathematical section. **Current execution status:** submitted for GitHub Actions verification, not presumed passing. The core finite tests cannot imply general worst-case complexity statements.
 
 **Next falsifiable gate:** compare every field-point count with the independent Boolean truth-table count, require zero non-Boolean roots in F4, verify the local coefficients are binomial(S+k-1,k), and inspect all new workflow and manuscript build results before merge.
+
+
+### M10-M11 verified CI evidence (2026-11-23)
+
+- [M10 algebraic SAT workflow run 45254719786](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254719786): **success** on implementation commit `36c27a6b254afd12185da43b1b864044ae64538f`.
+- [M11 SAT zeta workflow run 45254719731](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254719731): **success**, 10 combined unittest methods (five M10, five M11) including exhaustive small-field and F4 extension checks and seeded Boolean oracles.
+- [Existing SAT and graph search run 45254719775](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254719775): **success** at that same implementation commit.
+- [XeLaTeX manuscript run 45254437953](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254437953): **success** on commit `9db9dc0f8d634a3caea7be7c78e22340570ba03c` containing the M11 manuscript section. A later final-head XeLaTeX run was not yet completed when this record was written.
+
+These are CI execution results, not peer review or proof of any open conjecture. The final-head check must be inspected before merge.
