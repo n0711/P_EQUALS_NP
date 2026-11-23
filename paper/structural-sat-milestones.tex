@@ -410,6 +410,67 @@ complexity caveat for compressed input, and finite experimental
 protocol are recorded in
 \texttt{RIEMANN\_HYPOTHESIS\_RESEARCH\_2026\_11\_23.md}.
 
+\section{M11: Exact SAT zeta identity and its algorithmic barrier}
+Let $F$ be an explicit CNF formula with $n$ Boolean variables
+and $S(F)$ satisfying assignments. Let $X_F$ be the zero locus,
+over $\mathbb Z$, of the M10 quadratic equations including
+auxiliary prefix products.
+
+\begin{theorem}
+For every prime $p$ and integer $r\ge1$, the point count of the
+resulting scheme satisfies
+\[
+\#X_F(\mathbb F_{p^r})=S(F).
+\]
+Consequently the local Hasse--Weil point-counting series is
+\[
+Z(X_F/\mathbb F_p,t)
+=\exp\left(\sum_{r\ge1}\frac{\#X_F(\mathbb F_{p^r})}{r}t^r\right)
+=(1-t)^{-S(F)}
+\]
+and the arithmetic Euler product, for $\Re(s)>1$, is
+\[
+\zeta_{X_F}(s)=\prod_p(1-p^{-s})^{-S(F)}
+=\zeta(s)^{S(F)}.
+\]
+\end{theorem}
+\begin{proof}
+Over any field, $x_i(x_i-1)=0$ forces $x_i\in\{0,1\}$.
+Every prefix-product auxiliary variable is uniquely determined
+by the original variables. The final zero-product equation for a
+clause holds exactly when that Boolean clause is satisfied.
+Thus restriction to the original variables is a bijection between
+points over every $\mathbb F_{p^r}$ and satisfying assignments.
+The series follows from
+$-\log(1-t)=\sum_{r\ge1} t^r/r$; multiplying the prime-local
+factors gives the global formula.
+\end{proof}
+
+One can also identify $X_F$ with the disjoint union of $S(F)$
+copies of $\operatorname{Spec}\mathbb Z$ using
+$\mathbb Z[x]/(x(x-1))\cong\mathbb Z\times\mathbb Z$.
+In particular, $\zeta_{X_F}$ is identically $1$ for UNSAT
+formulas and has a pole of order $S(F)$ at $s=1$ for SAT
+formulas. Its first local power-series coefficient is $S(F)$,
+the \#SAT counting problem. Hence deriving this coefficient or
+pole order in polynomial time from arbitrary input would itself
+solve \#SAT; deciding only whether the pole exists would solve
+SAT. This encoding therefore reformulates rather than resolves
+$\mathsf P$ versus $\mathsf{NP}$. Assuming the Riemann Hypothesis
+changes no part of this computation: for $S(F)>0$ the nontrivial
+zero locations are those of ordinary $\zeta(s)$, with
+multiplicities scaled by $S(F)$.
+
+The identity uses standard arithmetic-zeta definitions
+\cite{musta} and requires neither RH nor GRH. By contrast,
+Koiran's general algebraic-feasibility upper bound cited in M10
+is conditional on GRH. The bounded Python program
+\texttt{zeta\_sat.py} performs explicit exponential model
+enumeration and computes the exact local coefficients from a
+supplied model count; it is not a general polynomial-time solver.
+See \texttt{SAT\_ZETA\_RIEMANN\_RESEARCH\_2026\_11\_23.md}
+for the full proof, independent field-extension tests and limits.
+
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.
 Repository: \url{https://github.com/n0711/P_EQUALS_NP}.
@@ -432,5 +493,8 @@ Necessary Proof Obligations, and Research Directions, 2026.
 P. Koiran, Hilbert's Nullstellensatz Is in the Polynomial Hierarchy,
 Journal of Complexity 12(4), 273--286, 1996.
 \url{https://www.sciencedirect.com/science/article/pii/S0885064X96900199}.
+\bibitem{musta}
+M. Musta\c{t}\u{a}, The Hasse--Weil zeta function: definition,
+lecture notes. \url{https://websites.umich.edu/~mmustata/lecture2.pdf}.
 \end{thebibliography}
 \end{document}
