@@ -1,0 +1,29 @@
+name: M10 Riemann/GRH algebraic SAT bridge
+
+on:
+  push:
+    paths:
+      - "rh_grh_bridge.py"
+      - "test_rh_grh_bridge.py"
+      - ".github/workflows/rh-grh-bridge.yml"
+  pull_request:
+    paths:
+      - "rh_grh_bridge.py"
+      - "test_rh_grh_bridge.py"
+      - ".github/workflows/rh-grh-bridge.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  quadratic-sat-reduction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Independent Boolean and finite-field oracles
+        run: python -m unittest -v test_rh_grh_bridge.py
+      - name: Verify syntax
+        run: python -m compileall -q rh_grh_bridge.py test_rh_grh_bridge.py
