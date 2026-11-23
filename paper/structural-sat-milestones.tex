@@ -371,6 +371,45 @@ triangle is logically present on every branch. With parity preprocessing
 only at the root, the M7 prefix-tree argument again gives at least
 $2^{k+1}-1$ recursive calls. Encoded length remains $O(k\log(k+1))$.
 
+\section{M10: A Riemann-hypothesis bridge through algebraic feasibility}
+For a CNF formula $F$, introduce a polynomial variable $x_i$
+for each Boolean variable and impose $x_i(x_i-1)=0$.
+The falsity factor for a positive literal $x_i$ is $1-x_i$;
+for a negative literal it is $x_i$. Each clause requires the product
+of its falsity factors to vanish. Long products are split into
+quadratic equations using prefix-product auxiliary variables, with
+a Booleanity equation for each auxiliary. The construction has
+$O(n+m+L)$ equations and variables in terms of the explicitly
+represented variable count $n$, clause count $m$ and literal
+occurrences $L$, and at most five monomials per equation.
+
+\begin{theorem}
+For every field $K$, the resulting quadratic system has a common
+zero over $K$ if and only if the CNF formula $F$ is satisfiable.
+\end{theorem}
+\begin{proof}
+The equation $x(x-1)=0$ forces $x\in\{0,1\}$ over a field.
+Every auxiliary prefix variable is then uniquely forced to equal
+its product of falsity factors. The final zero-product equation
+requires at least one literal of every clause to be true. An
+empty clause contributes $1=0$. Conversely, a Boolean satisfying
+assignment extends to the auxiliary prefix products and makes all
+the equations zero. Thus the implication holds in both directions.
+\end{proof}
+
+In particular, complex and prime-field feasibility are equivalent
+for these specific Boolean encodings \emph{without} the Riemann
+Hypothesis or the Generalized Riemann Hypothesis (GRH). This is
+a reduction, not a deterministic polynomial-time SAT algorithm.
+For general integer-polynomial systems, Koiran proved under GRH
+that complex feasibility belongs to $\mathsf{RP}^{\mathsf{NP}}$
+and hence the polynomial hierarchy~\cite{koiran}. That
+conditional upper bound is not $\mathsf{P}$ and does not settle
+$\mathsf{P}$ versus $\mathsf{NP}$. The formal construction,
+complexity caveat for compressed input, and finite experimental
+protocol are recorded in
+\texttt{RIEMANN\_HYPOTHESIS\_RESEARCH\_2026\_11\_23.md}.
+
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.
 Repository: \url{https://github.com/n0711/P_EQUALS_NP}.
@@ -389,5 +428,9 @@ Models, Artificial Intelligence, 171, 2007.
 C. Nadiotis, On the Proposition P = NP: Formal Foundations,
 Necessary Proof Obligations, and Research Directions, 2026.
 \url{https://www.researchgate.net/publication/417206732_On_the_Proposition_P_NP_Formal_Foundations_Necessary_Proof_Obligations_and_Research_Directions}.
+\bibitem{koiran}
+P. Koiran, Hilbert's Nullstellensatz Is in the Polynomial Hierarchy,
+Journal of Complexity 12(4), 273--286, 1996.
+\url{https://www.sciencedirect.com/science/article/pii/S0885064X96900199}.
 \end{thebibliography}
 \end{document}
