@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{23 November 2026\\Working manuscript, milestone M12}
+\date{23 November 2026\\Working manuscript, milestone M13}
 \begin{document}
 \maketitle
 
@@ -536,6 +536,93 @@ the independent proof record and validation limits.
 No unconditional general $\mathsf P$ versus $\mathsf{NP}$
 conclusion follows.
 
+\section{M13: Logarithmic cutsets and polynomially countable non-affine CNF}
+Let $F$ be an explicitly encoded CNF formula over $n$ named
+variables. A caller supplies a cutset $S$. For each assignment
+$\alpha\in\{0,1\}^S$, simplify $F$ and let the resulting primal
+graph's nontrivial variable-disjoint components be
+$F_{1,\alpha},\ldots,F_{k_\alpha,\alpha}$.
+Let $u_\alpha$ be the number of original variables outside $S$
+that occur in no residual clause. Contradictory branches
+contribute zero, and an empty component product is one.
+
+\begin{theorem}[Exact cutset model-count factorization]
+\[
+\#F=\sum_{\alpha\in\{0,1\}^S}
+2^{u_\alpha}\prod_{i=1}^{k_\alpha}\#F_{i,\alpha}.
+\]
+\end{theorem}
+\begin{proof}
+Every complete assignment fixes exactly one $\alpha$; the
+corresponding solution subsets are disjoint. Conditioned
+connected components have disjoint variable sets and can
+be solved independently, so their model counts multiply.
+Every unused residual variable contributes a free binary
+choice. The sum therefore counts each complete satisfying
+assignment exactly once.
+\end{proof}
+
+Let $N_0=\max\{2,n+m+L\}$ with $m$ original clauses and $L$
+literal occurrences, assuming the variables are explicitly
+represented, and set $b=\lfloor\log_2N_0\rfloor$.
+The implementation accepts $|S|\le b$, and for every
+noncontradictory branch either counts a component using
+the M12 affine recognizer and rank computation, or uses
+complete enumeration on a non-affine component of at most
+$b$ variables. Otherwise it explicitly returns
+\emph{unrecognized}; it does not guess a model count.
+
+\begin{theorem}[Restricted polynomial-time exact counting]
+Under the preceding checked conditions, this algorithm
+computes $\#F$ exactly with total bit complexity bounded by
+\[
+\operatorname{poly}(N_0+d)\,2^{|S|+b},
+\]
+when local zeta coefficients are requested through degree
+$d$ and its output length is included. Hence the accepted
+restricted class is computable in polynomial time.
+\end{theorem}
+\begin{proof}
+There are at most $2^{|S|}$ cutset assignments. Each creates
+at most polynomially many disjoint residual components.
+M12 exact affine rank counting is polynomial-time; each
+accepted non-affine component is counted in at most
+$2^b\operatorname{poly}(N_0)$ bit operations. The exact sum
+and product use integers of at most $n+1$ bits for final
+model counts, and the requested local coefficients have
+polynomial output size in $N_0+d$. Since both $|S|$ and
+$b$ are at most $\log_2N_0$, the bound is polynomial.
+\end{proof}
+
+A concrete globally connected non-affine family is
+\[
+F_k=\bigwedge_{i=1}^k
+(s\lor a_i\lor b_i\lor c_i).
+\]
+Conditioning on $s=1$ leaves $3k$ free variables, hence
+$8^k$ models. Conditioning on $s=0$ leaves $k$
+independent non-affine three-literal OR clauses, each with
+seven models, hence $7^k$ models. Consequently
+\[
+\#F_k=8^k+7^k,\qquad
+\zeta_{X_{F_k}}(s)=\zeta(s)^{8^k+7^k}
+\quad(\Re(s)>1).
+\]
+The symbol $s$ on the right denotes the zeta variable,
+distinct from the Boolean cutset literal.
+For every $k\ge1$ the count $8^k+7^k$ is odd and greater
+than one, so the set of models is not an affine subspace
+over $\mathbb F_2$. This is a genuine restricted-class
+extension beyond M12, not an unrestricted SAT algorithm.
+
+This is an implementation of established cutset
+conditioning and connected-component model counting
+\cite{bayardo,andorcutset}; no independent mathematical
+novelty or resolution of $\mathsf P$ versus $\mathsf{NP}$
+is claimed. The supplied cutset is not automatically
+discovered. Further proofs and regression evidence appear
+in \texttt{CUTSET\_ZETA\_M13\_2026\_11\_23.md}.
+
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.
 Repository: \url{https://github.com/n0711/P_EQUALS_NP}.
@@ -561,5 +648,12 @@ Journal of Complexity 12(4), 273--286, 1996.
 \bibitem{musta}
 M. Musta\c{t}\u{a}, The Hasse--Weil zeta function: definition,
 lecture notes. \url{https://websites.umich.edu/~mmustata/lecture2.pdf}.
+\bibitem{bayardo}
+R. J. Bayardo Jr. and J. D. Pehoushek, Counting Models Using
+Connected Components, AAAI 2000.
+\url{https://cdn.aaai.org/AAAI/2000/AAAI00-024.pdf}.
+\bibitem{andorcutset}
+R. Dechter et al., AND/OR Cutset Conditioning,
+IJCAI 2005. \url{https://ijcai.org/proceedings/2005/220}.
 \end{thebibliography}
 \end{document}
