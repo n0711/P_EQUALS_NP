@@ -54,3 +54,38 @@ The current repository contains no proof meeting both obligations. Finite experi
 ## Reproducibility and attribution
 
 The graph-search code and recorded test results remain in [search.mjs](search.mjs), [search.test.mjs](search.test.mjs), and [VALIDATION.md](VALIDATION.md). This proof record is attributed to Charalampos Nadiotis. The mathematical ingredients include established facts; attribution of this document must not be taken as a claim to have discovered those facts or settled an open problem.
+
+
+## M10-M11 addendum (23 November 2026): why the Riemann-zeta bridge is not a P vs NP proof
+
+The quadratic Boolean encoding of CNF formula F is a parsimonious
+field-independent algebraic reduction: each satisfying Boolean assignment
+has exactly one zero of the polynomial system over every field, and no
+nonsatisfying assignment extends to a zero.
+
+Let S(F) be the number of satisfying assignments. For the corresponding
+integer algebraic scheme X_F, the finite-field point count satisfies
+\(\#X_F(\mathbb F_{p^r})=S(F)\) for every prime p and r>=1. The point-counting
+Euler product therefore gives, for Re(s)>1,
+
+\[
+\zeta_{X_F}(s)=\zeta(s)^{S(F)}.
+\]
+
+The result is exact and unconditional, and the meromorphic continuation
+has a pole of order S(F) at s=1 when S(F)>0. When F is UNSAT, the
+zeta function is identically 1. This is a standard algebraic
+re-encoding of #SAT, not an efficient calculation of S(F).
+Finding the exponent or deciding from the compact polynomial input
+whether the pole exists requires solving the same counting/decision
+problem. The Riemann Hypothesis constrains the *locations* of zeros
+of ordinary zeta, not an algorithm for discovering this exponent.
+
+Consequently neither a deterministic polynomial-time SAT algorithm nor
+a superpolynomial lower bound for **all** SAT algorithms follows.
+No proof that P=NP, P!=NP, RH or GRH is established.
+
+Details: [M10 proof](RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md),
+[M11 zeta identity](SAT_ZETA_RIEMANN_RESEARCH_2026_11_23.md),
+[bounded code and test](zeta_sat.py), and the
+[updated research manuscript](paper/structural-sat-milestones.tex).
