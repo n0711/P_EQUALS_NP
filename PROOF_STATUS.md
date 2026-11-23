@@ -89,3 +89,27 @@ Details: [M10 proof](RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md),
 [M11 zeta identity](SAT_ZETA_RIEMANN_RESEARCH_2026_11_23.md),
 [bounded code and test](zeta_sat.py), and the
 [updated research manuscript](paper/structural-sat-milestones.tex).
+
+
+## M12 addendum (23 November 2026): exact counting for recognized affine formulas
+
+A separate restricted-class theorem extends M11: if a CNF consists
+of fully recognized complete XOR clause blocks of width at most
+three, it is equivalent to a linear system Ax=b over GF(2).
+Gaussian elimination computes its rank r in polynomial bit time,
+and the number of satisfying assignments is 0 if inconsistent,
+or 2^(n-r) if consistent, where n includes unconstrained variables.
+
+Thus the scheme's arithmetic zeta function is 1 in the inconsistent
+case, or zeta(s)^(2^(n-r)) in the consistent case. This is
+established affine constraint tractability (Schaefer 1978).
+The implementation returns an explicit "unrecognized" outcome
+for formulas outside this grammar, not a guessed #SAT count.
+
+**Unfulfilled general obligation remains unchanged:** neither a
+deterministic polynomial-time algorithm for arbitrary CNF-SAT
+nor a superpolynomial lower bound applying to *every* possible
+polynomial-time SAT algorithm has been provided.
+
+M12 mathematical and reproducibility record:
+[AFFINE_ZETA_M12_2026_11_23.md](AFFINE_ZETA_M12_2026_11_23.md).
