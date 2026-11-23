@@ -164,3 +164,29 @@ python -m unittest -v test_affine_zeta_sat.py test_zeta_sat.py test_rh_grh_bridg
 ```
 
 The [M12 verifier](.github/workflows/m12-affine-zeta.yml) runs independent counting oracles, even/odd Tseitin parity checks, signed-renaming cases and large polynomial-class regression instances. Source: [affine_zeta_sat.py](affine_zeta_sat.py). The general P-vs-NP proof obligations remain unresolved in [PROOF_STATUS.md](PROOF_STATUS.md).
+
+
+## M13: Exact #SAT on selected non-affine formulas via logarithmic cutsets
+
+The [M13 note](CUTSET_ZETA_M13_2026_11_23.md) proves the standard
+cutset sum/product identity for model counts. The new
+[cutset_zeta_sat.py](cutset_zeta_sat.py) accepts a **caller-supplied**
+separator bounded by `floor(log2(max(2,n+m+L)))` and counts each
+conditioned residual using M12 affine rank counting or enumeration
+of at most that many non-affine variables. Unrecognized instances
+return an explicit null count. This is polynomial only on the
+checked restricted class, not on unrestricted CNF-SAT.
+
+A connected non-affine family of k guarded three-variable clauses
+has exactly `8**k+7**k` satisfying assignments; the M10/M11
+arithmetic zeta is `zeta(s)**(8**k+7**k)`. Tests include 100
+independent guarded clauses and mixed large affine components.
+
+```sh
+python -m unittest -v test_cutset_zeta_sat.py test_affine_zeta_sat.py test_zeta_sat.py test_rh_grh_bridge.py
+```
+
+The [M13 GitHub Actions workflow](.github/workflows/m13-cutset-zeta.yml)
+runs 29 independent regression methods, including exhaustive small-CNF
+oracles. The [proof status](PROOF_STATUS.md) continues to report that
+neither P=NP nor P!=NP has been established.
