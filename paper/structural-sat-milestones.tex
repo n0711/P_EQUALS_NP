@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{23 November 2026\\Working manuscript, milestone M13}
+\date{24 November 2026\\Working manuscript, milestone M15}
 \begin{document}
 \maketitle
 
@@ -622,6 +622,61 @@ novelty or resolution of $\mathsf P$ versus $\mathsf{NP}$
 is claimed. The supplied cutset is not automatically
 discovered. Further proofs and regression evidence appear
 in \texttt{CUTSET\_ZETA\_M13\_2026\_11\_23.md}.
+
+\section{M15: Bellman--Ford certificates for Boolean difference constraints}
+An implication clause $(\neg x_i\lor x_j)$ over Boolean
+variables is equivalent to $x_i\le x_j$. This is a difference
+inequality; the associated weighted edge $(j,i,0)$ encodes
+$d_i-d_j\le0$ for integer potentials $d_i$.
+Introduce a reference vertex $0$ and bounding edges
+$(0,i,1)$ and $(i,0,0)$ for every $i$, constraining
+$0\le d_i-d_0\le1$. A positive unit literal $x_i$
+produces edge $(i,0,-1)$, a negative unit $\neg x_i$
+edge $(0,i,0)$, and an empty clause produces the negative
+self-loop $(0,0,-1)$.
+
+\begin{theorem}[Bellman--Ford Boolean implication decision]
+For a CNF in which every non-tautological deduplicated clause is
+empty, a unit clause, or a mixed-sign implication clause,
+the resulting weighted graph contains a negative-weight directed
+cycle if and only if the CNF is unsatisfiable.
+Otherwise integer Bellman--Ford distances yield an exact
+satisfying Boolean assignment.
+This algorithm takes $O((n+1)(n+m))$ relaxations on an explicit
+$n$-variable, $m$-clause input, with polynomial total bit cost.
+\end{theorem}
+\begin{proof}
+With $x_i=d_i-d_0$ in $\{0,1\}$, each graph inequality
+is equivalent to its originating Boolean clause. Every
+satisfying assignment extends to a feasible potential vector
+by choosing $d_0=0$; the converse holds for integer feasible
+potentials. By the difference-constraints theorem, feasibility
+over real potentials is equivalent to the absence of a negative
+cycle. Integer edge weights ensure Bellman--Ford from an
+implicit super-source with zero-distance initialization
+returns integer shortest paths; bounding inequalities then
+force every recovered potential difference to be Boolean.
+A negative cycle's summed inequalities imply $0<0$,
+certifying UNSAT. The edge bound is $2n+m$ and the vertex
+bound is $n+1$, yielding the stated relaxation complexity.
+All weights are in $\{-1,0,1\}$, keeping distance and
+certificate bit lengths polynomial.
+\end{proof}
+
+The restricted solver is integrated into the existing exact
+SAT portfolio and returns \emph{unrecognized} on positive
+binary disjunctions, all-negative binary clauses, and
+non-tautological clauses of width greater than two.
+The repository's existing SCC-based 2-SAT algorithm accepts a
+larger class in linear time; this Bellman--Ford route is
+chiefly an independent feasibility and negative-cycle
+certificate. It is not a \#SAT algorithm: the unconstrained
+two-variable CNF has four models, while
+$(\neg x_1\lor x_2)$ has three, despite both being feasible.
+Thus it does not calculate the M11 zeta exponent for
+general CNF and does not prove $\mathsf P=\mathsf{NP}$.
+See \texttt{BELLMAN\_FORD\_M15\_2026\_11\_24.md}
+and the corresponding independent finite regression suite.
 
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.
