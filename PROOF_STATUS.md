@@ -139,3 +139,25 @@ discovered for arbitrary formulas.
 This does **not** prove P=NP or P!=NP. The unrestricted
 worst-case proof obligation remains unfulfilled. See the
 [M13 mathematical record](CUTSET_ZETA_M13_2026_11_23.md).
+
+## M15 addendum (24 November 2026): Bellman–Ford does not prove P versus NP
+
+Bellman–Ford decides feasibility of a difference-constraint graph in O(VE)
+time and returns a negative cycle when the constraints are inconsistent.
+For the restricted Boolean CNF class consisting of unit clauses and
+mixed-sign implication clauses `(-i,j)`, adding Boolean bounding edges
+makes each supported clause equivalent to an integer difference
+inequality. A negative-weight cycle then certifies UNSAT, and integer
+shortest-path distances produce a verified Boolean satisfying assignment.
+
+This restricted language is a **subset of 2-SAT**, which is already
+known to be solvable in linear time by the existing SCC implementation.
+General disjunctions `(i,j)` and `(-i,-j)`, as well as arbitrary
+3-SAT clauses, are not accepted by the Bellman–Ford encoding.
+An unsupported input is reported as `unrecognized`, not assigned a
+fabricated decision. Bellman–Ford also does **not** count solutions
+or compute the arithmetic-zeta exponent in the M11 identity.
+
+Thus there is still no general deterministic polynomial-time SAT
+algorithm or superpolynomial lower bound for all possible SAT
+algorithms. See [M15 theorem and proof](BELLMAN_FORD_M15_2026_11_24.md).
