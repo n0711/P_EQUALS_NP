@@ -190,3 +190,15 @@ The [M13 GitHub Actions workflow](.github/workflows/m13-cutset-zeta.yml)
 runs 29 independent regression methods, including exhaustive small-CNF
 oracles. The [proof status](PROOF_STATUS.md) continues to report that
 neither P=NP nor P!=NP has been established.
+
+## M15: Bellman–Ford for implication/Boolean difference constraints
+
+M15 adds a **restricted** exact SAT decision routine based on the Bellman–Ford negative-cycle theorem. A clause `(-i,j)` represents the implication `x_i -> x_j`, equivalently the difference inequality `x_i - x_j <= 0`. Unit constraints and Boolean bounds can be encoded as weighted edges. In this grammar, a negative-weight cycle certifies UNSAT; otherwise integer distances reconstruct a verified Boolean model.
+
+The dedicated source is [bellman_ford_boolean_sat.py](bellman_ford_boolean_sat.py), with [M15 formal proof](BELLMAN_FORD_M15_2026_11_24.md), [11+ regression methods](test_bellman_ford_boolean_sat.py) and [dedicated CI workflow](.github/workflows/m15-bellman-ford.yml). The exact `structural_hybrid_sat.py` portfolio uses this check after affine recognition and falls back when Bellman–Ford reports `unrecognized`.
+
+```bash
+python -m unittest -v test_bellman_ford_boolean_sat.py test_structural_hybrid_sat.py
+```
+
+This implication/unit grammar is **strictly narrower** than general 2-SAT, which the existing `sat.py` already solves in linear time. Bellman–Ford here provides independently checkable negative-cycle certificates, **not** an improved general SAT complexity bound or a model-counting algorithm. Consequently it does not compute the M11 arithmetic-zeta exponent on arbitrary CNF and is not a proof of `P=NP` or `P!=NP`.
