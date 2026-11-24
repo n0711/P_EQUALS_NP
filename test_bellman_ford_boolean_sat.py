@@ -38,8 +38,11 @@ class BellmanFordBooleanSATTests(unittest.TestCase):
         reference = exhaustive_model(n, clauses)
         self.assertEqual(result["status"] == "sat", reference is not None,
                          (n, clauses, result))
-        scc_witness = two_sat(n, clauses)
-        self.assertEqual(scc_witness is not None, reference is not None)
+        # The SCC solver accepts only syntactic 2-CNF; the Bellman
+        # parser correctly discards tautologies even if they are wide.
+        if all(len(clause) <= 2 for clause in clauses):
+            scc_witness = two_sat(n, clauses)
+            self.assertEqual(scc_witness is not None, reference is not None)
         if result["status"] == "sat":
             self.assertIsNone(result["negative_cycle"])
             self.assertTrue(verify(n, clauses, result["model"]))
