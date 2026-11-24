@@ -1,7 +1,7 @@
 # P_EQUALS_NP - Research milestone ledger
 
 **Researcher and manuscript author:** Charalampos Nadiotis (PELAOS Tech)
-**Last updated:** 2026-11-23
+**Last updated:** 2026-11-24
 **Scope:** Graph-theoretic and algebraic exact SAT research, with every result labeled by evidence class.
 **Status:** No proof of P = NP. This record is a research log, not a priority claim.
 
@@ -36,6 +36,8 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M11 | 2026-11-23 | Arithmetic zeta encoding of CNF-SAT | For every finite field extension, point count equals #SAT; global zeta = Riemann zeta to power #SAT; pole criterion is SAT-equivalent | `zeta_sat.py`, `test_zeta_sat.py`, isolated CI; execution pending | M11: exact zeta identity and computational barrier |
 | M12 | 2026-11-23 | Counting/zeta exponent for complete affine CNF blocks | Consistent GF(2) rank r gives #SAT=2^(n-r), inconsistent system #SAT=0; polynomial bit time on this restricted class | `affine_zeta_sat.py`, `test_affine_zeta_sat.py`; 19 combined unittest methods passed in M12 CI | M12: affine rank/count theorem |
 | M13 | 2026-11-23 | Cutset #SAT and zeta exponents for mixed non-affine/affine components | Provided |S|<=log N, large components affine-recognized, non-affine components <=log N: polynomial bit-time exact counting or explicit unrecognized | `cutset_zeta_sat.py`, `test_cutset_zeta_sat.py`; 29 combined unittests passed in M13 CI | M13: cutset product-sum theorem |
+| M14 | 2026-11-24 | Residual linear-form rank on mixed affine/CNF | #SAT=2^(d-q) times accepted q-coordinate assignments; derived by rank-nullity, search 2^q poly(N) | `RESIDUAL_RANK_M14_2026_11_24.md` mathematical derivation only, no implementation/tests | Not yet integrated |
+| M15 | 2026-11-24 | Bellman–Ford for Boolean difference constraints | Unit/implication CNF SAT iff no negative-weight cycle in O((n+1)(n+m)) graph time; integer potentials yield Boolean witness | `bellman_ford_boolean_sat.py`, tests, CI 45349787910 success; portfolio integration | M15: difference-constraints theorem |
 
 ## M5 hypothesis and mathematical scope
 
@@ -246,3 +248,17 @@ These are CI execution results, not peer review or proof of any open conjecture.
 **Falsification gate:** Never return a numeric count on an input failing the separator bound or a non-affine residual component bound. Check zero-variable, tautological, contradictory and free-variable edge cases against independent exhaustive truth tables. Validate exact bit-cost and representation assumptions separately from measured runtime.
 
 **Open proof obligation:** Finding and exploiting a suitable small structural decomposition for every arbitrary CNF in provably polynomial worst-case bit complexity remains unsolved; nor has a superpolynomial bound for every SAT solver been established. No proof of P=NP or P!=NP is claimed.
+
+## M15 addendum (24 November 2026): Bellman–Ford difference-constraint SAT proof and implementation
+
+**Question and prior art.** Apply Bellman–Ford's standard difference-constraint feasibility theorem to an explicitly specified Boolean CNF class. This is an alternative to (and less general than) the already implemented linear-time SCC 2-SAT algorithm. No novelty in general SAT complexity is claimed.
+
+**Theorem.** After discarding tautologies and duplicate literals, permit only empty clauses, units, and mixed-sign binary implications `(-i,j)`. Introduce integer potentials `d0,...,dn` and bounding edges `(0,i,1)`, `(i,0,0)` encoding `0<=d_i-d0<=1`. An implication `(-i,j)` gives `(j,i,0)`, positive unit `(i,)` gives `(i,0,-1)`, negative unit `(-i,)` gives `(0,i,0)`, and empty clause gives `(0,0,-1)`. The formula is satisfiable iff the graph has no negative-weight cycle. Integer Bellman–Ford distances give Boolean values `d_i-d0`; a negative directed cycle gives a short UNSAT certificate. Runtime `O((n+1)(2n+m))` relaxations with polynomial bit length on explicitly represented inputs.
+
+**Scope.** Unsupported clauses (including `(i,j)`, `(-i,-j)` and non-tautological clauses of width >=3) cause an `unrecognized` outcome. The exact SAT portfolio safely falls back to established methods when Bellman–Ford does not apply. Bellman–Ford computes existence of a model, **not** #SAT, so it does not evaluate the M11 zeta exponent.
+
+**Implementation.** `bellman_ford_boolean_sat.py`, `test_bellman_ford_boolean_sat.py`, `.github/workflows/m15-bellman-ford.yml`, integration in `structural_hybrid_sat.py`, and XeLaTeX theorem. Detailed proof: [M15 Bellman–Ford record](BELLMAN_FORD_M15_2026_11_24.md).
+
+**Observed evidence.** [M15 dedicated CI run 45349787910](https://github.com/n0711/P_EQUALS_NP/actions/runs/45349787910) passed the Bellman–Ford test suite after portfolio integration and added a separate portfolio-routing regression. The earlier [run 45349679396](https://github.com/n0711/P_EQUALS_NP/actions/runs/45349679396) passed 11 methods before integration. The latest commit's XeLaTeX and independent tests must be rechecked before merge. Neither finite tests nor the restricted theorem settles P versus NP.
+
+**Falsification gates.** Compare with exhaustive truth tables and the independent 2-SAT SCC solver on supported inputs; validate explicit negative-cycle continuity and negative weight; check n=0 and empty clauses; verify unsupported inputs never receive a SAT/UNSAT decision from Bellman–Ford; preserve portfolio correctness on rejected formulas.
