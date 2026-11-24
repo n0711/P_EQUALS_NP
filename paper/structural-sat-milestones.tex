@@ -8,7 +8,7 @@
 \newtheorem{proposition}{Proposition}
 \title{Graph-Theoretic Conditioning and Affine Recognition for Exact CNF-SAT}
 \author{Charalampos Nadiotis\\PELAOS Tech, Cyprus}
-\date{16 November 2026\\Working manuscript, milestone M9}
+\date{24 November 2026\\Working manuscript, milestone M15}
 \begin{document}
 \maketitle
 
@@ -371,6 +371,313 @@ triangle is logically present on every branch. With parity preprocessing
 only at the root, the M7 prefix-tree argument again gives at least
 $2^{k+1}-1$ recursive calls. Encoded length remains $O(k\log(k+1))$.
 
+\section{M10: A Riemann-hypothesis bridge through algebraic feasibility}
+For a CNF formula $F$, introduce a polynomial variable $x_i$
+for each Boolean variable and impose $x_i(x_i-1)=0$.
+The falsity factor for a positive literal $x_i$ is $1-x_i$;
+for a negative literal it is $x_i$. Each clause requires the product
+of its falsity factors to vanish. Long products are split into
+quadratic equations using prefix-product auxiliary variables, with
+a Booleanity equation for each auxiliary. The construction has
+$O(n+m+L)$ equations and variables in terms of the explicitly
+represented variable count $n$, clause count $m$ and literal
+occurrences $L$, and at most five monomials per equation.
+
+\begin{theorem}
+For every field $K$, the resulting quadratic system has a common
+zero over $K$ if and only if the CNF formula $F$ is satisfiable.
+\end{theorem}
+\begin{proof}
+The equation $x(x-1)=0$ forces $x\in\{0,1\}$ over a field.
+Every auxiliary prefix variable is then uniquely forced to equal
+its product of falsity factors. The final zero-product equation
+requires at least one literal of every clause to be true. An
+empty clause contributes $1=0$. Conversely, a Boolean satisfying
+assignment extends to the auxiliary prefix products and makes all
+the equations zero. Thus the implication holds in both directions.
+\end{proof}
+
+In particular, complex and prime-field feasibility are equivalent
+for these specific Boolean encodings \emph{without} the Riemann
+Hypothesis or the Generalized Riemann Hypothesis (GRH). This is
+a reduction, not a deterministic polynomial-time SAT algorithm.
+For general integer-polynomial systems, Koiran proved under GRH
+that complex feasibility belongs to $\mathsf{RP}^{\mathsf{NP}}$
+and hence the polynomial hierarchy~\cite{koiran}. That
+conditional upper bound is not $\mathsf{P}$ and does not settle
+$\mathsf{P}$ versus $\mathsf{NP}$. The formal construction,
+complexity caveat for compressed input, and finite experimental
+protocol are recorded in
+\texttt{RIEMANN\_HYPOTHESIS\_RESEARCH\_2026\_11\_23.md}.
+
+\section{M11: Exact SAT zeta identity and its algorithmic barrier}
+Let $F$ be an explicit CNF formula with $n$ Boolean variables
+and $S(F)$ satisfying assignments. Let $X_F$ be the zero locus,
+over $\mathbb Z$, of the M10 quadratic equations including
+auxiliary prefix products.
+
+\begin{theorem}
+For every prime $p$ and integer $r\ge1$, the point count of the
+resulting scheme satisfies
+\[
+\#X_F(\mathbb F_{p^r})=S(F).
+\]
+Consequently the local Hasse--Weil point-counting series is
+\[
+Z(X_F/\mathbb F_p,t)
+=\exp\left(\sum_{r\ge1}\frac{\#X_F(\mathbb F_{p^r})}{r}t^r\right)
+=(1-t)^{-S(F)}
+\]
+and the arithmetic Euler product, for $\Re(s)>1$, is
+\[
+\zeta_{X_F}(s)=\prod_p(1-p^{-s})^{-S(F)}
+=\zeta(s)^{S(F)}.
+\]
+\end{theorem}
+\begin{proof}
+Over any field, $x_i(x_i-1)=0$ forces $x_i\in\{0,1\}$.
+Every prefix-product auxiliary variable is uniquely determined
+by the original variables. The final zero-product equation for a
+clause holds exactly when that Boolean clause is satisfied.
+Thus restriction to the original variables is a bijection between
+points over every $\mathbb F_{p^r}$ and satisfying assignments.
+The series follows from
+$-\log(1-t)=\sum_{r\ge1} t^r/r$; multiplying the prime-local
+factors gives the global formula.
+\end{proof}
+
+One can also identify $X_F$ with the disjoint union of $S(F)$
+copies of $\operatorname{Spec}\mathbb Z$ using
+$\mathbb Z[x]/(x(x-1))\cong\mathbb Z\times\mathbb Z$.
+In particular, $\zeta_{X_F}$ is identically $1$ for UNSAT
+formulas and has a pole of order $S(F)$ at $s=1$ for SAT
+formulas. Its first local power-series coefficient is $S(F)$,
+the \#SAT counting problem. Hence deriving this coefficient or
+pole order in polynomial time from arbitrary input would itself
+solve \#SAT; deciding only whether the pole exists would solve
+SAT. This encoding therefore reformulates rather than resolves
+$\mathsf P$ versus $\mathsf{NP}$. Assuming the Riemann Hypothesis
+changes no part of this computation: for $S(F)>0$ the nontrivial
+zero locations are those of ordinary $\zeta(s)$, with
+multiplicities scaled by $S(F)$.
+
+The identity uses standard arithmetic-zeta definitions
+\cite{musta} and requires neither RH nor GRH. By contrast,
+Koiran's general algebraic-feasibility upper bound cited in M10
+is conditional on GRH. The bounded Python program
+\texttt{zeta\_sat.py} performs explicit exponential model
+enumeration and computes the exact local coefficients from a
+supplied model count; it is not a general polynomial-time solver.
+See \texttt{SAT\_ZETA\_RIEMANN\_RESEARCH\_2026\_11\_23.md}
+for the full proof, independent field-extension tests and limits.
+
+\section{M12: Polynomial-time model counting and zeta exponents on affine CNF}
+For the M10--M11 arithmetic zeta encoding, the global exponent
+$S(F)$ equals the number of satisfying assignments to all named
+Boolean variables of $F$. Computing this exponent is generally
+\#SAT-hard, but certain exactly recognized constraint families
+admit polynomial-time counting.
+
+The existing conservative recognizer accepts a CNF if each
+non-tautological unsigned support of size one, two, or three has
+exactly all signed clauses forbidding a single parity class.
+Each support is then equivalent to one XOR equation over
+$\mathbb F_2$. Let $Ax=b$ denote the resulting linear system
+on the original $n$ Boolean variables, including unused variables.
+
+\begin{theorem}[Affine zeta exponent for recognized CNF]
+If the linear system $Ax=b$ is inconsistent, then $S(F)=0$ and
+$\zeta_{X_F}(s)=1$. If it is consistent and
+$r=\operatorname{rank}_{\mathbb F_2}A$, then
+\[
+S(F)=2^{n-r},\qquad
+\zeta_{X_F}(s)=\zeta(s)^{2^{n-r}}\quad(\Re(s)>1).
+\]
+The count and each fixed finite number of local zeta coefficients
+are computable in deterministic polynomial bit time from the
+explicitly encoded CNF, for this recognized class.
+\end{theorem}
+\begin{proof}
+The complete sign-pattern property enforces precisely one XOR
+parity equation per support. Their conjunction is the system
+$Ax=b$. Elimination over $\mathbb F_2$ detects inconsistency;
+otherwise the kernel has dimension $n-r$, and every assignment
+to its free variables extends uniquely to a solution.
+Thus exactly $2^{n-r}$ original Boolean assignments satisfy
+$F$. The M10 auxiliary variables have unique extensions, so
+M11 applies without changing the count. Since $2^{n-r}$ has
+at most $n+1$ binary digits, constructing this exact count
+from the rank requires polynomial bit operations. Given any
+fixed requested local degree, coefficient construction also
+has polynomial total bit cost.
+\end{proof}
+
+This is the established affine tractability phenomenon
+underlying Schaefer's classification~\cite{schaefer}.
+It does not extend to CNFs not recognized as complete XOR
+blocks. Specifically, the implementation
+\texttt{affine\_zeta\_sat.py} reports \emph{unrecognized}
+rather than 0 when a support is incomplete or outside
+its grammar, and therefore does not mistake an unknown
+instance for UNSAT. Given a variable-count parameter encoded
+only as an arbitrarily large binary number with few clauses,
+printing all Boolean variables would be a compressed-input
+problem outside the explicit-input theorem.
+When a user requests local coefficients up to degree $d$,
+the runtime is polynomial in $d$ and in the explicit input
+and output bit lengths, not necessarily in $\log d$.
+
+The independent finite-oracle tests include even/odd
+Tseitin parity constructions, signed variable renamings,
+unconstrained variables, inconsistent equations, and large
+recognized systems without enumeration.
+See \texttt{AFFINE\_ZETA\_M12\_2026\_11\_23.md} for
+the independent proof record and validation limits.
+No unconditional general $\mathsf P$ versus $\mathsf{NP}$
+conclusion follows.
+
+\section{M13: Logarithmic cutsets and polynomially countable non-affine CNF}
+Let $F$ be an explicitly encoded CNF formula over $n$ named
+variables. A caller supplies a cutset $S$. For each assignment
+$\alpha\in\{0,1\}^S$, simplify $F$ and let the resulting primal
+graph's nontrivial variable-disjoint components be
+$F_{1,\alpha},\ldots,F_{k_\alpha,\alpha}$.
+Let $u_\alpha$ be the number of original variables outside $S$
+that occur in no residual clause. Contradictory branches
+contribute zero, and an empty component product is one.
+
+\begin{theorem}[Exact cutset model-count factorization]
+\[
+\#F=\sum_{\alpha\in\{0,1\}^S}
+2^{u_\alpha}\prod_{i=1}^{k_\alpha}\#F_{i,\alpha}.
+\]
+\end{theorem}
+\begin{proof}
+Every complete assignment fixes exactly one $\alpha$; the
+corresponding solution subsets are disjoint. Conditioned
+connected components have disjoint variable sets and can
+be solved independently, so their model counts multiply.
+Every unused residual variable contributes a free binary
+choice. The sum therefore counts each complete satisfying
+assignment exactly once.
+\end{proof}
+
+Let $N_0=\max\{2,n+m+L\}$ with $m$ original clauses and $L$
+literal occurrences, assuming the variables are explicitly
+represented, and set $b=\lfloor\log_2N_0\rfloor$.
+The implementation accepts $|S|\le b$, and for every
+noncontradictory branch either counts a component using
+the M12 affine recognizer and rank computation, or uses
+complete enumeration on a non-affine component of at most
+$b$ variables. Otherwise it explicitly returns
+\emph{unrecognized}; it does not guess a model count.
+
+\begin{theorem}[Restricted polynomial-time exact counting]
+Under the preceding checked conditions, this algorithm
+computes $\#F$ exactly with total bit complexity bounded by
+\[
+\operatorname{poly}(N_0+d)\,2^{|S|+b},
+\]
+when local zeta coefficients are requested through degree
+$d$ and its output length is included. Hence the accepted
+restricted class is computable in polynomial time.
+\end{theorem}
+\begin{proof}
+There are at most $2^{|S|}$ cutset assignments. Each creates
+at most polynomially many disjoint residual components.
+M12 exact affine rank counting is polynomial-time; each
+accepted non-affine component is counted in at most
+$2^b\operatorname{poly}(N_0)$ bit operations. The exact sum
+and product use integers of at most $n+1$ bits for final
+model counts, and the requested local coefficients have
+polynomial output size in $N_0+d$. Since both $|S|$ and
+$b$ are at most $\log_2N_0$, the bound is polynomial.
+\end{proof}
+
+A concrete globally connected non-affine family is
+\[
+F_k=\bigwedge_{i=1}^k
+(s\lor a_i\lor b_i\lor c_i).
+\]
+Conditioning on $s=1$ leaves $3k$ free variables, hence
+$8^k$ models. Conditioning on $s=0$ leaves $k$
+independent non-affine three-literal OR clauses, each with
+seven models, hence $7^k$ models. Consequently
+\[
+\#F_k=8^k+7^k,\qquad
+\zeta_{X_{F_k}}(s)=\zeta(s)^{8^k+7^k}
+\quad(\Re(s)>1).
+\]
+The symbol $s$ on the right denotes the zeta variable,
+distinct from the Boolean cutset literal.
+For every $k\ge1$ the count $8^k+7^k$ is odd and greater
+than one, so the set of models is not an affine subspace
+over $\mathbb F_2$. This is a genuine restricted-class
+extension beyond M12, not an unrestricted SAT algorithm.
+
+This is an implementation of established cutset
+conditioning and connected-component model counting
+\cite{bayardo,andorcutset}; no independent mathematical
+novelty or resolution of $\mathsf P$ versus $\mathsf{NP}$
+is claimed. The supplied cutset is not automatically
+discovered. Further proofs and regression evidence appear
+in \texttt{CUTSET\_ZETA\_M13\_2026\_11\_23.md}.
+
+\section{M15: Bellman--Ford certificates for Boolean difference constraints}
+An implication clause $(\neg x_i\lor x_j)$ over Boolean
+variables is equivalent to $x_i\le x_j$. This is a difference
+inequality; the associated weighted edge $(j,i,0)$ encodes
+$d_i-d_j\le0$ for integer potentials $d_i$.
+Introduce a reference vertex $0$ and bounding edges
+$(0,i,1)$ and $(i,0,0)$ for every $i$, constraining
+$0\le d_i-d_0\le1$. A positive unit literal $x_i$
+produces edge $(i,0,-1)$, a negative unit $\neg x_i$
+edge $(0,i,0)$, and an empty clause produces the negative
+self-loop $(0,0,-1)$.
+
+\begin{theorem}[Bellman--Ford Boolean implication decision]
+For a CNF in which every non-tautological deduplicated clause is
+empty, a unit clause, or a mixed-sign implication clause,
+the resulting weighted graph contains a negative-weight directed
+cycle if and only if the CNF is unsatisfiable.
+Otherwise integer Bellman--Ford distances yield an exact
+satisfying Boolean assignment.
+This algorithm takes $O((n+1)(n+m))$ relaxations on an explicit
+$n$-variable, $m$-clause input, with polynomial total bit cost.
+\end{theorem}
+\begin{proof}
+With $x_i=d_i-d_0$ in $\{0,1\}$, each graph inequality
+is equivalent to its originating Boolean clause. Every
+satisfying assignment extends to a feasible potential vector
+by choosing $d_0=0$; the converse holds for integer feasible
+potentials. By the difference-constraints theorem, feasibility
+over real potentials is equivalent to the absence of a negative
+cycle. Integer edge weights ensure Bellman--Ford from an
+implicit super-source with zero-distance initialization
+returns integer shortest paths; bounding inequalities then
+force every recovered potential difference to be Boolean.
+A negative cycle's summed inequalities imply $0<0$,
+certifying UNSAT. The edge bound is $2n+m$ and the vertex
+bound is $n+1$, yielding the stated relaxation complexity.
+All weights are in $\{-1,0,1\}$, keeping distance and
+certificate bit lengths polynomial.
+\end{proof}
+
+The restricted solver is integrated into the existing exact
+SAT portfolio and returns \emph{unrecognized} on positive
+binary disjunctions, all-negative binary clauses, and
+non-tautological clauses of width greater than two.
+The repository's existing SCC-based 2-SAT algorithm accepts a
+larger class in linear time; this Bellman--Ford route is
+chiefly an independent feasibility and negative-cycle
+certificate. It is not a \#SAT algorithm: the unconstrained
+two-variable CNF has four models, while
+$(\neg x_1\lor x_2)$ has three, despite both being feasible.
+Thus it does not calculate the M11 zeta exponent for
+general CNF and does not prove $\mathsf P=\mathsf{NP}$.
+See \texttt{BELLMAN\_FORD\_M15\_2026\_11\_24.md}
+and the corresponding independent finite regression suite.
+
 \section*{Attribution and reproducibility}
 Copyright 2026 Charalampos Nadiotis.
 Repository: \url{https://github.com/n0711/P_EQUALS_NP}.
@@ -389,5 +696,19 @@ Models, Artificial Intelligence, 171, 2007.
 C. Nadiotis, On the Proposition P = NP: Formal Foundations,
 Necessary Proof Obligations, and Research Directions, 2026.
 \url{https://www.researchgate.net/publication/417206732_On_the_Proposition_P_NP_Formal_Foundations_Necessary_Proof_Obligations_and_Research_Directions}.
+\bibitem{koiran}
+P. Koiran, Hilbert's Nullstellensatz Is in the Polynomial Hierarchy,
+Journal of Complexity 12(4), 273--286, 1996.
+\url{https://www.sciencedirect.com/science/article/pii/S0885064X96900199}.
+\bibitem{musta}
+M. Musta\c{t}\u{a}, The Hasse--Weil zeta function: definition,
+lecture notes. \url{https://websites.umich.edu/~mmustata/lecture2.pdf}.
+\bibitem{bayardo}
+R. J. Bayardo Jr. and J. D. Pehoushek, Counting Models Using
+Connected Components, AAAI 2000.
+\url{https://cdn.aaai.org/AAAI/2000/AAAI00-024.pdf}.
+\bibitem{andorcutset}
+R. Dechter et al., AND/OR Cutset Conditioning,
+IJCAI 2005. \url{https://ijcai.org/proceedings/2005/220}.
 \end{thebibliography}
 \end{document}

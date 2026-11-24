@@ -54,3 +54,110 @@ The current repository contains no proof meeting both obligations. Finite experi
 ## Reproducibility and attribution
 
 The graph-search code and recorded test results remain in [search.mjs](search.mjs), [search.test.mjs](search.test.mjs), and [VALIDATION.md](VALIDATION.md). This proof record is attributed to Charalampos Nadiotis. The mathematical ingredients include established facts; attribution of this document must not be taken as a claim to have discovered those facts or settled an open problem.
+
+
+## M10-M11 addendum (23 November 2026): why the Riemann-zeta bridge is not a P vs NP proof
+
+The quadratic Boolean encoding of CNF formula F is a parsimonious
+field-independent algebraic reduction: each satisfying Boolean assignment
+has exactly one zero of the polynomial system over every field, and no
+nonsatisfying assignment extends to a zero.
+
+Let S(F) be the number of satisfying assignments. For the corresponding
+integer algebraic scheme X_F, the finite-field point count satisfies
+\(\#X_F(\mathbb F_{p^r})=S(F)\) for every prime p and r>=1. The point-counting
+Euler product therefore gives, for Re(s)>1,
+
+\[
+\zeta_{X_F}(s)=\zeta(s)^{S(F)}.
+\]
+
+The result is exact and unconditional, and the meromorphic continuation
+has a pole of order S(F) at s=1 when S(F)>0. When F is UNSAT, the
+zeta function is identically 1. This is a standard algebraic
+re-encoding of #SAT, not an efficient calculation of S(F).
+Finding the exponent or deciding from the compact polynomial input
+whether the pole exists requires solving the same counting/decision
+problem. The Riemann Hypothesis constrains the *locations* of zeros
+of ordinary zeta, not an algorithm for discovering this exponent.
+
+Consequently neither a deterministic polynomial-time SAT algorithm nor
+a superpolynomial lower bound for **all** SAT algorithms follows.
+No proof that P=NP, P!=NP, RH or GRH is established.
+
+Details: [M10 proof](RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md),
+[M11 zeta identity](SAT_ZETA_RIEMANN_RESEARCH_2026_11_23.md),
+[bounded code and test](zeta_sat.py), and the
+[updated research manuscript](paper/structural-sat-milestones.tex).
+
+
+## M12 addendum (23 November 2026): exact counting for recognized affine formulas
+
+A separate restricted-class theorem extends M11: if a CNF consists
+of fully recognized complete XOR clause blocks of width at most
+three, it is equivalent to a linear system Ax=b over GF(2).
+Gaussian elimination computes its rank r in polynomial bit time,
+and the number of satisfying assignments is 0 if inconsistent,
+or 2^(n-r) if consistent, where n includes unconstrained variables.
+
+Thus the scheme's arithmetic zeta function is 1 in the inconsistent
+case, or zeta(s)^(2^(n-r)) in the consistent case. This is
+established affine constraint tractability (Schaefer 1978).
+The implementation returns an explicit "unrecognized" outcome
+for formulas outside this grammar, not a guessed #SAT count.
+
+**Unfulfilled general obligation remains unchanged:** neither a
+deterministic polynomial-time algorithm for arbitrary CNF-SAT
+nor a superpolynomial lower bound applying to *every* possible
+polynomial-time SAT algorithm has been provided.
+
+M12 mathematical and reproducibility record:
+[AFFINE_ZETA_M12_2026_11_23.md](AFFINE_ZETA_M12_2026_11_23.md).
+
+
+## M13 addendum (23 November 2026): tractable non-affine cutset family, not general SAT
+
+The M13 exact cutset counter sums the model counts for disjoint
+assignments of a *supplied*, logarithmically small variable separator.
+For each separator assignment, disjoint residual components multiply
+their counts; the algorithm uses M12 rank counting for fully
+recognized affine components and exhaustive counting only for
+residual components of logarithmic variable size.
+
+In the explicit-input convention this is polynomial time on
+instances satisfying the checked restrictions, even if the original
+formula is not affine. For example, the connected CNF family
+`F_k=AND_i(s OR a_i OR b_i OR c_i)` has exactly
+`8^k + 7^k` models under this method, and this count is not
+a power of two. The arithmetic zeta exponent is exactly that count.
+
+The implementation returns **unrecognized** for a cutset that is
+too large or for an unsupported residual component, and makes no
+SAT/UNSAT claim in those cases. The cutset is supplied, not
+discovered for arbitrary formulas.
+
+This does **not** prove P=NP or P!=NP. The unrestricted
+worst-case proof obligation remains unfulfilled. See the
+[M13 mathematical record](CUTSET_ZETA_M13_2026_11_23.md).
+
+## M15 addendum (24 November 2026): Bellman–Ford does not prove P versus NP
+
+Bellman–Ford decides feasibility of a difference-constraint graph in O(VE)
+time and returns a negative cycle when the constraints are inconsistent.
+For the restricted Boolean CNF class consisting of unit clauses and
+mixed-sign implication clauses `(-i,j)`, adding Boolean bounding edges
+makes each supported clause equivalent to an integer difference
+inequality. A negative-weight cycle then certifies UNSAT, and integer
+shortest-path distances produce a verified Boolean satisfying assignment.
+
+This restricted language is a **subset of 2-SAT**, which is already
+known to be solvable in linear time by the existing SCC implementation.
+General disjunctions `(i,j)` and `(-i,-j)`, as well as arbitrary
+3-SAT clauses, are not accepted by the Bellman–Ford encoding.
+An unsupported input is reported as `unrecognized`, not assigned a
+fabricated decision. Bellman–Ford also does **not** count solutions
+or compute the arithmetic-zeta exponent in the M11 identity.
+
+Thus there is still no general deterministic polynomial-time SAT
+algorithm or superpolynomial lower bound for all possible SAT
+algorithms. See [M15 theorem and proof](BELLMAN_FORD_M15_2026_11_24.md).

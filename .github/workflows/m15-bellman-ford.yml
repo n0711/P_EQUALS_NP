@@ -1,0 +1,31 @@
+name: M15 Bellman-Ford Boolean difference constraints
+
+on:
+  push:
+    paths:
+      - "bellman_ford_boolean_sat.py"
+      - "test_bellman_ford_boolean_sat.py"
+      - "sat.py"
+      - ".github/workflows/m15-bellman-ford.yml"
+  pull_request:
+    paths:
+      - "bellman_ford_boolean_sat.py"
+      - "test_bellman_ford_boolean_sat.py"
+      - "sat.py"
+      - ".github/workflows/m15-bellman-ford.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  bellman-ford-certificates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Independent exhaustive, 2-SAT and negative-cycle certificate tests
+        run: python -m unittest -v test_bellman_ford_boolean_sat.py
+      - name: Verify Python syntax
+        run: python -m compileall -q bellman_ford_boolean_sat.py test_bellman_ford_boolean_sat.py

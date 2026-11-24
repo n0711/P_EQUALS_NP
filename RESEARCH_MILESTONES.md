@@ -1,7 +1,7 @@
 # P_EQUALS_NP - Research milestone ledger
 
 **Researcher and manuscript author:** Charalampos Nadiotis (PELAOS Tech)
-**Last updated:** 2026-11-07
+**Last updated:** 2026-11-24
 **Scope:** Graph-theoretic and algebraic exact SAT research, with every result labeled by evidence class.
 **Status:** No proof of P = NP. This record is a research log, not a priority claim.
 
@@ -32,6 +32,12 @@ The prior graph-search manuscript is separate and remains in \`paper/graph-searc
 | M4 | 2026-11-07 | Exact primal-graph separator conditioning | Correct by exhaustive separator assignments plus independent component solving; exponential worst case | \`graph_separator_sat.py\`, \`test_graph_separator_sat.py\`; 9 local methods, 900 oracle cases, 210 renamings; 18 benchmark cases; GitHub Actions passed before this branch's later changes | Section: separator search |
 | M5 | 2026-11-07 | Affine recognizer + GF(2) / graph-adversary benchmark infrastructure | Exact equivalence for recognized complete XOR clause blocks, standard Gaussian elimination; connected odd-charge Tseitin contradiction | \`structural_hybrid_sat.py\`, \`graph_research_instances.py\`, \`test_structural_hybrid_sat.py\`, \`run_structural_benchmark.py\`; **CI on M5 head pending verification** | Section: algebraic shortcut, evaluation plan |
 | M6 | 2026-11-07 | Polarity signatures and identical-primal-graph SAT/UNSAT constructions | Exact pure/unit preprocessing and complete clause-pattern UNSAT certificate, with three K_n 3-CNF families of distinct SAT status | `polarity_sat.py`, `dense_cnf_families.py`, `test_polarity_sat.py`, `run_polarity_benchmark.py`; M6 CI verification initially pending | Section: polarity-aware graph counterexample |
+| M10 | 2026-11-23 | RH/GRH bridge: CNF to quadratic integer polynomial systems | Unconditional field-independent polynomial-sized reduction, GRH only for general HN upper bound | `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, dedicated CI; execution pending | M10: algebraic feasibility and number theory |
+| M11 | 2026-11-23 | Arithmetic zeta encoding of CNF-SAT | For every finite field extension, point count equals #SAT; global zeta = Riemann zeta to power #SAT; pole criterion is SAT-equivalent | `zeta_sat.py`, `test_zeta_sat.py`, isolated CI; execution pending | M11: exact zeta identity and computational barrier |
+| M12 | 2026-11-23 | Counting/zeta exponent for complete affine CNF blocks | Consistent GF(2) rank r gives #SAT=2^(n-r), inconsistent system #SAT=0; polynomial bit time on this restricted class | `affine_zeta_sat.py`, `test_affine_zeta_sat.py`; 19 combined unittest methods passed in M12 CI | M12: affine rank/count theorem |
+| M13 | 2026-11-23 | Cutset #SAT and zeta exponents for mixed non-affine/affine components | Provided |S|<=log N, large components affine-recognized, non-affine components <=log N: polynomial bit-time exact counting or explicit unrecognized | `cutset_zeta_sat.py`, `test_cutset_zeta_sat.py`; 29 combined unittests passed in M13 CI | M13: cutset product-sum theorem |
+| M14 | 2026-11-24 | Residual linear-form rank on mixed affine/CNF | #SAT=2^(d-q) times accepted q-coordinate assignments; derived by rank-nullity, search 2^q poly(N) | `RESIDUAL_RANK_M14_2026_11_24.md` mathematical derivation only, no implementation/tests | Not yet integrated |
+| M15 | 2026-11-24 | Bellman–Ford for Boolean difference constraints | Unit/implication CNF SAT iff no negative-weight cycle in O((n+1)(n+m)) graph time; integer potentials yield Boolean witness | `bellman_ford_boolean_sat.py`, tests, CI 45349787910 success; portfolio integration | M15: difference-constraints theorem |
 
 ## M5 hypothesis and mathematical scope
 
@@ -175,3 +181,84 @@ Local verification on x86_64, Python 3.12.14: 58 root unittest methods passed. R
 Starting from M8 commit `dc1f6c8196abeb55512393eddf1b9559a85af830`, the structural hybrid extracts equality and inequality edges, rejects inconsistent components before recursive search, and substitutes signed representatives into consistent residuals. The M9 manuscript section proves soundness, model lifting and a surviving lower bound for an equivalent all-ternary encoding.
 
 Reproduce with `python3 -m unittest discover -v`. On x86_64 with Python 3.12.14 all 61 root tests passed, including 250 seeded mixed-formula comparisons with exhaustive search, explicit original-model reconstruction and both odd-cycle encodings. The former M8 family is decided at the root even with max_calls=1. Uncapped recursive calls on the guarded family for k=1 through 5 were 15, 31, 63, 127 and 191. These are finite observations. The lower bound for all k follows from the manuscript. The next falsifiable step is deriving the missing binary clauses by resolving opposite guard literals, with the number and cost of derived clauses accounted for.
+
+## M10 addendum (23 November 2026): Riemann hypotheses and exact SAT
+
+**Question:** Can classical RH or GRH be used as a valid step in a proof of P=NP?
+
+**Proven result (standard construction, rederived):** CNF-SAT has a polynomial-size quadratic integer-polynomial feasibility encoding over every field under the conventional explicit-input measure. Auxiliary prefix products avoid an exponential expanded-clause representation. The equivalence needs neither RH nor GRH. See [the full statement, proof, caveats, and bibliography](RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md).
+
+**Known conditional theorem:** Koiran's 1996 GRH-conditional placement of general HN in RP^NP / the polynomial hierarchy does not show HN is in deterministic P and does not settle P versus NP. The distinction RH versus GRH is explicit.
+
+**Implementation:** `rh_grh_bridge.py`, `test_rh_grh_bridge.py`, and isolated GitHub Actions workflow `.github/workflows/rh-grh-bridge.yml`. **Current execution classification:** CI pending verification at branch creation. Do not claim test success without inspecting the run. The XeLaTeX working manuscript includes the theorem and citation; its build is also subject to verification.
+
+**Falsification gate:** brute-force over small prime fields must agree with independent Boolean truth-table SAT; Boolean lifts must satisfy the equations iff the original assignment satisfies the formula; long clauses must remain quadratic with linear-sized auxiliary encodings. Any failed check blocks merge. **Missing proof obligation:** a deterministic polynomial worst-case bit bound for unrestricted SAT (or a general P-vs-NP separation) remains unsolved.
+
+## M11 addendum (23 November 2026): arithmetic zeta counts and the P vs NP proof barrier
+
+**Question:** Can the ordinary Riemann zeta function or RH solve SAT when applied to the M10 quadratic encoding?
+
+**Established identity (standard consequence of point-counting):** Let S(F) be #SAT on all n original variables, and let X_F be the integer polynomial scheme from M10, including its unique auxiliary extensions. Every finite field extension F_(p^r) has exactly S(F) zeros. The local zeta factor equals (1-t)^(-S(F)); the global arithmetic zeta is zeta(s)^(S(F)) for Re(s)>1. The pole at 1 has order S(F), so detecting a pole decides SAT; extracting its order computes #SAT. See [the detailed theorem, proof, and computational limitations](SAT_ZETA_RIEMANN_RESEARCH_2026_11_23.md).
+
+**Implication:** This exact identity is a computational reparameterization, not a polynomial algorithm. RH constrains zeta zero locations, not the exponent S(F). No P=NP, P!=NP, RH or GRH result has been established here.
+
+**Implementation:** `zeta_sat.py` is bounded exhaustive counting, `test_zeta_sat.py` independently enumerates F2 and F4 field-valued zeros, and `.github/workflows/m11-zeta-sat.yml` runs the tests. The XeLaTeX paper contains a mathematical section. **Current execution status:** submitted for GitHub Actions verification, not presumed passing. The core finite tests cannot imply general worst-case complexity statements.
+
+**Next falsifiable gate:** compare every field-point count with the independent Boolean truth-table count, require zero non-Boolean roots in F4, verify the local coefficients are binomial(S+k-1,k), and inspect all new workflow and manuscript build results before merge.
+
+
+### M10-M11 verified CI evidence (2026-11-23)
+
+- [M10 algebraic SAT workflow run 45254719786](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254719786): **success** on implementation commit `36c27a6b254afd12185da43b1b864044ae64538f`.
+- [M11 SAT zeta workflow run 45254719731](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254719731): **success**, 10 combined unittest methods (five M10, five M11) including exhaustive small-field and F4 extension checks and seeded Boolean oracles.
+- [Existing SAT and graph search run 45254719775](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254719775): **success** at that same implementation commit.
+- [XeLaTeX manuscript run 45254437953](https://github.com/n0711/P_EQUALS_NP/actions/runs/45254437953): **success** on commit `9db9dc0f8d634a3caea7be7c78e22340570ba03c` containing the M11 manuscript section. A later final-head XeLaTeX run was not yet completed when this record was written.
+
+These are CI execution results, not peer review or proof of any open conjecture. The final-head check must be inspected before merge.
+
+## M12 addendum (23 November 2026): efficiently computable zeta exponent for affine SAT
+
+**Question.** Can the number-theoretic zeta exponent from M11 ever be computed in polynomial time from a compact CNF? **Yes, but only for a precisely specified tractable subclass**: CNFs whose complete signed clause blocks on supports of width 1-3 encode a system of XOR equations over GF(2).
+
+**Theorem.** If recognized and consistent, then the number of Boolean models, including unconstrained original variables, is `2^(n-r)`, where `r` is the GF(2) matrix rank. If recognized and inconsistent the count is zero. Therefore the M11 zeta exponent is computable in deterministic polynomial bit time for this restricted class. This is established affine tractability (Schaefer 1978), not a new P-vs-NP result. Complete derivation: [M12 proof and evidence](AFFINE_ZETA_M12_2026_11_23.md).
+
+**Implementation.** `affine_zeta_sat.py` reuses the existing conservative affine recognizer/linear elimination and computes the exact count and requested finite local-zeta coefficients. An input not recognized as an affine block *never* receives a fabricated SAT/UNSAT answer, even if a separate solver could decide it.
+
+**Verified evidence.** [GitHub Actions M12 run 45260360585](https://github.com/n0711/P_EQUALS_NP/actions/runs/45260360585) completed successfully on commit `1aaf0fdebcd24f56b057471e43b32df1d0f19efa`, with **19** unittest methods passed (9 M12 + 5 M11 + 5 M10). Observed CI logs include independent truth-table oracles, F2/F4 finite-extension point counts, seeded variable-renaming checks, a connected Tseitin graph-count family, 200-variable rank reduction, and a 1000-variable unconstrained count.
+
+**Manuscript.** A new XeLaTeX M12 section was added to `paper/structural-sat-milestones.tex`. Its latest build is a separate verification gate; do not claim it passed until the relevant commit's workflow is complete.
+
+**Falsification gate.** Cross-check the recognized output with independent small truth tables and signed relabeling, verify that inconsistent recognized systems give zero, ensure no unrecognized input is silently returned as UNSAT, and audit large input time/bit-size accounting.
+
+**Unresolved target.** No general deterministic polynomial-time SAT algorithm or general superpolynomial SAT lower bound is known here. Hence neither P=NP nor P!=NP has been proved.
+
+
+## M13 addendum (23 November 2026): polynomial counting beyond affine by logarithmic cutset conditioning
+
+**Mathematical identity:** For a supplied separator S and its Boolean assignments alpha, after conditioning obtain variable-disjoint residual components, and let u_alpha count free original variables. Exact #SAT is the sum across alpha of `2^u_alpha * product_i #component_i`. This is established connected-component model counting / cutset conditioning, not an original solution of P vs NP.
+
+**Proved restricted guarantee:** Under explicit-size proxy `N=max(2,n+m+L)`, accept supplied separator `|S|<=floor(log2 N)`. For each conditioned residual component, either compute its count via the established affine XOR rank method (any size), or enumerate at most `floor(log2 N)` non-affine variables. If a branch has unsupported non-affine components, return `unrecognized` instead of a count. Total bit complexity on accepted instances is `poly(N+d) 2^(|S|+floor(log2 N))`, polynomial in N+d, with d the requested explicit finite local-zeta degree. The algorithm **does not find a separator automatically**, and the class does not include arbitrary SAT.
+
+**Non-affine witness family:** `F_k=AND_i(s OR a_i OR b_i OR c_i)` with distinct private triples. Its global primal graph is connected, but conditioning s gives exact `#F_k=8^k+7^k` and arithmetic zeta `zeta_X(s)=zeta(s)^(8^k+7^k)`. Count is odd >1 and therefore cannot be a GF(2) affine solution-space count. A guarded XOR chain can coexist and be counted by rank.
+
+**Code:** `cutset_zeta_sat.py`, `test_cutset_zeta_sat.py`, `.github/workflows/m13-cutset-zeta.yml`, and manuscript section M13. Full statement and references: [M13 note](CUTSET_ZETA_M13_2026_11_23.md).
+
+**Verified finite execution:** [GitHub Actions run 45261663593](https://github.com/n0711/P_EQUALS_NP/actions/runs/45261663593) passed **29** unittest methods on head commit `148a2ce9936762c4ae7e919716096d1747c2db35` (10 M13, 9 M12, 5 M11, 5 M10); Python syntax verification passed. It includes independent random truth tables, 100 non-affine guarded petals, 120-variable guarded affine XOR chain and mixed component tests. Later manuscript/ledger commits require their own final-head CI before merging.
+
+**Falsification gate:** Never return a numeric count on an input failing the separator bound or a non-affine residual component bound. Check zero-variable, tautological, contradictory and free-variable edge cases against independent exhaustive truth tables. Validate exact bit-cost and representation assumptions separately from measured runtime.
+
+**Open proof obligation:** Finding and exploiting a suitable small structural decomposition for every arbitrary CNF in provably polynomial worst-case bit complexity remains unsolved; nor has a superpolynomial bound for every SAT solver been established. No proof of P=NP or P!=NP is claimed.
+
+## M15 addendum (24 November 2026): Bellman–Ford difference-constraint SAT proof and implementation
+
+**Question and prior art.** Apply Bellman–Ford's standard difference-constraint feasibility theorem to an explicitly specified Boolean CNF class. This is an alternative to (and less general than) the already implemented linear-time SCC 2-SAT algorithm. No novelty in general SAT complexity is claimed.
+
+**Theorem.** After discarding tautologies and duplicate literals, permit only empty clauses, units, and mixed-sign binary implications `(-i,j)`. Introduce integer potentials `d0,...,dn` and bounding edges `(0,i,1)`, `(i,0,0)` encoding `0<=d_i-d0<=1`. An implication `(-i,j)` gives `(j,i,0)`, positive unit `(i,)` gives `(i,0,-1)`, negative unit `(-i,)` gives `(0,i,0)`, and empty clause gives `(0,0,-1)`. The formula is satisfiable iff the graph has no negative-weight cycle. Integer Bellman–Ford distances give Boolean values `d_i-d0`; a negative directed cycle gives a short UNSAT certificate. Runtime `O((n+1)(2n+m))` relaxations with polynomial bit length on explicitly represented inputs.
+
+**Scope.** Unsupported clauses (including `(i,j)`, `(-i,-j)` and non-tautological clauses of width >=3) cause an `unrecognized` outcome. The exact SAT portfolio safely falls back to established methods when Bellman–Ford does not apply. Bellman–Ford computes existence of a model, **not** #SAT, so it does not evaluate the M11 zeta exponent.
+
+**Implementation.** `bellman_ford_boolean_sat.py`, `test_bellman_ford_boolean_sat.py`, `.github/workflows/m15-bellman-ford.yml`, integration in `structural_hybrid_sat.py`, and XeLaTeX theorem. Detailed proof: [M15 Bellman–Ford record](BELLMAN_FORD_M15_2026_11_24.md).
+
+**Observed evidence.** [M15 dedicated CI run 45349787910](https://github.com/n0711/P_EQUALS_NP/actions/runs/45349787910) passed the Bellman–Ford test suite after portfolio integration and added a separate portfolio-routing regression. The earlier [run 45349679396](https://github.com/n0711/P_EQUALS_NP/actions/runs/45349679396) passed 11 methods before integration. The latest commit's XeLaTeX and independent tests must be rechecked before merge. Neither finite tests nor the restricted theorem settles P versus NP.
+
+**Falsification gates.** Compare with exhaustive truth tables and the independent 2-SAT SCC solver on supported inputs; validate explicit negative-cycle continuity and negative weight; check n=0 and empty clauses; verify unsupported inputs never receive a SAT/UNSAT decision from Bellman–Ford; preserve portfolio correctness on rejected formulas.

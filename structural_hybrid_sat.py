@@ -6,6 +6,7 @@ from itertools import combinations
 from time import perf_counter
 
 from sat import _validate, verify
+from bellman_ford_boolean_sat import bellman_ford_boolean_sat
 
 
 def try_affine_sat(n, clauses):
@@ -157,6 +158,18 @@ def structural_hybrid_sat(n, clauses, *, max_calls=None,
     if recognized:
         return model, {"status": "completed", "method": "affine_gf2",
                        "affine": affine_metrics}
+    # M15: alternative polynomial-time decision on implication-and-unit
+    # clauses. Negative cycles certify UNSAT; unsupported formulas
+    # continue through the existing exact portfolio (no guessed result).
+    bellman = bellman_ford_boolean_sat(n, clauses)
+    if bellman["status"] != "unrecognized":
+        return bellman["model"], {
+            "status": "completed",
+            "method": "bellman_ford_difference",
+            "affine": affine_metrics,
+            "bellman_ford": bellman["metrics"],
+            "negative_cycle": bellman["negative_cycle"],
+        }
     original = clauses
     representatives = _binary_parity(original)
     if representatives is None:

@@ -141,3 +141,64 @@ python run_polarity_benchmark.py --quick --timeout-seconds 3 --max-calls 1800 > 
 ```
 
 A GitHub Actions workflow runs M6 alongside the earlier SAT regression suites and archives the benchmark JSON. See the milestone ledger for the verified run ID, not merely the existence of a test file.
+
+
+## M10-M11: Riemann zeta and exact algebraic SAT correspondence (23 November 2026)
+
+**This is not a proof that P = NP or P != NP.** The [M10 research note](RIEMANN_HYPOTHESIS_RESEARCH_2026_11_23.md) proves an unconditional polynomial-size encoding of arbitrary explicitly written CNF formulas as degree-two integer polynomial systems. Every satisfying original Boolean assignment extends uniquely to a polynomial root over *any* field. The [M11 note](SAT_ZETA_RIEMANN_RESEARCH_2026_11_23.md) derives the exact arithmetic zeta identity `zeta_X(s)=zeta(s)^(#SAT(F))` for `Re(s)>1`. The pole order at 1 is exactly #SAT. Thus the reformulation does not bypass the unsolved counting/decision problem, and neither RH nor GRH yields a polynomial-time SAT algorithm here.
+
+Reproduce the bounded independent Boolean and finite-field tests:
+
+```sh
+python -m unittest -v test_rh_grh_bridge.py test_zeta_sat.py
+```
+
+[Source](rh_grh_bridge.py) | [Zeta model-count demonstration](zeta_sat.py) | [Proof-status boundary](PROOF_STATUS.md) | [XeLaTeX manuscript](paper/structural-sat-milestones.tex).
+
+## M12: Exact polynomial-time counting and zeta exponent on recognized affine CNF
+
+[M12's theorem and verification record](AFFINE_ZETA_M12_2026_11_23.md) extend the M10/M11 algebraic identity into a **tractable, explicitly limited** case. For complete XOR-clause blocks of width 1-3 recognized by the existing affine solver, GF(2) elimination gives model count `0` if inconsistent or `2^(n-r)` for `n` original variables and matrix rank `r`. This is an established property of affine satisfiability, not an unrestricted polynomial-time SAT algorithm. Inputs outside the recognized grammar return `unrecognized` with a null count.
+
+```sh
+python -m unittest -v test_affine_zeta_sat.py test_zeta_sat.py test_rh_grh_bridge.py
+```
+
+The [M12 verifier](.github/workflows/m12-affine-zeta.yml) runs independent counting oracles, even/odd Tseitin parity checks, signed-renaming cases and large polynomial-class regression instances. Source: [affine_zeta_sat.py](affine_zeta_sat.py). The general P-vs-NP proof obligations remain unresolved in [PROOF_STATUS.md](PROOF_STATUS.md).
+
+
+## M13: Exact #SAT on selected non-affine formulas via logarithmic cutsets
+
+The [M13 note](CUTSET_ZETA_M13_2026_11_23.md) proves the standard
+cutset sum/product identity for model counts. The new
+[cutset_zeta_sat.py](cutset_zeta_sat.py) accepts a **caller-supplied**
+separator bounded by `floor(log2(max(2,n+m+L)))` and counts each
+conditioned residual using M12 affine rank counting or enumeration
+of at most that many non-affine variables. Unrecognized instances
+return an explicit null count. This is polynomial only on the
+checked restricted class, not on unrestricted CNF-SAT.
+
+A connected non-affine family of k guarded three-variable clauses
+has exactly `8**k+7**k` satisfying assignments; the M10/M11
+arithmetic zeta is `zeta(s)**(8**k+7**k)`. Tests include 100
+independent guarded clauses and mixed large affine components.
+
+```sh
+python -m unittest -v test_cutset_zeta_sat.py test_affine_zeta_sat.py test_zeta_sat.py test_rh_grh_bridge.py
+```
+
+The [M13 GitHub Actions workflow](.github/workflows/m13-cutset-zeta.yml)
+runs 29 independent regression methods, including exhaustive small-CNF
+oracles. The [proof status](PROOF_STATUS.md) continues to report that
+neither P=NP nor P!=NP has been established.
+
+## M15: Bellman–Ford for implication/Boolean difference constraints
+
+M15 adds a **restricted** exact SAT decision routine based on the Bellman–Ford negative-cycle theorem. A clause `(-i,j)` represents the implication `x_i -> x_j`, equivalently the difference inequality `x_i - x_j <= 0`. Unit constraints and Boolean bounds can be encoded as weighted edges. In this grammar, a negative-weight cycle certifies UNSAT; otherwise integer distances reconstruct a verified Boolean model.
+
+The dedicated source is [bellman_ford_boolean_sat.py](bellman_ford_boolean_sat.py), with [M15 formal proof](BELLMAN_FORD_M15_2026_11_24.md), [11+ regression methods](test_bellman_ford_boolean_sat.py) and [dedicated CI workflow](.github/workflows/m15-bellman-ford.yml). The exact `structural_hybrid_sat.py` portfolio uses this check after affine recognition and falls back when Bellman–Ford reports `unrecognized`.
+
+```bash
+python -m unittest -v test_bellman_ford_boolean_sat.py test_structural_hybrid_sat.py
+```
+
+This implication/unit grammar is **strictly narrower** than general 2-SAT, which the existing `sat.py` already solves in linear time. Bellman–Ford here provides independently checkable negative-cycle certificates, **not** an improved general SAT complexity bound or a model-counting algorithm. Consequently it does not compute the M11 arithmetic-zeta exponent on arbitrary CNF and is not a proof of `P=NP` or `P!=NP`.
