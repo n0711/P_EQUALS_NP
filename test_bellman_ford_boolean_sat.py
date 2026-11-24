@@ -10,6 +10,7 @@ import unittest
 
 from bellman_ford_boolean_sat import bellman_ford_boolean_sat
 from sat import two_sat, verify
+from structural_hybrid_sat import structural_hybrid_sat
 
 
 def exhaustive_model(n, clauses):
@@ -145,6 +146,27 @@ class BellmanFordBooleanSATTests(unittest.TestCase):
         self.assertTrue(result["model"][0])
         self.assertTrue(result["model"][1])
         self.assertFalse(result["model"][4])
+
+    def test_portfolio_uses_bellman_ford_after_affine_rejection(self):
+        sat_formula = [(1,), (-1, 2), (-2, 3)]
+        model, metrics = structural_hybrid_sat(3, sat_formula)
+        self.assertEqual(metrics["status"], "completed")
+        self.assertEqual(metrics["method"], "bellman_ford_difference")
+        self.assertTrue(verify(3, sat_formula, model))
+        self.assertIsNone(metrics["negative_cycle"])
+
+        unsat_formula = sat_formula + [(-3,)]
+        model, metrics = structural_hybrid_sat(3, unsat_formula)
+        self.assertEqual(metrics["status"], "completed")
+        self.assertEqual(metrics["method"], "bellman_ford_difference")
+        self.assertIsNone(model)
+        assert_negative_cycle(self, metrics["negative_cycle"], 4)
+
+        # Unsupported positive disjunction remains with the exact fallback.
+        model, metrics = structural_hybrid_sat(3, [(1, 2, 3)])
+        self.assertEqual(metrics["status"], "completed")
+        self.assertNotEqual(metrics["method"], "bellman_ford_difference")
+        self.assertTrue(verify(3, [(1, 2, 3)], model))
 
     def test_exact_input_validation(self):
         for n, clauses in ((-1, []), (True, []), (1.5, []),
