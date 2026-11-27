@@ -1,0 +1,35 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\newtheorem{proposition}{Proposition}
+\title{Graph State Sums and Sudoku: An Arithmetic Projection Milestone}
+\author{P\_EQUALS\_NP research project}
+\date{27 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We construct a bounded-degree graph state-sum representation of weighted list-coloring, including generalized Sudoku. The construction is exact over every field and polynomial in explicit graph size and palette size. It supplies no general circuit lower bound or proof of P versus NP.
+\end{abstract}
+Let \(G=(V,E)\) be a simple graph, with \(n\) vertices, \(m\) edges and \(q\) colors. For clue-consistent proper colorings \(c\), define
+\[
+ C_G(X)=\sum_c\prod_{v\in V}X_{v,c(v)}.
+\]
+The generic state sum of a network \(H\), as studied in \cite{openai}, is
+\[
+ Z_{H,q}(T)=\sum_{a\in[q]^{E(H)}}\prod_{v\in V(H)}T_{v,a|_{E(v)}}.
+\]
+\begin{proposition}
+There is a maximum-degree-three network \(H\), with \(O(n+m)\) vertices and edges, such that \(C_G\) is a projection of \(Z_{H,q}\) over any field.
+\end{proposition}
+\begin{proof}
+Replace each vertex by a chain of equality nodes, one for each incidence, and each edge by an inequality node joined to its two incidence nodes. An isolated vertex receives a unary equality node linked to a free unary node. On each equality node the table is zero unless its incident labels agree. At one marked node per original vertex the surviving entry is \(X_{v,c(v)}\), unless the clue fails. At every other equality node the surviving entry is one. At each inequality node its two labels must differ; a free node has all entries one. Thus compatible edge labelings correspond bijectively to proper clue-consistent colorings, with the same monomial.
+\end{proof}
+For \(i\) isolated vertices the network has \(3m+2i\) vertices and \(4m-n+2i\) edges. The number of independent table entries is \(O((n+m)q^3)\). For Sudoku with \(q=b^2\) symbols and \(b\times b\) blocks, the cell graph has \(q^2\) vertices and degree \(3q-2b-1\), hence the table bound is \(O(q^6)\).
+\paragraph{Validation.} The reference implementation compares 48 small graph instances with an independent coloring enumeration and four \(4\times4\) Sudoku cases against a row-permutation oracle. Observed counts: 288, 72, 0 and 24 respectively, with clue details recorded in the repository test. These are finite checks, not asymptotic evidence.
+\paragraph{Lower-bound direction.} Substitution implies that the specialized polynomial is no harder than the generic state sum, not the reverse. Consequently the reported generic arithmetic lower bounds \cite{openai,anthropic} cannot be transferred to Sudoku by this projection alone. A counting polynomial is also distinct from a uniform Boolean decision algorithm. No classical complexity separation follows. The complete external proofs and Lean formalizations have not been independently verified here.
+\begin{thebibliography}{9}
+\bibitem{openai} OpenAI. \emph{Paths, trees and grids separate Valiant's hierarchy}. Preprint, November 24, 2026. \url{https://github.com/openai/math}
+\bibitem{anthropic} Anthropic. \emph{VP not equal to VNP over every field}. Research artifact, November 2026. \url{https://github.com/anthropics/formal-math/tree/main/vp-vnp}
+\end{thebibliography}
+\end{document}
