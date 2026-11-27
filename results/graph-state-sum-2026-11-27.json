@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-27",
+  "execution": "V8 JavaScript; same audit body as Node test; full repository CI not run",
+  "smallGraphCases": 48,
+  "sudokuCounts": [
+    "288",
+    "72",
+    "0",
+    "24"
+  ],
+  "weightedEdge": "29",
+  "sudoku4": {
+    "vertices": 168,
+    "edges": 208
+  },
+  "sudoku9": {
+    "vertices": 2430,
+    "edges": 3159
+  }
+}
